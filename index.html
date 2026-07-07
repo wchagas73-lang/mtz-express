@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTZ Express | Entregas Rápidas & Seguras</title>
-
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0;}
         body {
@@ -23,41 +22,34 @@
             border: 1px solid rgba(0,180,140,0.15);
         }
         .logo img {max-width: 280px; width: 100%; border-radius: 16px; margin-bottom: 10px;}
-        .slogan {font-size: 15px; color: #B2DFD0; margin-bottom: 15px; line-height: 1.4;}
+        .slogan {font-size: 15px; color: #E0F8F0; margin-bottom: 15px; line-height: 1.4;}
         .aviso-cidade {
-            background: rgba(0,180,140,0.1); color: #A0F0D0;
+            background: rgba(0,180,140,0.1); color: #E0F8F0;
             padding: 12px; border-radius: 12px; border-left: 4px solid #00C896;
             font-weight: 600; font-size: 14px; margin: 12px 0;
         }
         .contato-principal {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
-            padding: 14px; border-radius: 16px; border-left: 4px solid;
-            border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
-            margin-bottom: 20px;
+            padding: 14px; border-radius: 16px; border-left: 4px solid #00C896;
+            margin-bottom: 20px; color: #E0F8F0;
         }
-        .contato-principal p {font-size: 17px; color: #C0F0E0; font-weight: 700;}
+        .contato-principal p {font-size: 17px; font-weight: 700;}
         .diferenciais {display: grid; gap: 10px; margin-bottom: 25px;}
         .diferencial {
             background: linear-gradient(90deg, rgba(0,180,140,0.1), rgba(0,160,180,0.08));
             padding: 12px; border-radius: 14px; text-align: left;
-            border-left: 4px solid; border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
+            border-left: 4px solid #00C896; color: #E0F8F0;
         }
-        .diferencial strong {
-            background: linear-gradient(90deg, #00E0A8, #00C8E0);
-            -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 15px;
-        }
-        .diferencial p {font-size: 13px; color: #A0D8CC; margin-top: 3px;}
+        .diferencial strong {font-size: 15px;}
         label {display: block; text-align: left; color: #E0F8F0; font-weight: 700; margin: 16px 0 6px; font-size: 15px;}
         label.obrigatorio::after {content: " *"; color: #FF6B75;}
-        input, select, textarea {
-            width: 100%; padding: 14px 16px; border: 2px solid rgba(0,180,150,0.2);
+        input, select {
+            width: 100%; padding: 14px 16px; border: 2px solid rgba(0,180,140,0.2);
             border-radius: 12px; font-size: 16px; background: rgba(15,43,51,0.6); 
-            color: #E0F8F0; /* Texto claro e legível */
-            transition: border 0.2s;
+            color: #E0F8F0;
         }
-        input:focus {border-color: #00C896; background: rgba(15,43,51,0.85); outline: none;}
+        input:focus {border-color: #00C896; outline: none;}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
-        .linha-tripla {display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;}
         .bloco-endereco {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
             padding: 16px; border-radius: 18px; border-left: 5px solid #00C896;
@@ -68,35 +60,31 @@
             display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap;
             background: rgba(0,180,140,0.08); padding: 16px; border-radius: 16px; border-left: 3px solid #00C896;
         }
-        .destino-item .campo-grupo {width: calc(100% - 80px);}
+        .campo-grupo {width: calc(100% - 80px);}
         .btn-mais {
             width: 100%; padding: 14px; border: 2px dashed #00C896;
             background: rgba(0,200,150,0.1); color: #00E0A8; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer; margin: 8px 0 16px; transition: all 0.2s;
+            font-size: 15px; font-weight: 600; cursor: pointer; margin: 8px 0 16px;
         }
-        .btn-mais:hover {background: rgba(0,200,150,0.2);}
         .btn-remover {
             background: #dc3545; color: white; border: none; border-radius: 8px; width: 36px; height: 36px;
-            font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0; transition: background 0.2s;
+            font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
         }
-        .btn-remover:hover {background: #b02a37;}
         .info-distancia {
-            font-size: 16px; color: #A0D8CC; font-weight: 600; margin: 12px 0; padding: 12px;
-            background: rgba(0,180,140,0.08); border-radius: 12px; line-height: 1.6;
+            font-size: 16px; color: #E0F8F0; font-weight: 600; margin: 12px 0; padding: 12px;
+            background: rgba(0,180,140,0.08); border-radius: 12px;
         }
         .botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;}
         .btn-calcular {
             background: linear-gradient(90deg, #00A86B, #008F60);
             color: #fff; border: none; padding: 16px; border-radius: 14px;
-            font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            font-size: 17px; font-weight: 700; cursor: pointer;
         }
-        .btn-calcular:hover {background: linear-gradient(90deg, #00965e, #007a52);}
         .btn-limpar {
             background: linear-gradient(90deg, #dc3545, #b02a37);
             color: #fff; border: none; padding: 16px; border-radius: 14px;
-            font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            font-size: 17px; font-weight: 700; cursor: pointer;
         }
-        .btn-limpar:hover {background: linear-gradient(90deg, #c82333, #9e2330);}
         .caixa-valor {
             background: linear-gradient(135deg, rgba(0,168,107,0.15), rgba(0,143,96,0.1));
             padding: 25px 20px; border-radius: 20px; margin-top: 22px; border-left: 5px solid #00C896;
@@ -123,41 +111,36 @@
         .btn-enviar {
             margin-top: 25px; width: 100%; background: linear-gradient(90deg, #25D366, #128C7E);
             color: #fff; border: none; padding: 18px; border-radius: 16px;
-            font-size: 19px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+            font-size: 19px; font-weight: 800; cursor: pointer;
         }
-        .btn-enviar:hover {background: linear-gradient(90deg, #1fb859, #0f736b);}
-        .btn-enviar:disabled {opacity: 0.6; cursor: not-allowed; background: #444;}
+        .btn-enviar:disabled {opacity: 0.6; cursor: not-allowed;}
+        .carregando {color: #FFD700; font-weight: 600;}
+        .aviso-extra {font-size: 13px; color: #E0F8F0; margin-top: 10px; text-align: center;}
         .whatsapp-fixo {
             position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
             background: linear-gradient(135deg, #25D366, #128C7E); border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 32px;
-            z-index: 999; text-decoration: none; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999; text-decoration: none; color: white;
         }
-        .carregando {color: #FFD700; font-weight: 600;}
-        .aviso-extra {font-size: 13px; color: #B2DFD0; margin-top: 10px; text-align: center;}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <div class="cabecalho">
-                <div class="logo">
-                    <img src="https://i.ibb.co/bgh9qcpR/1783405332697.jpg" alt="MTZ Express">
-                </div>
-                <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
+            <div class="logo"><img src="https://i.ibb.co/bgh9qcpR/1783405332697.jpg" alt="MTZ Express"></div>
+            <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
 
-                <div class="aviso-cidade">
-                    🗺️ <strong>CÁLCULO COM ROTAS REAIS DO GOOGLE MAPS</strong> — 100% exato
-                </div>
+            <div class="aviso-cidade">
+                🗺️ <strong>CÁLCULO COM ROTAS REAIS DO GOOGLE MAPS — 100% EXATO</strong>
+            </div>
 
-                <div class="contato-principal">
-                    📞 WhatsApp: <strong>(32) 9 9995-3215</strong>
-                </div>
+            <div class="contato-principal">
+                📞 WhatsApp: <strong>(32) 9 9995-3215</strong>
             </div>
 
             <div class="diferenciais">
                 <div class="diferencial">✅ <strong>SEM ERROS</strong> — Dados separados e completos</div>
-                <div class="diferencial">📍 <strong>SÓ JUIZ DE FORA-MG</strong> — CEP e endereço certos</div>
+                <div class="diferencial">📍 <strong>SÓ JUIZ DE FORA-MG</strong> — Endereços certos</div>
                 <div class="diferencial">🗺️ <strong>ROTA REAL</strong> — Mesmo valor do Google Maps</div>
                 <div class="diferencial">💸 <strong>VALOR JUSTO</strong> — Sem surpresas</div>
             </div>
@@ -166,56 +149,34 @@
                 <label for="nomeLoja" class="obrigatorio">🏪 Nome da Loja / Empresa</label>
                 <input type="text" id="nomeLoja" placeholder="Ex: Loja de Roupas Silva" required>
 
-                <!-- 📍 ENDEREÇO DE RETIRADA — CAMPOS SEPARADOS -->
                 <div class="bloco-endereco">
                     <h4>📍 Endereço de Retirada</h4>
-                    
                     <label class="obrigatorio">Rua / Avenida</label>
                     <input type="text" id="ruaRetirada" placeholder="Ex: Rua das Flores" required>
-                    
                     <div class="linha-dupla">
-                        <div>
-                            <label class="obrigatorio">Número</label>
-                            <input type="text" id="numRetirada" placeholder="Ex: 123" required>
-                        </div>
-                        <div>
-                            <label class="obrigatorio">CEP</label>
-                            <input type="text" id="cepRetirada" placeholder="Ex: 36000-000" required>
-                        </div>
+                        <div><label class="obrigatorio">Número</label><input type="text" id="numRetirada" placeholder="Ex: 123" required></div>
+                        <div><label class="obrigatorio">CEP</label><input type="text" id="cepRetirada" placeholder="Ex: 36000-000" required></div>
                     </div>
-                    
                     <label class="obrigatorio">Bairro</label>
                     <input type="text" id="bairroRetirada" placeholder="Ex: Centro" required>
-                    
                     <label>📌 Ponto de Referência</label>
                     <input type="text" id="refRetirada" placeholder="Ex: Próximo ao supermercado">
                 </div>
 
-                <!-- 📍 ENDEREÇO DE DESTINO — CAMPOS SEPARADOS -->
                 <label class="obrigatorio">📍 Endereço de Destino</label>
                 <div id="listaDestinos">
                     <div class="destino-item">
                         <div class="campo-grupo">
                             <label class="obrigatorio">Rua / Avenida</label>
                             <input type="text" class="rua-destino" placeholder="Ex: Avenida Brasil" required>
-                            
                             <div class="linha-dupla">
-                                <div>
-                                    <label class="obrigatorio">Número</label>
-                                    <input type="text" class="num-destino" placeholder="Ex: 456" required>
-                                </div>
-                                <div>
-                                    <label class="obrigatorio">CEP</label>
-                                    <input type="text" class="cep-destino" placeholder="Ex: 36010-100" required>
-                                </div>
+                                <div><label class="obrigatorio">Número</label><input type="text" class="num-destino" placeholder="Ex: 456" required></div>
+                                <div><label class="obrigatorio">CEP</label><input type="text" class="cep-destino" placeholder="Ex: 36010-100" required></div>
                             </div>
-                            
                             <label class="obrigatorio">Bairro</label>
                             <input type="text" class="bairro-destino" placeholder="Ex: São Mateus" required>
-                            
                             <label class="obrigatorio">👤 Nome do Cliente</label>
                             <input type="text" class="nome-cliente" placeholder="Nome completo" required>
-                            
                             <label class="obrigatorio">📱 Telefone do Cliente</label>
                             <input type="tel" class="telefone-cliente" placeholder="(32) 9XXXX-XXXX" maxlength="15" required>
                         </div>
@@ -243,14 +204,13 @@
                     <option value="cliente">💵 Pago na entrega</option>
                 </select>
 
-                <!-- 🛑 BOTÕES: CALCULAR E REFAZER TUDO -->
                 <div class="botoes">
                     <button type="button" class="btn-calcular" id="btnCalcular">🗺️ CALCULAR ROTA</button>
                     <button type="button" class="btn-limpar" id="btnLimpar">🔄 REFAZER TUDO</button>
                 </div>
 
                 <div class="caixa-valor" id="caixaValor">
-                    <p style="color:#A0D8CC; font-size:16px;">Valor Total da Entrega</p>
+                    <p style="color:#E0F8F0; font-size:16px;">Valor Total da Entrega</p>
                     <div class="valor-final" id="valorTotal">R$ 0,00</div>
                 </div>
 
@@ -293,14 +253,11 @@
 
     <a href="https://wa.me/5532999953215" target="_blank" class="whatsapp-fixo">💬</a>
 
-    <!-- 🗺️ CHAVE DO GOOGLE MAPS JÁ INSERIDA E PRONTA! -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOH1KGAdRtv5y6Q3t2XEt65UmZK3a7tOM&libraries=places"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOH1KGAdRtv5y6Q3t2XEt65UmZK3a7tOM&libraries=places&timeout=10000"></script>
 
     <script>
         let distanciaTotal = 0;
-        let directionsService;
 
-        // 📏 Tabela de preços
         function getValorPorDistancia(km) {
             if (km <= 1) return 8.00;
             if (km <= 2) return 9.00;
@@ -325,14 +282,12 @@
             return null;
         }
 
-        // ➕ Adicionar novo destino
         function adicionarDestino() {
             const modelo = document.querySelector('.destino-item').cloneNode(true);
             modelo.querySelectorAll('input').forEach(i => i.value = '');
             document.getElementById('listaDestinos').appendChild(modelo);
         }
 
-        // ❌ Remover destino
         function removerDestino(botao) {
             if (document.querySelectorAll('.destino-item').length > 1) {
                 botao.closest('.destino-item').remove();
@@ -341,12 +296,10 @@
             }
         }
 
-        // 🔄 Montar endereço completo para o Google Maps
         function montarEndereco(rua, numero, bairro, cep) {
-            return `${rua}, ${numero} - ${bairro}, Juiz de Fora - MG, ${cep}, Brasil`;
+            return `${rua.trim()}, ${numero.trim()} - ${bairro.trim()}, Juiz de Fora - MG, ${cep.trim()}`;
         }
 
-        // 🗺️ Calcular rota real no Google Maps
         async function calcularRotaGoogle() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const ruaR = document.getElementById('ruaRetirada').value.trim();
@@ -356,20 +309,19 @@
             const retorno = document.getElementById('retorno').value;
             const pagamento = document.getElementById('formaPagamento').value;
 
-            // ✅ Verificação de preenchimento
             if (!nomeLoja || !ruaR || !numR || !bairroR || !cepR || !retorno || !pagamento) {
-                alert('⚠️ Preencha TODOS os campos obrigatórios (*) da retirada!');
+                alert('⚠️ Preencha TODOS os campos obrigatórios!');
                 return;
             }
 
-            document.getElementById('infoDistancia').innerHTML = '<span class="carregando">🗺️ Calculando rota real no Google Maps...</span>';
+            document.getElementById('infoDistancia').innerHTML = '<span class="carregando">🗺️ Calculando rota real...</span>';
             document.getElementById('btnCalcular').disabled = true;
+            distanciaTotal = 0;
 
             const enderecoOrigem = montarEndereco(ruaR, numR, bairroR, cepR);
             const destinos = document.querySelectorAll('.destino-item');
             let pontos = [enderecoOrigem];
 
-            // Verificar e montar endereços de destino
             for (const dest of destinos) {
                 const ruaD = dest.querySelector('.rua-destino').value.trim();
                 const numD = dest.querySelector('.num-destino').value.trim();
@@ -379,41 +331,37 @@
                 const telCli = dest.querySelector('.telefone-cliente').value.trim();
 
                 if (!ruaD || !numD || !bairroD || !cepD || !nomeCli || !telCli) {
-                    alert('⚠️ Preencha TODOS os campos do destino!');
+                    alert('⚠️ Preencha TODOS os dados do destino!');
                     document.getElementById('btnCalcular').disabled = false;
                     return;
                 }
                 pontos.push(montarEndereco(ruaD, numD, bairroD, cepD));
             }
 
-            // Se voltar para a loja, adiciona a origem novamente
             if (retorno === 'sim') pontos.push(enderecoOrigem);
 
-            distanciaTotal = 0;
-            directionsService = new google.maps.DirectionsService();
+            const directionsService = new google.maps.DirectionsService();
 
             try {
-                // Calcular cada trecho da rota
                 for (let i = 0; i < pontos.length - 1; i++) {
                     const rota = await directionsService.route({
                         origin: pontos[i],
                         destination: pontos[i+1],
-                        travelMode: google.maps.TravelMode.DRIVING,
+                        travelMode: 'DRIVING',
                         region: 'br',
-                        language: 'pt-BR'
+                        language: 'pt-BR',
+                        avoidFerries: true
                     });
 
                     if (rota.status !== 'OK') throw new Error('Endereço não encontrado');
-                    const km = rota.routes[0].legs[0].distance.value / 1000;
-                    distanciaTotal += km;
+                    distanciaTotal += rota.routes[0].legs[0].distance.value / 1000;
                 }
 
                 distanciaTotal = Math.round(distanciaTotal * 100) / 100;
-
-                // Calcular valor
                 let valorBase = getValorPorDistancia(distanciaTotal);
+
                 if (valorBase === null) {
-                    alert(`📏 Distância total: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km! Entre em contato para valor especial.`);
+                    alert(`📏 Distância: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km — combine valor`);
                     document.getElementById('infoDistancia').innerHTML = `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
                     return;
                 }
@@ -421,25 +369,23 @@
                 const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
                 const valorFinal = valorBase + adicional;
 
-                // Mostrar resultado
                 document.getElementById('infoDistancia').innerHTML =
-                    `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong><small style="display:block; font-size:12px; opacity:0.8">✅ Rota exata do Google Maps</small>`;
+                    `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong><br>✅ Rota exata do Google Maps`;
                 document.getElementById('valorTotal').textContent = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 document.getElementById('caixaValor').style.display = 'block';
                 document.getElementById('btnEnviar').disabled = false;
 
-                alert(`✅ Cálculo feito!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
+                alert(`✅ Cálculo feito com sucesso!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
 
             } catch (erro) {
-                alert(`❌ Erro ao buscar endereço!\nVerifique se todos os dados são de Juiz de Fora-MG e estão corretos.\nMotivo: ${erro.message}`);
-                document.getElementById('infoDistancia').innerHTML = '⚠️ Endereço não encontrado! Verifique os dados.';
+                alert(`❌ Erro: ${erro.message}\nVerifique se os endereços são de Juiz de Fora e estão corretos.`);
+                document.getElementById('infoDistancia').innerHTML = '⚠️ Verifique os endereços!';
                 document.getElementById('caixaValor').style.display = 'none';
             } finally {
                 document.getElementById('btnCalcular').disabled = false;
             }
         }
 
-        // 📤 Enviar pedido no WhatsApp
         document.getElementById('btnEnviar').onclick = function() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const ruaR = document.getElementById('ruaRetirada').value.trim();
@@ -448,7 +394,7 @@
             const cepR = document.getElementById('cepRetirada').value.trim();
             const refR = document.getElementById('refRetirada').value.trim();
             const retorno = document.getElementById('retorno').value === 'sim' ? 'Sim' : 'Não';
-            const pagamento = document.getElementById('formaPagamento').options[document.getElementById('formaPagamento').selectedIndex].text;
+            const pagamento = document.getElementById('formaPagamento').selectedOptions[0].text;
             const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
             const valorTotal = document.getElementById('valorTotal').textContent;
 
@@ -458,32 +404,25 @@
 
             const destinos = document.querySelectorAll('.destino-item');
             destinos.forEach((dest, i) => {
-                const ruaD = dest.querySelector('.rua-destino').value.trim();
-                const numD = dest.querySelector('.num-destino').value.trim();
-                const bairroD = dest.querySelector('.bairro-destino').value.trim();
-                const cepD = dest.querySelector('.cep-destino').value.trim();
-                const nomeCli = dest.querySelector('.nome-cliente').value.trim();
-                const telCli = dest.querySelector('.telefone-cliente').value.trim();
-                
                 texto += `🎯 DESTINO ${i+1}:\n`;
-                texto += `Cliente: ${nomeCli}\nTelefone: ${telCli}\n`;
-                texto += `Endereço: ${ruaD}, ${numD} - ${bairroD}\nCEP: ${cepD}\n\n`;
+                texto += `Cliente: ${dest.querySelector('.nome-cliente').value.trim()}\n`;
+                texto += `Telefone: ${dest.querySelector('.telefone-cliente').value.trim()}\n`;
+                texto += `Endereço: ${dest.querySelector('.rua-destino').value.trim()}, ${dest.querySelector('.num-destino').value.trim()} - ${dest.querySelector('.bairro-destino').value.trim()}\n`;
+                texto += `CEP: ${dest.querySelector('.cep-destino').value.trim()}\n\n`;
             });
 
             texto += `🔄 Volta para a loja: ${retorno}\n`;
             texto += `💵 Pagamento: ${pagamento}\n`;
-            texto += `📏 Distância percorrida: ${distanciaTotal.toFixed(2)} km\n`;
-            if (adicional > 0) texto += `➕ Valor adicional: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
-            texto += `💰 VALOR TOTAL: ${valorTotal}\n\n`;
-            texto += `Gerado automaticamente pelo sistema 🛵💨`;
+            texto += `📏 Distância: ${distanciaTotal.toFixed(2)} km\n`;
+            if (adicional > 0) texto += `➕ Adicional: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
+            texto += `💰 TOTAL: ${valorTotal}\n\n`;
+            texto += `Sistema MTZ Express 🛵💨`;
 
-            const url = `https://wa.me/5532999953215?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/5532999953215?text=${encodeURIComponent(texto)}`, '_blank');
         };
 
-        // 🔄 Botão Refazer Tudo
         document.getElementById('btnLimpar').onclick = function() {
-            if (confirm('🔄 Tem certeza que quer apagar todos os dados e recomeçar?')) {
+            if (confirm('🔄 Recomeçar do zero?')) {
                 document.getElementById('formPedido').reset();
                 document.getElementById('listaDestinos').innerHTML = `
                     <div class="destino-item">
@@ -491,14 +430,8 @@
                             <label class="obrigatorio">Rua / Avenida</label>
                             <input type="text" class="rua-destino" placeholder="Ex: Avenida Brasil" required>
                             <div class="linha-dupla">
-                                <div>
-                                    <label class="obrigatorio">Número</label>
-                                    <input type="text" class="num-destino" placeholder="Ex: 456" required>
-                                </div>
-                                <div>
-                                    <label class="obrigatorio">CEP</label>
-                                    <input type="text" class="cep-destino" placeholder="Ex: 36010-100" required>
-                                </div>
+                                <div><label class="obrigatorio">Número</label><input type="text" class="num-destino" placeholder="Ex: 456" required></div>
+                                <div><label class="obrigatorio">CEP</label><input type="text" class="cep-destino" placeholder="Ex: 36010-100" required></div>
                             </div>
                             <label class="obrigatorio">Bairro</label>
                             <input type="text" class="bairro-destino" placeholder="Ex: São Mateus" required>
@@ -514,11 +447,9 @@
                 document.getElementById('btnEnviar').disabled = true;
                 document.getElementById('infoDistancia').innerHTML = 'Preencha todos os dados e clique em Calcular<br>🗺️ Rota real e exata do Google Maps';
                 distanciaTotal = 0;
-                window.scrollTo({top: 0, behavior: 'smooth'});
             }
         };
 
-        // Iniciar funções
         window.onload = () => {
             document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
             document.getElementById('btnCalcular').onclick = calcularRotaGoogle;
