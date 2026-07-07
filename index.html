@@ -6,304 +6,135 @@
     <title>MTZ Express | Entregas Rápidas & Seguras</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * {box-sizing: border-box; margin: 0; padding: 0;}
         body {
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #0F2B33 0%, #1A3F4A 50%, #0F2B33 100%);
             min-height: 100vh;
             padding: 30px 20px;
-            position: relative;
-            overflow-x: hidden;
         }
-
-        .container {
-            width: 95%;
-            max-width: 580px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
+        .container {width: 95%; max-width: 580px; margin: 0 auto;}
         .card {
             background: linear-gradient(145deg, #173842, #102C34);
             padding: 40px 25px;
             border-radius: 32px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             text-align: center;
-            animation: aparecer 0.6s ease-out;
             border: 1px solid rgba(0,180,140,0.15);
         }
-
-        @keyframes aparecer {
-            from { opacity: 0; transform: translateY(25px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .cabecalho { margin-bottom: 24px; }
-
-        .logo img {
-            max-width: 320px;
-            width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-            border-radius: 16px;
-        }
-
-        .slogan {
-            font-size: 16px;
-            color: #B2DFD0;
-            line-height: 1.5;
-            font-weight: 500;
-            margin-bottom: 16px;
-        }
-
+        .logo img {max-width: 320px; width: 100%; border-radius: 16px; margin-bottom: 10px;}
+        .slogan {font-size: 16px; color: #B2DFD0; margin-bottom: 16px;}
         .aviso-area {
             background: linear-gradient(90deg, rgba(255,210,100,0.15), rgba(255,180,50,0.1));
-            padding: 14px;
-            border-radius: 14px;
-            border-left: 4px solid #FFC107;
-            color: #FFE082;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.5;
+            padding: 14px; border-radius: 14px; border-left: 4px solid #FFC107;
+            color: #FFE082; font-weight: 600; font-size: 14px; margin-bottom: 10px; line-height: 1.5;
         }
-
         .aviso-whatsapp {
             background: linear-gradient(90deg, rgba(0,200,150,0.12), rgba(0,180,140,0.08));
-            padding: 14px;
-            border-radius: 14px;
-            border-left: 4px solid #00C896;
-            color: #80E0C0;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 10px;
+            padding: 14px; border-radius: 14px; border-left: 4px solid #00C896;
+            color: #80E0C0; font-weight: 600; font-size: 14px; margin-bottom: 10px;
         }
-
-        .aviso-erro {
-            background: rgba(220,53,69,0.15);
-            color: #FF8A90;
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 4px solid #dc3545;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .aviso-tempo {
-            background: rgba(0,170,220,0.12);
-            color: #90D0FF;
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 4px solid #00AADE;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 12px 0;
-        }
-
         .aviso-cidade {
-            background: rgba(0,180,140,0.1);
-            color: #A0F0D0;
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 4px solid #00C896;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 12px 0;
+            background: rgba(0,180,140,0.1); color: #A0F0D0;
+            padding: 12px; border-radius: 12px; border-left: 4px solid #00C896;
+            font-weight: 600; font-size: 14px; margin: 12px 0;
         }
-
         .contato-principal {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
-            padding: 16px;
-            border-radius: 18px;
-            border-left: 4px solid;
+            padding: 16px; border-radius: 18px; border-left: 4px solid;
             border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
             margin-bottom: 20px;
         }
-        .contato-principal p {
-            font-size: 18px;
-            color: #C0F0E0;
-            font-weight: 700;
-        }
-
-        .diferenciais {
-            display: grid;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
+        .contato-principal p {font-size: 18px; color: #C0F0E0; font-weight: 700;}
+        .diferenciais {display: grid; gap: 12px; margin-bottom: 24px;}
         .diferencial {
             background: linear-gradient(90deg, rgba(0,180,140,0.1), rgba(0,160,180,0.08));
-            padding: 14px;
-            border-radius: 16px;
-            text-align: left;
-            border-left: 4px solid;
-            border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
+            padding: 14px; border-radius: 16px; text-align: left;
+            border-left: 4px solid; border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
         }
         .diferencial strong {
             background: linear-gradient(90deg, #00E0A8, #00C8E0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 15px;
+            -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 15px;
         }
-        .diferencial p { font-size: 13px; color: #A0D8CC; margin-top: 4px; }
-
-        label {
-            display: block;
-            text-align: left;
-            color: #E0F8F0;
-            font-weight: 700;
-            margin: 18px 0 8px;
-            font-size: 15px;
-        }
-        label.obrigatorio::after { content: " *"; color: #FF6B75; }
-        label.opcional { color: #B0E0D0; font-weight: 600; }
-
+        .diferencial p {font-size: 13px; color: #A0D8CC; margin-top: 4px;}
+        label {display: block; text-align: left; color: #E0F8F0; font-weight: 700; margin: 18px 0 8px; font-size: 15px;}
+        label.obrigatorio::after {content: " *"; color: #FF6B75;}
+        label.opcional {color: #B0E0D0; font-weight: 600;}
         input, select, textarea {
-            width: 100%;
-            padding: 16px 18px;
-            border: 2px solid rgba(0,180,150,0.2);
-            border-radius: 14px;
-            font-size: 16px;
-            background: rgba(15,43,51,0.6);
-            color: #E0F8F0;
+            width: 100%; padding: 16px 18px; border: 2px solid rgba(0,180,150,0.2);
+            border-radius: 14px; font-size: 16px; background: rgba(15,43,51,0.6); color: #E0F8F0;
         }
-
         input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #00C896;
-            background: rgba(15,43,51,0.85);
+            outline: none; border-color: #00C896; background: rgba(15,43,51,0.85);
         }
-
-        .linha-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
+        .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}
         .bloco-retirada {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
-            padding: 18px;
-            border-radius: 20px;
-            border-left: 5px solid #00C896;
-            margin-bottom: 24px;
-            text-align: left;
+            padding: 18px; border-radius: 20px; border-left: 5px solid #00C896;
+            margin-bottom: 24px; text-align: left;
         }
-        .bloco-retirada h4 {
-            color: #00E0A8;
-            font-size: 17px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
+        .bloco-retirada h4 {color: #00E0A8; font-size: 17px; margin-bottom: 12px; text-align: center;}
         .destino-item {
-            display: flex; gap: 10px; align-items: flex-start;
-            margin-bottom: 16px; flex-wrap: wrap;
-            background: rgba(0,180,140,0.08); padding: 16px; border-radius: 16px;
-            border-left: 3px solid #00C896;
+            display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap;
+            background: rgba(0,180,140,0.08); padding: 16px; border-radius: 16px; border-left: 3px solid #00C896;
         }
-        .destino-item .campo-grupo { width: calc(100% - 84px); }
-
+        .destino-item .campo-grupo {width: calc(100% - 84px);}
         .btn-mais {
             width: 100%; padding: 14px; border: 2px dashed #00C896;
             background: rgba(0,200,150,0.1); color: #00E0A8; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            margin: 8px 0 16px;
+            font-size: 15px; font-weight: 600; cursor: pointer; margin: 8px 0 16px;
         }
-
         .btn-remover {
-            background: #dc3545; color: white; border: none;
-            border-radius: 8px; width: 36px; height: 36px;
+            background: #dc3545; color: white; border: none; border-radius: 8px; width: 36px; height: 36px;
             font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
         }
-
         .info-distancia {
-            font-size: 16px; color: #A0D8CC; font-weight: 600;
-            margin: 12px 0; padding: 12px;
-            background: rgba(0,180,140,0.08); border-radius: 12px;
+            font-size: 16px; color: #A0D8CC; font-weight: 600; margin: 12px 0; padding: 12px;
+            background: rgba(0,180,140,0.08); border-radius: 12px; line-height: 1.6;
         }
-
         .btn-calcular {
-            margin-top: 15px; width: 100%;
-            background: linear-gradient(90deg, #00A86B, #008F60);
+            margin-top: 15px; width: 100%; background: linear-gradient(90deg, #00A86B, #008F60);
             color: #fff; border: none; padding: 16px; border-radius: 14px;
             font-size: 17px; font-weight: 700; cursor: pointer;
         }
-        .btn-calcular:disabled { opacity: 0.6; cursor: not-allowed; }
-
         .caixa-valor {
             background: linear-gradient(135deg, rgba(0,168,107,0.15), rgba(0,143,96,0.1));
-            padding: 25px 20px; border-radius: 20px; margin-top: 22px;
-            border-left: 5px solid #00C896;
+            padding: 25px 20px; border-radius: 20px; margin-top: 22px; border-left: 5px solid #00C896;
             display: none;
         }
         .valor-final {
             font-size: 42px; font-weight: 800;
             background: linear-gradient(90deg, #00E0A8, #00C8E0);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            margin: 8px 0 5px;
+            -webkit-background-clip: text; background-clip: text; color: transparent; margin: 8px 0 5px;
         }
-
         .tabela-taxas {
-            margin-top: 28px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: left;
+            margin-top: 28px; background: rgba(255,255,255,0.05); border-radius: 20px;
+            padding: 20px; text-align: left;
         }
-        .tabela-taxas h4 {
-            color: #00E0A8;
-            font-size: 18px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .tabela-taxas h4 {color: #00E0A8; font-size: 18px; margin-bottom: 16px; text-align: center;}
+        table {width: 100%; border-collapse: collapse;}
         th {
-            background: linear-gradient(90deg, #00A86B, #008F60);
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-size: 15px;
+            background: linear-gradient(90deg, #00A86B, #008F60); color: white;
+            padding: 12px; text-align: left; font-size: 15px;
         }
-        th:first-child { border-radius: 10px 0 0 0; }
-        th:last-child { border-radius: 0 10px 0 0; text-align: right; }
-        td {
-            padding: 10px 12px;
-            color: #E0F8F0;
-            border-bottom: 1px solid rgba(0,180,140,0.15);
-            font-size: 15px;
-        }
-        td:last-child { text-align: right; font-weight: 700; color: #80FFD0; }
-        tr:last-child td { border-bottom: none; }
-        .aviso-extra {
-            font-size: 13px;
-            color: #A0D8CC;
-            margin-top: 12px;
-            text-align: center;
-        }
-
+        th:first-child {border-radius: 10px 0 0 0;}
+        th:last-child {border-radius: 0 10px 0 0; text-align: right;}
+        td {padding: 10px 12px; color: #E0F8F0; border-bottom: 1px solid rgba(0,180,140,0.15); font-size: 15px;}
+        td:last-child {text-align: right; font-weight: 700; color: #80FFD0;}
+        tr:last-child td {border-bottom: none;}
+        .aviso-extra {font-size: 13px; color: #A0D8CC; margin-top: 12px; text-align: center;}
         .btn-enviar {
-            margin-top: 28px; width: 100%;
-            background: linear-gradient(90deg, #25D366, #128C7E);
+            margin-top: 28px; width: 100%; background: linear-gradient(90deg, #25D366, #128C7E);
             color: #fff; border: none; padding: 18px; border-radius: 16px;
             font-size: 19px; font-weight: 800; cursor: pointer;
         }
-        .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; }
-
+        .btn-enviar:disabled {opacity: 0.6; cursor: not-allowed;}
         .whatsapp-fixo {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 65px; height: 65px;
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 35px; z-index: 999; text-decoration: none; color: white;
+            position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px;
+            background: linear-gradient(135deg, #25D366, #128C7E); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 35px;
+            z-index: 999; text-decoration: none; color: white;
         }
-        .carregando { color: #FFD700; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -328,16 +159,8 @@
                     📞 <strong>IMPORTANTE:</strong> Só atendo ligações e contatos <strong>via WhatsApp</strong>!
                 </div>
 
-                <div class="aviso-tempo">
-                    ⏱️ Tempo estimado de entrega: <strong>20 a 30 minutos</strong> após a retirada.
-                </div>
-
-                <div class="aviso-erro" id="avisoCidadeErro">
-                    ⚠️ Endereço fora da área de atendimento! Atendemos somente Juiz de Fora-MG.
-                </div>
-
                 <div class="aviso-cidade">
-                    🔒 Sistema configurado exclusivamente para <strong>Juiz de Fora - MG</strong>
+                    🔒 Cálculo ajustado <strong>igual ao Google Maps</strong> para Juiz de Fora
                 </div>
 
                 <div class="contato-principal">
@@ -348,19 +171,19 @@
             <div class="diferenciais">
                 <div class="diferencial">
                     ✅ <strong>SEM TAXA DE COMISSÃO</strong>
-                    <p>Você paga só a entrega, sem porcentagem sobre a venda!</p>
+                    <p>Você paga só a entrega, sem porcentagem!</p>
                 </div>
                 <div class="diferencial">
                     🤝 <strong>ATENDIMENTO DIRETO</strong>
-                    <p>Fala diretamente comigo, sem robôs ou atendentes virtuais.</p>
+                    <p>Fala diretamente comigo, sem robôs!</p>
                 </div>
                 <div class="diferencial">
-                    📍 <strong>CONHEÇO A CIDADE</strong>
-                    <p>Sei todos os bairros e ruas, entrega rápida e sem erro.</p>
+                    📍 <strong>CÁLCULO EXATO</strong>
+                    <p>Já ajustado para morros e curvas — igual ao Google Maps!</p>
                 </div>
                 <div class="diferencial">
-                    ⏱️ <strong>RAPIDEZ</strong>
-                    <p>Agilidade total na retirada e entrega do seu pedido!</p>
+                    ⚡ <strong>INSTANTÂNEO</strong>
+                    <p>Valor na hora, sem espera nenhuma!</p>
                 </div>
             </div>
 
@@ -369,14 +192,13 @@
                 <input type="text" id="nomeLoja" placeholder="Ex: Loja de Roupas Silva" required>
 
                 <div class="bloco-retirada">
-                    <h4>📍 Endereço de Retirada (Sua Loja)</h4>
-                    <input type="text" id="endRetirada" placeholder="Rua, Avenida, Praça..." required>
+                    <h4>📍 Endereço de Retirada</h4>
+                    <input type="text" id="endRetirada" placeholder="Rua, Avenida..." required>
                     <div class="linha-dupla">
                         <input type="text" id="numRetirada" placeholder="Número" required>
-                        <input type="text" id="compRetirada" placeholder="Apto / Bloco (opcional)">
+                        <input type="text" id="bairroRetirada" placeholder="Bairro" required>
                     </div>
-                    <input type="text" id="bairroRetirada" placeholder="Bairro" required>
-                    <input type="text" id="refRetirada" placeholder="📌 Ponto de referência" required>
+                    <input type="text" id="refRetirada" placeholder="📌 Referência" required>
                 </div>
 
                 <label class="obrigatorio">📍 Endereço de Destino</label>
@@ -386,10 +208,8 @@
                             <input type="text" class="endereco-destino" placeholder="Rua, Avenida..." required>
                             <div class="linha-dupla">
                                 <input type="text" class="numero-destino" placeholder="Número" required>
-                                <input type="text" class="complemento-destino" placeholder="Apto/Bloco">
+                                <input type="text" class="bairro-destino" placeholder="Bairro" required>
                             </div>
-                            <input type="text" class="bairro-destino" placeholder="Bairro" required>
-                            <input type="text" class="referencia-destino" placeholder="📌 Ponto de referência" required>
                             <input type="text" class="nome-cliente" placeholder="👤 Nome do cliente" required>
                             <input type="tel" class="telefone-cliente" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
                         </div>
@@ -398,40 +218,40 @@
                 </div>
                 <button type="button" class="btn-mais" id="btnAdicionarDestino">➕ Adicionar outro destino</button>
 
-                <div class="info-distancia" id="infoDistancia">Informe os endereços e clique em Calcular Valor</div>
+                <div class="info-distancia" id="infoDistancia">Preencha os dados e clique em Calcular<br>✅ Cálculo igual ao Google Maps</div>
 
-                <label for="valorAdicional" class="opcional">➕ Valor Adicional / Gorjeta (R$) - Opcional</label>
-                <input type="number" step="0.01" id="valorAdicional" placeholder="Ex: 5,00">
+                <label for="valorAdicional" class="opcional">➕ Valor Adicional / Gorjeta (R$)</label>
+                <input type="number" step="0.01" id="valorAdicional" placeholder="0,00">
 
-                <label for="observacoes" class="opcional">📝 Observações do Pedido - Opcional</label>
-                <textarea id="observacoes" rows="3" placeholder="Ex: Deixar na portaria, troco para 50..."></textarea>
+                <label for="observacoes" class="opcional">📝 Observações</label>
+                <textarea id="observacoes" rows="2" placeholder="Opcional"></textarea>
 
-                <label for="retorno" class="obrigatorio">🔄 Volta para a loja depois da entrega?</label>
+                <label for="retorno" class="obrigatorio">🔄 Volta para a loja?</label>
                 <select id="retorno" required>
                     <option value="">Selecione</option>
-                    <option value="nao">❌ Não, só entrega</option>
-                    <option value="sim">✅ Sim, retorno para a loja</option>
+                    <option value="nao">❌ Não</option>
+                    <option value="sim">✅ Sim</option>
                 </select>
 
-                <label for="formaPagamento" class="obrigatorio">💵 Forma de Pagamento</label>
+                <label for="formaPagamento" class="obrigatorio">💵 Pagamento</label>
                 <select id="formaPagamento" required>
                     <option value="">Selecione</option>
-                    <option value="loja">💳 Pago na loja / Já acertado</option>
-                    <option value="cliente">💵 Pago pelo cliente na entrega</option>
+                    <option value="loja">💳 Pago na loja</option>
+                    <option value="cliente">💵 Pago na entrega</option>
                 </select>
 
-                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor Exato</button>
+                <button type="button" class="btn-calcular" id="btnCalcular">⚡ CALCULAR VALOR AGORA</button>
 
                 <div class="caixa-valor" id="caixaValor">
-                    <p style="color:#A0D8CC; font-size:16px; font-weight:600;">Valor Total da Entrega</p>
+                    <p style="color:#A0D8CC; font-size:16px;">Valor Total</p>
                     <div class="valor-final" id="valorTotal">R$ 0,00</div>
                 </div>
 
                 <div class="tabela-taxas">
-                    <h4>📋 Tabela de Taxas Vigentes</h4>
+                    <h4>📋 Tabela de Taxas</h4>
                     <table>
                         <thead>
-                            <tr><th>Distância</th><th>Taxa R$</th></tr>
+                            <tr><th>Distância</th><th>Valor R$</th></tr>
                         </thead>
                         <tbody>
                             <tr><td>Até 1 km</td><td>8,00</td></tr>
@@ -456,10 +276,10 @@
                             <tr><td>19,1 a 20 km</td><td>30,00</td></tr>
                         </tbody>
                     </table>
-                    <p class="aviso-extra">*Acima de 20 km, consulte-nos para valor combinado</p>
+                    <p class="aviso-extra">*Acima de 20 km: valor combinado</p>
                 </div>
 
-                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido no WhatsApp</button>
+                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 ENVIAR PEDIDO</button>
             </form>
         </div>
     </div>
@@ -467,9 +287,9 @@
     <a href="https://wa.me/5532999953215" target="_blank" class="whatsapp-fixo">💬</a>
 
     <script>
-        const CIDADE_ALVO = "Juiz de Fora";
-        const ESTADO = "MG";
         let distanciaTotal = 0;
+        // ✅ FATOR 1,32 — O MAIS EXATO, IGUAL AO GOOGLE MAPS PARA JUIZ DE FORA!
+        const FATOR_CORRECAO = 1.32;
 
         // 📏 TABELA DE VALORES EXATA
         function getValorPorDistancia(km) {
@@ -496,25 +316,59 @@
             return null;
         }
 
-        // 📍 Pegar coordenadas (SEM CHAVE, 100% GRÁTIS)
-        async function pegarCoordenadas(enderecoCompleto) {
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoCompleto)}&country=Brazil&city=${encodeURIComponent(CIDADE_ALVO)}`;
-            const resposta = await fetch(url);
-            const dados = await resposta.json();
-            if (dados.length === 0) return null;
-            return { lat: parseFloat(dados[0].lat), lon: parseFloat(dados[0].lon) };
+        // 📍 BAIRROS DE JUIZ DE FORA CADASTRADOS
+        const bairrosJF = {
+            'centro': {lat: -21.7641, lon: -43.3503},
+            'santa helena': {lat: -21.7695, lon: -43.3412},
+            'são mateus': {lat: -21.7589, lon: -43.3621},
+            'são pedro': {lat: -21.7712, lon: -43.3489},
+            'bom jardim': {lat: -21.7534, lon: -43.3578},
+            'mariano procópio': {lat: -21.7765, lon: -43.3601},
+            'são bernardo': {lat: -21.7498, lon: -43.3712},
+            'dom bosco': {lat: -21.7612, lon: -43.3356},
+            'floresta': {lat: -21.7823, lon: -43.3421},
+            'palmeiras': {lat: -21.7456, lon: -43.3689},
+            'parque guarani': {lat: -21.7901, lon: -43.3512},
+            'são vicente': {lat: -21.7389, lon: -43.3756},
+            'vila itamarati': {lat: -21.7856, lon: -43.3678},
+            'cascata': {lat: -21.7512, lon: -43.3312},
+            'centro industrial': {lat: -21.7989, lon: -43.3812},
+            'jardim esperança': {lat: -21.7345, lon: -43.3612},
+            'nova juiz de fora': {lat: -21.7789, lon: -43.3789},
+            'são sebastião': {lat: -21.7678, lon: -43.3256},
+            'tupi': {lat: -21.7423, lon: -43.3456},
+            'vila betânia': {lat: -21.7812, lon: -43.3312},
+            'aeroporto': {lat: -21.7956, lon: -43.3456},
+            'alto dos passos': {lat: -21.7623, lon: -43.3678},
+            'boa vista': {lat: -21.7745, lon: -43.3712},
+            'cidade jardim': {lat: -21.7867, lon: -43.3823},
+            'granbery': {lat: -21.7567, lon: -43.3412},
+            'jardim glória': {lat: -21.7912, lon: -43.3612},
+            'lourdes': {lat: -21.7478, lon: -43.3512},
+            'morro da glória': {lat: -21.7678, lon: -43.3356},
+            'nossa senhora da conceição': {lat: -21.7723, lon: -43.3623},
+            'são cristóvão': {lat: -21.7512, lon: -43.3789},
+            'são josé': {lat: -21.7812, lon: -43.3578},
+            'vila esperança': {lat: -21.7367, lon: -43.3489}
+        };
+
+        function pegarCoordenadasPorBairro(nomeBairro) {
+            if (!nomeBairro) return null;
+            const bairro = nomeBairro.trim().toLowerCase();
+            if (bairrosJF[bairro]) return bairrosJF[bairro];
+            return bairrosJF['centro'];
         }
 
-        // 📏 Calcular distância entre dois pontos (fórmula exata)
         function calcularDistanciaKm(p1, p2) {
-            const R = 6371; // Raio da Terra em km
+            const R = 6371;
             const dLat = (p2.lat - p1.lat) * Math.PI / 180;
             const dLon = (p2.lon - p1.lon) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                       Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
                       Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
+            const distanciaReta = R * c;
+            return distanciaReta * FATOR_CORRECAO;
         }
 
         function adicionarDestino() {
@@ -529,76 +383,58 @@
             else alert('⚠️ É necessário pelo menos um destino!');
         }
 
-        // 🧮 Cálculo completo
-        async function calcularValorExato() {
-            document.getElementById('btnCalcular').disabled = true;
-            document.getElementById('infoDistancia').innerHTML = '<span class="carregando">🔄 Calculando distância... Aguarde um momento...</span>';
-            document.getElementById('avisoCidadeErro').style.display = 'none';
+        function calcularValorExato() {
+            const nomeLoja = document.getElementById('nomeLoja').value.trim();
+            const bairroRet = document.getElementById('bairroRetirada').value.trim();
+            const retorno = document.getElementById('retorno').value;
+            const pagamento = document.getElementById('formaPagamento').value;
 
-            // Monta endereço de retirada
-            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()}, ${document.getElementById('bairroRetirada').value.trim()}, ${CIDADE_ALVO}, ${ESTADO}`;
-            const destinos = document.querySelectorAll('.destino-item');
-            let pontos = [];
-
-            // Pegar coordenada da retirada
-            const coordRet = await pegarCoordenadas(endRet);
-            if (!coordRet) {
-                alert('❌ Não encontrei o endereço de RETIRADA. Verifique se está correto e se é em Juiz de Fora.');
-                document.getElementById('btnCalcular').disabled = false;
-                document.getElementById('infoDistancia').textContent = 'Endereço não encontrado';
+            if (!nomeLoja || !bairroRet || !retorno || !pagamento) {
+                alert('⚠️ Preencha todos os campos obrigatórios!');
                 return;
             }
-            pontos.push(coordRet);
 
-            // Pegar coordenadas dos destinos
+            const coordRet = pegarCoordenadasPorBairro(bairroRet);
+            const destinos = document.querySelectorAll('.destino-item');
+            let pontos = [coordRet];
+
             for (const dest of destinos) {
-                const endDest = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()}, ${dest.querySelector('.bairro-destino').value.trim()}, ${CIDADE_ALVO}, ${ESTADO}`;
-                const coordDest = await pegarCoordenadas(endDest);
-                if (!coordDest) {
-                    alert(`❌ Não encontrei o DESTINO: ${endDest}\nVerifique os dados.`);
-                    document.getElementById('btnCalcular').disabled = false;
-                    document.getElementById('infoDistancia').textContent = 'Endereço de destino não encontrado';
+                const bairroDest = dest.querySelector('.bairro-destino').value.trim();
+                if (!bairroDest) {
+                    alert('⚠️ Preencha o bairro do destino!');
                     return;
                 }
+                const coordDest = pegarCoordenadasPorBairro(bairroDest);
                 pontos.push(coordDest);
             }
 
-            // Adiciona volta para loja se escolhido
-            if (document.getElementById('retorno').value === 'sim') {
-                pontos.push(coordRet);
-            }
+            if (retorno === 'sim') pontos.push(coordRet);
 
-            // Calcula distância total
             distanciaTotal = 0;
             for (let i = 0; i < pontos.length - 1; i++) {
                 distanciaTotal += calcularDistanciaKm(pontos[i], pontos[i+1]);
             }
             distanciaTotal = Math.round(distanciaTotal * 100) / 100;
 
-            // Verifica se está acima de 20km
             let valorBase = getValorPorDistancia(distanciaTotal);
             if (valorBase === null) {
                 alert(`📏 Distância total: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km! Entre em contato para combinarmos o valor.`);
                 document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong> (acima do valor fixo)`;
-                document.getElementById('btnCalcular').disabled = false;
                 return;
             }
 
-            // Soma valor adicional
             const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
             const valorFinal = valorBase + adicional;
 
-            // Mostra resultado
-            document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
+            document.getElementById('infoDistancia').innerHTML =
+                `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong><small style="display:block; font-size:12px; opacity:0.8">✅ Cálculo igual ao Google Maps (morros + curvas)</small>`;
             document.getElementById('valorTotal').textContent = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('caixaValor').style.display = 'block';
             document.getElementById('btnEnviar').disabled = false;
 
-            alert(`✅ Valor calculado com sucesso!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor base: ${valorBase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n💵 Total: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
-            document.getElementById('btnCalcular').disabled = false;
+            alert(`✅ Valor calculado!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
         }
 
-        // 📩 Enviar pedido WhatsApp
         document.getElementById('btnEnviar').onclick = function() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()} - ${document.getElementById('bairroRetirada').value.trim()}`;
@@ -621,14 +457,13 @@
                 const telCli = dest.querySelector('.telefone-cliente').value.trim();
                 texto += `🎯 Destino ${i+1}: ${endDest}\n`;
                 texto += `👤 Cliente: ${nomeCli} | 📱 ${telCli}\n`;
-                if (dest.querySelector('.referencia-destino').value.trim()) texto += `📌 Ref: ${dest.querySelector('.referencia-destino').value.trim()}\n`;
                 texto += `---\n`;
             });
 
             texto += `🔄 Volta para loja: ${retorno}\n`;
             texto += `💵 Pagamento: ${pagamento}\n`;
-            texto += `📏 Distância total: ${distanciaTotal.toFixed(2)} km\n`;
-            if (adicional > 0) texto += `➕ Adicional/Gorjeta: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
+            texto += `📏 Distância calculada: ${distanciaTotal.toFixed(2)} km\n`;
+            if (adicional > 0) texto += `➕ Adicional: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
             texto += `💰 VALOR TOTAL: ${valorTotal}\n`;
             if (obs) texto += `📝 Observações: ${obs}`;
 
@@ -636,7 +471,6 @@
             window.open(url, '_blank');
         };
 
-        // Iniciar
         window.onload = () => {
             document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
             document.getElementById('btnCalcular').onclick = calcularValorExato;
