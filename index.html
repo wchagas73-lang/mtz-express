@@ -3,79 +3,911 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTZ Express | Transporte e Entregas</title>
+    <title>MTZ Express | Entregas Rápidas & Seguras</title>
 
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f8f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #009E68 0%, #007F54 50%, #005F3E 100%);
             min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(255,255,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 580px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .card {
-            background: #fff;
-            width: 90%;
-            max-width: 420px;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, .15);
+            background: #ffffff;
+            padding: 40px 25px;
+            border-radius: 28px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
             text-align: center;
+            animation: aparecer 0.6s ease-out;
         }
 
-        h1 {
-            color: #00875A;
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cabecalho { margin-bottom: 20px; }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .logo-moto {
+            font-size: 52px;
+            background: linear-gradient(135deg, #009E68, #F9A825);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-texto {
             font-size: 42px;
-            margin-bottom: 10px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #009E68 0%, #007F54 60%, #F9A825 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .slogan {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+            font-weight: 500;
+            margin-bottom: 16px;
         }
 
-        p {
-            color: #555;
-            font-size: 18px;
+        .aviso-area {
+            background: linear-gradient(90deg, #fff3cd, #ffeeba);
+            padding: 14px;
+            border-radius: 12px;
+            border-left: 4px solid #F57C00;
+            color: #8B5A00;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
             line-height: 1.5;
         }
 
-        button {
-            margin-top: 30px;
-            background: #00875A;
-            color: #fff;
-            border: none;
-            padding: 16px 35px;
+        .aviso-whatsapp {
+            background: linear-gradient(90deg, #e6f7ee, #d6f2e3);
+            padding: 14px;
             border-radius: 12px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-left: 4px solid #009E68;
+            color: #006F49;
             font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .aviso-erro {
+            background: #f8d7da;
+            color: #842029;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #dc3545;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .aviso-valor-minimo {
+            background: #fff3cd;
+            color: #8B5A00;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 8px 0;
+            display: none;
+        }
+
+        .aviso-tempo {
+            background: #e6f2ff;
+            color: #0059b3;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #0066cc;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 12px 0;
+        }
+
+        .contato-principal {
+            background: linear-gradient(90deg, #e6f7ee, #d6f2e3);
+            padding: 14px;
+            border-radius: 16px;
+            border-left: 4px solid;
+            border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+            margin-bottom: 20px;
+        }
+        .contato-principal p {
+            font-size: 17px;
+            color: #006F49;
+            font-weight: 700;
+        }
+
+        .sobre-mim {
+            background: linear-gradient(90deg, #fff8e6, #fff3d6);
+            padding: 14px;
+            border-radius: 16px;
+            border-left: 4px solid;
+            border-image: linear-gradient(180deg, #F9A825, #F57C00) 1;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .sobre-mim p {
+            font-size: 15px;
+            color: #8B5A00;
+            font-weight: 600;
+        }
+
+        .diferenciais {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .diferencial {
+            background: linear-gradient(90deg, #f0f9f4, #e6f7ee);
+            padding: 14px;
+            border-radius: 14px;
+            text-align: left;
+            border-left: 4px solid;
+            border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+        }
+        .diferencial strong {
+            background: linear-gradient(90deg, #007F54, #005F3E);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 15px;
+        }
+        .diferencial p { font-size: 13px; color: #444; margin-top: 4px; }
+
+        .destaques {
+            background: #f8faf9;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+            border-left: 4px solid;
+            border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+        }
+        .destaques p {
+            font-size: 14px;
+            color: #333;
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .historico {
+            background: #f8faf9;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+            border-left: 4px solid #667EEA;
+        }
+        .historico h4 {
+            color: #334155;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+        .item-historico {
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .item-historico:hover {
+            border-color: #667EEA;
+            background: #f0f4ff;
+        }
+        .sem-historico {
+            color: #718096;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .origem-fixa {
+            background: linear-gradient(90deg, #f0f9f4, #e6f7ee);
+            padding: 14px 20px;
+            border-radius: 16px;
+            color: #006F49;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: inset 0 0 0 1px rgba(0,158,104,0.15);
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            color: #2d3748;
+            font-weight: 700;
+            margin: 18px 0 8px;
+            font-size: 15px;
+        }
+        label.obrigatorio::after { content: " *"; color: #dc3545; }
+        label.opcional::after { content: " (opcional)"; color: #718096; font-weight: 400; font-size: 13px; }
+
+        input, select, textarea {
             width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
         }
 
-        button:hover {
-            background: #006F49;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 111, 73, 0.3);
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #009E68;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 158, 104, 0.12);
         }
 
-        button:active {
-            transform: scale(0.98);
+        .pac-container {
+            border: 2px solid #009E68;
+            border-top: none;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            font-family: inherit;
+            font-size: 15px;
+            z-index: 9999;
         }
+        .pac-item { padding: 10px 15px; cursor: pointer; }
+        .pac-item:hover { background: #f0f9f4; }
+        .pac-item-query { font-weight: 600; color: #007F54; }
+
+        textarea { resize: none; height: 90px; }
+
+        .linha-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .caixa-pagamento {
+            background: #f8faf9;
+            padding: 16px;
+            border-radius: 16px;
+            margin: 16px 0;
+            border-left: 4px solid;
+            border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+        }
+
+        .botoes-pgto { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-sim, .btn-nao {
+            flex: 1; padding: 14px; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-sim { background: linear-gradient(90deg, #009E68, #007F54); color: white; }
+        .btn-sim.selecionado { background: #007F54; transform: scale(0.98); }
+        .btn-nao { background: #e9ecef; color: #dc3545; }
+        .btn-nao.selecionado { background: #f8d7da; transform: scale(0.98); }
+
+        .salvar-dados {
+            display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;
+            justify-content: flex-start;
+        }
+        .salvar-dados input { width: auto; margin: 0; }
+
+        .btn-mais {
+            width: 100%; padding: 14px; border: 2px dashed #009E68;
+            background: #f0f9f4; color: #007F54; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin: 8px 0 16px; transition: all 0.2s;
+        }
+        .btn-mais:hover { background: #e6f7ee; }
+
+        .btn-remover {
+            background: #dc3545; color: white; border: none;
+            border-radius: 8px; width: 36px; height: 36px;
+            font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
+        }
+
+        .btn-copiar-endereco {
+            background: #667EEA; color: white; border: none;
+            border-radius: 8px; padding: 8px 10px; font-size: 13px;
+            cursor: pointer; margin-top: 28px; flex-shrink: 0;
+        }
+
+        .destino-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            margin-bottom: 16px; flex-wrap: wrap;
+            background: #f8faf9; padding: 16px; border-radius: 16px;
+            border-left: 3px solid #009E68;
+        }
+        .destino-item .campo-grupo { width: calc(100% - 84px); }
+        .destino-item .campo-grupo input { margin-bottom: 8px; }
+
+        #map {
+            height: 260px; width: 100%; border-radius: 16px;
+            margin-top: 12px; margin-bottom: 8px; border: 2px solid #e2e8f0;
+        }
+
+        .info-distancia {
+            font-size: 15px; color: #555; font-weight: 600;
+            margin: 8px 0; line-height: 1.6;
+        }
+
+        .tabela-taxas {
+            width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 16px; overflow: hidden; border: 2px solid #e2e8f0;
+        }
+        .tabela-taxas th {
+            background: linear-gradient(90deg, #009E68, #007F54); color: white;
+            padding: 12px; font-size: 15px;
+        }
+        .tabela-taxas td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .tabela-taxas tr:nth-child(even) { background: #f8faf9; }
+        .tabela-taxas .valor { font-weight: 700; color: #007F54; text-align: right; }
+
+        .regras {
+            background: linear-gradient(90deg, #fef9ee, #fff6e0);
+            padding: 16px; border-radius: 14px; margin-top: 18px;
+            text-align: left; font-size: 14px; color: #444;
+            border-left: 4px solid; border-image: linear-gradient(180deg, #F9A825, #F57C00) 1;
+        }
+        .regras h4 { color: #B26E00; margin-bottom: 10px; font-size: 15px; }
+
+        .btn-calcular {
+            margin-top: 15px; width: 100%;
+            background: linear-gradient(90deg, #F9A825, #F57C00);
+            color: #fff; border: none; padding: 16px; border-radius: 14px;
+            font-size: 17px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(249, 168, 37, 0.35);
+        }
+        .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(245, 124, 0, 0.4); }
+
+        .btn-nova-entrega {
+            margin-top: 12px; width: 100%;
+            background: linear-gradient(90deg, #667EEA, #764BA2);
+            color: #fff; border: none; padding: 14px; border-radius: 14px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-nova-entrega:hover { transform: translateY(-2px); }
+
+        .btn-copiar {
+            margin-top: 12px; width: 100%;
+            background: linear-gradient(90deg, #667EEA, #764BA2);
+            color: #fff; border: none; padding: 14px; border-radius: 14px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-copiar.copiado { background: #28a745; }
+
+        .caixa-valor {
+            background: linear-gradient(135deg, #fffbf0, #fff8e6);
+            padding: 25px 20px; border-radius: 18px; margin-top: 22px;
+            border-left: 5px solid; border-image: linear-gradient(180deg, #F9A825, #F57C00) 1;
+            box-shadow: 0 8px 20px rgba(249, 168, 37, 0.18); display: none;
+        }
+        .titulo-valor { color: #B26E00; font-weight: 700; font-size: 16px; }
+        .valor-final {
+            font-size: 42px; font-weight: 800;
+            background: linear-gradient(90deg, #F57C00, #E65100);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin: 8px 0 5px;
+        }
+        .detalhe { font-size: 14px; color: #B26E00; line-height: 1.6; text-align: left; }
+
+        .caixa-resumo {
+            background: linear-gradient(135deg, #f0f9f4, #e6f7ee);
+            padding: 20px; border-radius: 18px; margin-top: 24px;
+            border-left: 5px solid #009E68; text-align: left; display: none;
+        }
+        .caixa-resumo h4 { color: #006F49; font-size: 17px; margin-bottom: 12px; text-align: center; }
+        .item-resumo {
+            padding: 8px 0; font-size: 14px; color: #333;
+            border-bottom: 1px dashed #cce5d8; line-height: 1.5;
+        }
+        .item-resumo strong { color: #006F49; }
+
+        .btn-enviar {
+            margin-top: 28px; width: 100%;
+            background: linear-gradient(90deg, #25D366, #128C7E);
+            color: #fff; border: none; padding: 18px; border-radius: 16px;
+            font-size: 19px; font-weight: 800; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35);
+        }
+        .btn-enviar:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(18, 140, 126, 0.45); }
+        .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-enviar:active, .btn-calcular:active { transform: scale(0.97); }
+
+        .aviso { margin-top: 22px; font-size: 13px; color: #8898aa; line-height: 1.5; }
+
+        .sucesso {
+            background: #d1e7dd; color: #0f5132;
+            padding: 16px; border-radius: 14px; margin-top: 20px;
+            font-weight: 700; display: none;
+        }
+
+        .depoimentos {
+            background: #f8faf9; padding: 16px; border-radius: 16px;
+            margin-top: 24px; text-align: left; border-left: 4px solid;
+            border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+        }
+        .depoimentos h4 { color: #006F49; margin-bottom: 10px; font-size: 15px; text-align: center; }
+        .depoimento {
+            font-size: 14px; color: #444; padding: 10px 12px;
+            background: #fff; border-radius: 10px; margin-bottom: 8px; font-style: italic;
+        }
+        .depoimento strong { color: #007F54; }
+
+        .pagamento {
+            background: linear-gradient(90deg, #f0f9f4, #e6f7ee);
+            padding: 16px; border-radius: 16px; margin-top: 18px;
+            border-left: 4px solid; border-image: linear-gradient(180deg, #009E68, #F9A825) 1;
+        }
+        .pagamento h4 { color: #006F49; margin-bottom: 8px; font-size: 15px; }
+        .chave-pix {
+            background: #fff; padding: 12px; border-radius: 10px;
+            font-weight: 700; color: #007F54; font-size: 16px;
+            margin: 8px 0; border: 2px dashed #009E68;
+        }
+
+        .whatsapp-fixo {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 65px; height: 65px;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 35px; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999; transition: all 0.3s ease; text-decoration: none;
+        }
+        .whatsapp-fixo:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>MTZ Express</h1>
-        <p>Transporte rápido, seguro e profissional.</p>
-        
-        <!-- BOTÃO COM LINK DO WHATSAPP -->
-        <a href="https://wa.me/5532999953215?text=Olá! Gostaria de solicitar uma entrega." target="_blank" style="text-decoration: none;">
-            <button>Solicitar Entrega</button>
-        </a>
+    <div class="container">
+        <div class="card">
+            <div class="cabecalho">
+                <div class="logo">
+                    <span class="logo-moto">🛵</span>
+                    <span class="logo-texto">MTZ Express</span>
+                </div>
+                <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
+
+                <div class="aviso-area">
+                    ⏰ <strong>Horário de Atendimento:</strong> Seg-Sex 08h às 19h | Sáb 08h às 14h<br>
+                    🚫 Não atendemos domingos e feriados — retornamos no próximo dia útil.
+                </div>
+
+                <div class="aviso-area">
+                    📍 Atendemos <strong>somente Juiz de Fora-MG</strong>
+                </div>
+
+                <div class="aviso-whatsapp">
+                    📞 <strong>IMPORTANTE:</strong> Só atendo ligações e contatos <strong>via WhatsApp</strong>!
+                </div>
+
+                <div class="aviso-tempo">
+                    ⏱️ Tempo estimado de entrega: <strong>20 a 30 minutos</strong> após a retirada.
+                </div>
+
+                <div class="aviso-erro" id="avisoCidadeErro">
+                    ⚠️ Endereço de outra cidade! Atendemos somente Juiz de Fora-MG.
+                </div>
+
+                <div class="aviso-valor-minimo" id="avisoValorMinimo">
+                    💡 Valor mínimo de entrega: R$ 10,00 — calculado automaticamente.
+                </div>
+
+                <div class="contato-principal">
+                    📞 WhatsApp: <strong>(32) 9 9995-3215</strong>
+                </div>
+
+                <div class="sobre-mim">
+                    <p>👋 Sou eu quem faz a entrega! Trabalho com dedicação e cuidado com o seu pedido.</p>
+                </div>
+            </div>
+
+            <div class="diferenciais">
+                <div class="diferencial">
+                    ✅ <strong>SEM TAXA DE COMISSÃO</strong>
+                    <p>Você paga só a entrega, sem porcentagem sobre a venda!</p>
+                </div>
+                <div class="diferencial">
+                    🤝 <strong>ATENDIMENTO DIRETO</strong>
+                    <p>Fala diretamente comigo, sem robôs ou atendentes virtuais.</p>
+                </div>
+                <div class="diferencial">
+                    📍 <strong>CONHEÇO A CIDADE</strong>
+                    <p>Sei todos os bairros e ruas, entrega rápida e sem erro.</p>
+                </div>
+                <div class="diferencial">
+                    ⏱️ <strong>RAPIDEZ</strong>
+                    <p>Agilidade na retirada e entrega do seu produto.</p>
+                </div>
+            </div>
+
+            <div class="historico" id="blocoHistorico" style="display: none;">
+                <h4>📂 Últimos Pedidos (clique para usar)</h4>
+                <div id="listaHistorico"></div>
+            </div>
+
+            <div class="origem-fixa">
+                📍 Retirada: Juiz de Fora - MG
+            </div>
+
+            <form id="formPedido">
+                <label for="nomeLoja" class="obrigatorio">🏪 Nome da Loja / Empresa</label>
+                <input type="text" id="nomeLoja" placeholder="Ex: Loja de Roupas Silva" required>
+
+                <label class="salvar-dados">
+                    <input type="checkbox" id="salvarLoja" checked> Salvar nome da loja para próximos pedidos
+                </label>
+
+                <label class="obrigatorio">📍 Endereço de Destino (até 3 destinos)</label>
+                <div id="listaDestinos">
+                    <div class="destino-item">
+                        <div class="campo-grupo">
+                            <input type="text" class="endereco-destino obrigatorio" placeholder="Rua, Avenida, Praça..." required>
+                            <div class="linha-dupla">
+                                <input type="text" class="numero-destino obrigatorio" placeholder="Número" required>
+                                <input type="text" class="complemento-destino" placeholder="Apto / Bloco / Andar">
+                            </div>
+                            <input type="text" class="bairro-destino obrigatorio" placeholder="Bairro" required>
+                            <input type="text" class="referencia-destino obrigatorio" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
+                            <input type="text" class="nome-cliente obrigatorio" placeholder="👤 Nome completo do cliente final" required>
+                            <input type="tel" class="telefone-cliente obrigatorio" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
+                        </div>
+                        <button type="button" class="btn-copiar-endereco" title="Copiar para próximo destino">📋</button>
+                        <button type="button" class="btn-remover" onclick="removerDestino(this)">×</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-mais" id="btnAdicionarDestino">➕ Adicionar outro destino</button>
+
+                <div id="map"></div>
+                <div class="info-distancia" id="infoDistancia">Informe os endereços para calcular a distância e valor</div>
+                <div style="font-size:14px; color:#555; margin: 5px 0 15px;">💡 Cálculo: R$ 2,50 por km rodado + taxa mínima de R$ 10,00</div>
+
+                <label for="retorno" class="obrigatorio">🔄 Precisa voltar para a loja depois da entrega?</label>
+                <select id="retorno" required>
+                    <option value="">Selecione uma opção</option>
+                    <option value="nao">❌ Não, só entrega</option>
+                    <option value="sim">✅ Sim, retorno para a loja</option>
+                </select>
+
+                <label for="formaPagamento" class="obrigatorio">💵 Forma de Pagamento da Entrega</label>
+                <select id="formaPagamento" required>
+                    <option value="">Selecione</option>
+                    <option value="loja">💳 Pago na loja / Já acertado</option>
+                    <option value="cliente">💵 Pago pelo cliente na entrega</option>
+                </select>
+
+                <label for="valorTroco" class="opcional">💵 Precisa de troco para quanto?</label>
+                <input type="text" id="valorTroco" placeholder="Ex: 100,00 — se não precisar, deixe vazio">
+
+                <label for="observacoes" class="opcional">📝 Observações / Instruções especiais</label>
+                <textarea id="observacoes" placeholder="Ex: Entregar na porta lateral, apartamento sem porteiro, etc."></textarea>
+
+                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor da Entrega</button>
+
+                <div class="caixa-valor" id="caixaValor">
+                    <div class="titulo-valor">Valor Total da Entrega</div>
+                    <div class="valor-final" id="valorTotal">R$ 0,00</div>
+                    <div class="detalhe" id="detalheValor"></div>
+                    <button type="button" class="btn-copiar" id="btnCopiarValor">📋 Copiar Valor</button>
+                </div>
+
+                <div class="caixa-resumo" id="caixaResumo">
+                    <h4>📋 Resumo do Pedido</h4>
+                    <div id="conteudoResumo"></div>
+                    <button type="button" class="btn-copiar" id="btnCopiarMensagem">📋 Copiar Mensagem Completa</button>
+                </div>
+
+                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido no WhatsApp</button>
+                <button type="button" class="btn-nova-entrega" id="btnNovaEntrega">🆕 Nova Entrega</button>
+
+                <div class="sucesso" id="mensagemSucesso">
+                    ✅ Pedido enviado com sucesso! Obrigado por usar nossos serviços.
+                </div>
+
+                <p class="aviso">Ao clicar em enviar, você confere todos os dados e concorda com os termos de uso.</p>
+            </form>
+
+            <div class="regras">
+                <h4>ℹ️ Regras e Informações Importantes</h4>
+                <p>• Valor mínimo de entrega: R$ 10,00</p>
+                <p>• Valor calculado: R$ 2,50 por km rodado</p>
+                <p>• Entregas fora do perímetro central podem ter acréscimo</p>
+                <p>• Não nos responsabilizamos pelo conteúdo da encomenda</p>
+                <p>• Em caso de ausência no endereço, nova taxa de entrega será cobrada</p>
+            </div>
+
+            <div class="depoimentos">
+                <h4>⭐ O que dizem nossos clientes</h4>
+                <div class="depoimento">"Serviço excelente, super rápido e confiável! Sempre uso." <strong>— Loja de Variedades</strong></div>
+                <div class="depoimento">"Melhor entrega da cidade, nunca erra o endereço!" <strong>— Padaria e Confeitaria</strong></div>
+                <div class="depoimento">"Preço justo e atendimento nota 10!" <strong>— Mercado e Açougue</strong></div>
+            </div>
+
+            <div class="pagamento">
+                <h4>💳 Formas de Pagamento</h4>
+                <p>✅ Dinheiro | ✅ Pix | ✅ Cartão de crédito/débito</p>
+                <div class="chave-pix">Chave Pix: (32) 99995-3215</div>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+
+    <a href="https://wa.me/5532999953215?text=Olá! Vim do site e preciso de mais informações." target="_blank" class="whatsapp-fixo">💬</a>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Z7Kf1xQ8K6hGxQeY7z9aX7z9aX7z9aX&libraries=places&language=pt-BR&region=BR"></script>
+
+    <script>
+        // ===== VARIÁVEIS GLOBAIS =====
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let distanciaTotal = 0;
+        let valorEntrega = 0;
+        let mensagemPedidoCompleta = '';
+        const CIDADE_ALVO = "Juiz de Fora";
+        const ESTADO_ALVO = "MG";
+        const VALOR_MINIMO = 10;
+        const VALOR_POR_KM = 2.5;
+
+        // ===== INICIALIZAÇÃO =====
+        window.addEventListener('load', () => {
+            carregarNomeLojaSalvo();
+            carregarHistorico();
+            inicializarMapa();
+            configurarMascaras();
+            configurarAutocomplete();
+            adicionarEventos();
+        });
+
+        // ===== SALVAR E MANTER NOME DA LOJA =====
+        function carregarNomeLojaSalvo() {
+            const nomeSalvo = localStorage.getItem('nomeLojaMTZ');
+            if (nomeSalvo) document.getElementById('nomeLoja').value = nomeSalvo;
+        }
+
+        document.getElementById('nomeLoja').addEventListener('input', salvarNomeLoja);
+        document.getElementById('salvarLoja').addEventListener('change', salvarNomeLoja);
+
+        function salvarNomeLoja() {
+            if (document.getElementById('salvarLoja').checked) {
+                localStorage.setItem('nomeLojaMTZ', document.getElementById('nomeLoja').value.trim());
+            } else {
+                localStorage.removeItem('nomeLojaMTZ');
+            }
+        }
+
+        // ===== MÁSCARA DE TELEFONE + VALIDAÇÃO 11 DÍGITOS =====
+        function configurarMascaras() {
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('telefone-cliente')) {
+                    let valor = e.target.value.replace(/\D/g, '');
+                    if (valor.length > 11) valor = valor.substring(0, 11);
+                    if (valor.length === 11) {
+                        valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7,11)}`;
+                    } else if (valor.length > 6) {
+                        valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7)}`;
+                    } else if (valor.length > 2) {
+                        valor = `(${valor.substring(0,2)}) ${valor.substring(2)}`;
+                    } else if (valor.length > 0) {
+                        valor = `(${valor}`;
+                    }
+                    e.target.value = valor;
+                }
+            });
+        }
+
+        function validarTelefone(telefone) {
+            const numeroLimpo = telefone.replace(/\D/g, '');
+            return numeroLimpo.length === 11;
+        }
+
+        // ===== ADICIONAR / REMOVER / COPIAR DESTINO =====
+        function adicionarDestino() {
+            const lista = document.getElementById('listaDestinos');
+            const modelo = document.querySelector('.destino-item').cloneNode(true);
+            
+            modelo.querySelectorAll('input').forEach(input => input.value = '');
+            lista.appendChild(modelo);
+
+            configurarAutocomplete();
+            configurarMascaras();
+        }
+
+        function removerDestino(botao) {
+            const destinos = document.querySelectorAll('.destino-item');
+            if (destinos.length > 1) {
+                botao.closest('.destino-item').remove();
+            } else {
+                alert('⚠️ É necessário pelo menos um destino!');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-copiar-endereco')) {
+                const destinoAtual = e.target.closest('.destino-item');
+                const dados = {
+                    endereco: destinoAtual.querySelector('.endereco-destino').value,
+                    numero: destinoAtual.querySelector('.numero-destino').value,
+                    complemento: destinoAtual.querySelector('.complemento-destino').value,
+                    bairro: destinoAtual.querySelector('.bairro-destino').value,
+                    referencia: destinoAtual.querySelector('.referencia-destino').value
+                };
+
+                adicionarDestino();
+                const novoDestino = document.querySelectorAll('.destino-item')[document.querySelectorAll('.destino-item').length - 1];
+                novoDestino.querySelector('.endereco-destino').value = dados.endereco;
+                novoDestino.querySelector('.numero-destino').value = dados.numero;
+                novoDestino.querySelector('.complemento-destino').value = dados.complemento;
+                novoDestino.querySelector('.bairro-destino').value = dados.bairro;
+                novoDestino.querySelector('.referencia-destino').value = dados.referencia;
+            }
+        });
+
+        // ===== AUTOCOMPLETE + VALIDAÇÃO DE JUIZ DE FORA =====
+        function configurarAutocomplete() {
+            const camposEndereco = document.querySelectorAll('.endereco-destino');
+            camposEndereco.forEach(campo => {
+                if (!campo.dataset.inicializado) {
+                    const opcoes = {
+                        componentRestrictions: { country: 'br' },
+                        types: ['address']
+                    };
+
+                    const autocomplete = new google.maps.places.Autocomplete(campo, opcoes);
+                    autocomplete.setFields(['address_components']);
+
+                    autocomplete.addListener('place_changed', () => {
+                        const place = autocomplete.getPlace();
+                        if (!place.address_components) return;
+
+                        const pegarComponente = (tipo) => 
+                            place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
+
+                        const cidade = pegarComponente('administrative_area_level_2');
+                        const itemDestino = campo.closest('.destino-item');
+                        const aviso = document.getElementById('avisoCidadeErro');
+
+                        if (!cidade.includes(CIDADE_ALVO)) {
+                            aviso.style.display = 'block';
+                            campo.value = '';
+                            itemDestino.querySelector('.bairro-destino').value = '';
+                            return;
+                        } else {
+                            aviso.style.display = 'none';
+                        }
+
+                        itemDestino.querySelector('.bairro-destino').value = 
+                            pegarComponente('sublocality_level_1') || pegarComponente('administrative_area_level_3') || '';
+                    });
+
+                    campo.dataset.inicializado = 'true';
+                }
+            });
+        }
+
+        // ===== MAPA E ROTAS =====
+        function inicializarMapa() {
+            const centro = { lat: -21.7641, lng: -43.3503 };
+            map = new google.maps.Map(document.getElementById('map'), { zoom: 12, center: centro });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+        }
+
+        // ===== CALCULAR VALOR =====
+        function calcularValor() {
+            const destinos = document.querySelectorAll('.destino-item');
+            let valido = true;
+            let enderecos = [];
+
+            destinos.forEach((dest, indice) => {
+                const end = dest.querySelector('.endereco-destino').value.trim();
+                const num = dest.querySelector('.numero-destino').value.trim();
+                const bairro = dest.querySelector('.bairro-destino').value.trim();
+                const ref = dest.querySelector('.referencia-destino').value.trim();
+                const nomeCli = dest.querySelector('.nome-cliente').value.trim();
+                const tel = dest.querySelector('.telefone-cliente').value;
+
+                if (!end || !num || !bairro || !ref || !nomeCli || !validarTelefone(tel)) {
+                    alert(`⚠️ Dados incompletos ou telefone inválido no destino ${indice + 1}! Verifique todos os campos.`);
+                    valido = false;
+                    return;
+                }
+
+                enderecos.push(`${end}, ${num} - ${bairro}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`);
+            });
+
+            if (!valido) return;
+
+            const origem = `${CIDADE_ALVO}, ${ESTADO_ALVO}`;
+            let rota = [origem, ...enderecos];
+            const volta = document.getElementById('retorno').value === 'sim';
+            if (volta) rota.push(origem);
+
+            const waypoints = rota.slice(1, -1).map(e => ({ location: e, stopover: true }));
+
+            directionsService.route({
+                origin: rota[0],
+                destination: rota[rota.length - 1],
+                waypoints: waypoints,
+                optimizeWaypoints: false,
+                travelMode: google.maps.TravelMode.DRIVING
+            }, (resultado, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(resultado);
+                    distanciaTotal = 0;
+                    resultado.routes[0].legs.forEach(parte => distanciaTotal += parte.distance.value / 1000);
+
+                    valorEntrega = Math.max(VALOR_MINIMO, VALOR_MINIMO + (distanciaTotal * VALOR_POR_KM));
+
+                    if (valorEntrega === VALOR_MINIMO) {
+                        document.getElementById('avisoValorMinimo').style.display = 'block';
+                    } else {
+                        document.getElementById('avisoValorMinimo').style.display = 'none';
+                    }
+
+                    document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
+                    document.getElementById('valorTotal').textContent = `R$ ${valorEntrega.toFixed(2)}`;
+                    document.getElementById('detalheValor').innerHTML = 
+                        `Distância: ${distanciaTotal.toFixed(2)} km<br>` +
+                        `R$ ${VALOR_POR_KM.toFixed(2)} por km + Taxa mínima R$ ${VALOR_MINIMO.toFixed(2)}`;
+                    document.getElementById('caixaValor').style.display = 'block';
+                    document.getElementById('btnEnviar').disabled = false;
+
+                    gerarResumo();
+                } else {
+                    alert('❌ Não foi possível calcular a rota. Verifique o endereço e tente novamente.');
+                }
+            });
+        }
+
+        // ===== GERAR RESUMO E MENSAGEM COMPLETA =====
+        function gerarResumo() {
+            const destinos = document.querySelectorAll('.destino-item');
+            let resumoHTML = '';
+            let mensagem = `🚀 NOVO PEDIDO DE ENTREGA - MTZ EXPRESS 🚀\n\n`;
+            mensagem += `🏪 Loja: ${document.getElementById('nomeLoja').value.trim()}\n`;
+            mensagem += `🔄 Retorno: ${document.getElementById('retorno').value === 'sim' ? 'SIM' : 'NÃO'}\n`;
+            mensagem += `💳 Pagamento: ${document.getElementById('formaPagamento').selectedOptions[0].text}\n`;
+            
+            if (document.getElementById('
