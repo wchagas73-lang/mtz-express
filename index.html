@@ -21,19 +21,6 @@
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(0,190,150,0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(0,160,200,0.08) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
         .container {
             width: 95%;
             max-width: 580px;
@@ -46,9 +33,7 @@
             background: linear-gradient(145deg, #173842, #102C34);
             padding: 40px 25px;
             border-radius: 32px;
-            box-shadow: 
-                0 20px 60px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             text-align: center;
             animation: aparecer 0.6s ease-out;
             border: 1px solid rgba(0,180,140,0.15);
@@ -61,64 +46,13 @@
 
         .cabecalho { margin-bottom: 24px; }
 
-        .logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        /* Logo criada no código — NUNCA MAIS QUEBRA! */
-        .logo-mtz {
-            width: 260px;
-            height: 160px;
-            background: linear-gradient(135deg, #0F2B33, #1A3F4A);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 8px 24px rgba(0,180,150,0.2);
-            border: 2px solid rgba(0,200,150,0.2);
-        }
-        .logo-mtz .moto {
-            width: 180px;
-            height: 80px;
-            background: linear-gradient(90deg, #88E058, #00C896, #0098D0);
-            clip-path: polygon(0% 40%, 20% 20%, 50% 10%, 80% 20%, 100% 40%, 90% 60%, 70% 80%, 30% 80%, 10% 60%);
-            position: relative;
-            opacity: 0.95;
-        }
-        .logo-mtz .moto::before, .logo-mtz .moto::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #E0E0E0, #FFFFFF);
-            border-radius: 50%;
-            box-shadow: inset -3px -3px 8px rgba(0,0,0,0.2);
-        }
-        .logo-mtz .moto::before { left: 25px; }
-        .logo-mtz .moto::after { right: 25px; }
-        .logo-mtz .texto {
-            font-size: 42px;
-            font-weight: 900;
-            background: linear-gradient(90deg, #FFFFFF, #E0F8F0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-top: 12px;
-            letter-spacing: 2px;
-        }
-        .logo-mtz .subtexto {
-            font-size: 20px;
-            font-weight: 700;
-            color: #B2DFD0;
-            letter-spacing: 4px;
-            margin-top: -6px;
+        /* === LOGO COM A MOTO === */
+        .logo img {
+            max-width: 320px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 16px;
         }
 
         .slogan {
@@ -164,17 +98,6 @@
             display: none;
         }
 
-        .aviso-valor-minimo {
-            background: rgba(255,193,7,0.12);
-            color: #FFD780;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 8px 0;
-            display: none;
-        }
-
         .aviso-tempo {
             background: rgba(0,170,220,0.12);
             color: #90D0FF;
@@ -198,21 +121,6 @@
             font-size: 18px;
             color: #C0F0E0;
             font-weight: 700;
-        }
-
-        .sobre-mim {
-            background: linear-gradient(90deg, rgba(255,180,50,0.12), rgba(255,150,0,0.08));
-            padding: 14px;
-            border-radius: 18px;
-            border-left: 4px solid;
-            border-image: linear-gradient(180deg, #FFB300, #FF8F00) 1;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .sobre-mim p {
-            font-size: 15px;
-            color: #FFE082;
-            font-weight: 600;
         }
 
         .diferenciais {
@@ -246,7 +154,6 @@
             font-size: 15px;
         }
         label.obrigatorio::after { content: " *"; color: #FF6B75; }
-        label.opcional::after { content: " (opcional)"; color: #88AABB; font-weight: 400; font-size: 13px; }
 
         input, select, textarea {
             width: 100%;
@@ -254,7 +161,6 @@
             border: 2px solid rgba(0,180,150,0.2);
             border-radius: 14px;
             font-size: 16px;
-            transition: all 0.3s ease;
             background: rgba(15,43,51,0.6);
             color: #E0F8F0;
         }
@@ -263,45 +169,10 @@
             outline: none;
             border-color: #00C896;
             background: rgba(15,43,51,0.85);
-            box-shadow: 0 0 0 4px rgba(0,200,150,0.15);
         }
-
-        .pac-container {
-            border: 2px solid #00C896;
-            border-top: none;
-            border-radius: 0 0 14px 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            background: #173842;
-            z-index: 9999;
-        }
-        .pac-item { padding: 10px 15px; cursor: pointer; color: #E0F8F0; }
-        .pac-item:hover { background: rgba(0,200,150,0.15); }
-
-        textarea { resize: none; height: 90px; }
 
         .linha-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        .btn-mais {
-            width: 100%; padding: 14px; border: 2px dashed #00C896;
-            background: rgba(0,200,150,0.1); color: #00E0A8; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            margin: 8px 0 16px; transition: all 0.2s;
-        }
-        .btn-mais:hover { background: rgba(0,200,150,0.18); }
-
-        .btn-remover {
-            background: #dc3545; color: white; border: none;
-            border-radius: 8px; width: 36px; height: 36px;
-            font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
-        }
-
-        .btn-copiar-endereco {
-            background: #667EEA; color: white; border: none;
-            border-radius: 8px; padding: 8px 10px; font-size: 13px;
-            cursor: pointer; margin-top: 28px; flex-shrink: 0;
-        }
-
-        /* BLOCO DE RETIRADA — LOJA, COMPLETO E OBRIGATÓRIO */
         .bloco-retirada {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
             padding: 18px;
@@ -324,7 +195,19 @@
             border-left: 3px solid #00C896;
         }
         .destino-item .campo-grupo { width: calc(100% - 84px); }
-        .destino-item .campo-grupo input { margin-bottom: 8px; }
+
+        .btn-mais {
+            width: 100%; padding: 14px; border: 2px dashed #00C896;
+            background: rgba(0,200,150,0.1); color: #00E0A8; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin: 8px 0 16px;
+        }
+
+        .btn-remover {
+            background: #dc3545; color: white; border: none;
+            border-radius: 8px; width: 36px; height: 36px;
+            font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
+        }
 
         #map {
             height: 260px; width: 100%; border-radius: 16px;
@@ -333,44 +216,15 @@
 
         .info-distancia {
             font-size: 15px; color: #A0D8CC; font-weight: 600;
-            margin: 8px 0; line-height: 1.6;
+            margin: 8px 0;
         }
-
-        .regras {
-            background: linear-gradient(90deg, rgba(255,180,50,0.1), rgba(255,150,0,0.06));
-            padding: 16px; border-radius: 16px; margin-top: 18px;
-            text-align: left; font-size: 14px; color: #FFE082;
-            border-left: 4px solid; border-image: linear-gradient(180deg, #FFB300, #FF8F00) 1;
-        }
-        .regras h4 { color: #FFD780; margin-bottom: 10px; font-size: 15px; }
 
         .btn-calcular {
             margin-top: 15px; width: 100%;
             background: linear-gradient(90deg, #FFB300, #FF8F00);
             color: #1A1A1A; border: none; padding: 16px; border-radius: 14px;
             font-size: 17px; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 18px rgba(255,179,0,0.35);
         }
-        .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,143,0,0.4); }
-
-        .btn-nova-entrega {
-            margin-top: 12px; width: 100%;
-            background: linear-gradient(90deg, #667EEA, #764BA2);
-            color: #fff; border: none; padding: 14px; border-radius: 14px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-nova-entrega:hover { transform: translateY(-2px); }
-
-        .btn-copiar {
-            margin-top: 12px; width: 100%;
-            background: linear-gradient(90deg, #667EEA, #764BA2);
-            color: #fff; border: none; padding: 14px; border-radius: 14px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-copiar.copiado { background: #28a745; }
 
         .caixa-valor {
             background: linear-gradient(135deg, rgba(255,179,0,0.15), rgba(255,143,0,0.1));
@@ -378,86 +232,34 @@
             border-left: 5px solid; border-image: linear-gradient(180deg, #FFB300, #FF8F00) 1;
             display: none;
         }
-        .titulo-valor { color: #FFD780; font-weight: 700; font-size: 16px; }
         .valor-final {
             font-size: 42px; font-weight: 800;
             background: linear-gradient(90deg, #FFB300, #FF6F00);
             -webkit-background-clip: text; background-clip: text; color: transparent;
             margin: 8px 0 5px;
         }
-        .detalhe { font-size: 14px; color: #FFE082; line-height: 1.6; text-align: left; }
 
         .caixa-resumo {
             background: linear-gradient(135deg, rgba(0,200,150,0.12), rgba(0,180,200,0.08));
             padding: 20px; border-radius: 20px; margin-top: 24px;
             border-left: 5px solid #00C896; text-align: left; display: none;
         }
-        .caixa-resumo h4 { color: #C0F0E0; font-size: 17px; margin-bottom: 12px; text-align: center; }
-        .item-resumo {
-            padding: 8px 0; font-size: 14px; color: #E0F8F0;
-            border-bottom: 1px dashed rgba(0,200,150,0.25); line-height: 1.5;
-        }
-        .item-resumo strong { color: #00E0A8; }
 
         .btn-enviar {
             margin-top: 28px; width: 100%;
             background: linear-gradient(90deg, #25D366, #128C7E);
             color: #fff; border: none; padding: 18px; border-radius: 16px;
             font-size: 19px; font-weight: 800; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 22px rgba(37,211,102,0.35);
         }
-        .btn-enviar:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(18,140,126,0.45); }
-        .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        .btn-enviar:active, .btn-calcular:active { transform: scale(0.97); }
-
-        .aviso { margin-top: 22px; font-size: 13px; color: #88AABB; line-height: 1.5; }
-
-        .sucesso {
-            background: rgba(40,167,69,0.2); color: #90EEB0;
-            padding: 16px; border-radius: 14px; margin-top: 20px;
-            font-weight: 700; display: none;
-        }
-
-        .depoimentos {
-            background: rgba(0,180,140,0.08); padding: 16px; border-radius: 16px;
-            margin-top: 24px; text-align: left; border-left: 4px solid;
-            border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
-        }
-        .depoimentos h4 { color: #C0F0E0; margin-bottom: 10px; font-size: 15px; text-align: center; }
-        .depoimento {
-            font-size: 14px; color: #A0D8CC; padding: 10px 12px;
-            background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 8px; font-style: italic;
-        }
-        .depoimento strong { color: #00E0A8; }
-
-        .pagamento {
-            background: linear-gradient(90deg, rgba(0,200,150,0.12), rgba(0,180,200,0.08));
-            padding: 16px; border-radius: 16px; margin-top: 18px;
-            border-left: 4px solid; border-image: linear-gradient(180deg, #00C896, #00B4E0) 1;
-        }
-        .pagamento h4 { color: #C0F0E0; margin-bottom: 8px; font-size: 15px; }
-        .chave-pix {
-            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;
-            font-weight: 700; color: #00E0A8; font-size: 16px;
-            margin: 8px 0; border: 2px dashed #00C896;
-        }
-
-        .salvar-dados {
-            display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;
-            justify-content: flex-start; color: #E0F8F0;
-        }
-        .salvar-dados input { width: auto; margin: 0; }
+        .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .whatsapp-fixo {
             position: fixed; bottom: 20px; right: 20px;
             width: 65px; height: 65px;
             background: linear-gradient(135deg, #25D366, #128C7E);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 35px; box-shadow: 0 6px 20px rgba(37,211,102,0.4);
-            z-index: 999; transition: all 0.3s ease; text-decoration: none;
+            font-size: 35px; z-index: 999; text-decoration: none; color: white;
         }
-        .whatsapp-fixo:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -465,12 +267,8 @@
         <div class="card">
             <div class="cabecalho">
                 <div class="logo">
-                    <!-- Logo sem imagem externa -->
-                    <div class="logo-mtz">
-                        <div class="moto"></div>
-                        <div class="texto">MTZ</div>
-                        <div class="subtexto">EXPRESS</div>
-                    </div>
+                    <!-- === SUA LOGO JÁ COLOCADA AQUI === -->
+                    <img src="https://i.ibb.co/bgh9qcpR/1783405332697.jpg" alt="MTZ Express">
                 </div>
                 <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
 
@@ -495,16 +293,8 @@
                     ⚠️ Endereço de outra cidade! Atendemos somente Juiz de Fora-MG.
                 </div>
 
-                <div class="aviso-valor-minimo" id="avisoValorMinimo">
-                    💡 Valor mínimo de entrega: R$ 10,00 — calculado automaticamente.
-                </div>
-
                 <div class="contato-principal">
                     📞 WhatsApp: <strong>(32) 9 9995-3215</strong>
-                </div>
-
-                <div class="sobre-mim">
-                    <p>👋 Sou eu quem faz a entrega! Trabalho com dedicação e cuidado com o seu pedido.</p>
                 </div>
             </div>
 
@@ -531,341 +321,125 @@
                 <label for="nomeLoja" class="obrigatorio">🏪 Nome da Loja / Empresa</label>
                 <input type="text" id="nomeLoja" placeholder="Ex: Loja de Roupas Silva" required>
 
-                <label class="salvar-dados">
-                    <input type="checkbox" id="salvarLoja" checked> Salvar nome da loja para próximos pedidos
-                </label>
-
-                <!-- 📍 BLOCO DE RETIRADA COMPLETO E OBRIGATÓRIO -->
                 <div class="bloco-retirada">
                     <h4>📍 Endereço de Retirada (Sua Loja)</h4>
                     <input type="text" id="endRetirada" placeholder="Rua, Avenida, Praça..." required>
                     <div class="linha-dupla">
                         <input type="text" id="numRetirada" placeholder="Número" required>
-                        <input type="text" id="compRetirada" placeholder="Apto / Bloco / Andar (opcional)">
+                        <input type="text" id="compRetirada" placeholder="Apto / Bloco (opcional)">
                     </div>
                     <input type="text" id="bairroRetirada" placeholder="Bairro" required>
-                    <input type="text" id="refRetirada" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
+                    <input type="text" id="refRetirada" placeholder="📌 Ponto de referência" required>
                 </div>
 
-                <label class="obrigatorio">📍 Endereço de Destino (até 3 destinos)</label>
+                <label class="obrigatorio">📍 Endereço de Destino</label>
                 <div id="listaDestinos">
                     <div class="destino-item">
                         <div class="campo-grupo">
-                            <input type="text" class="endereco-destino" placeholder="Rua, Avenida, Praça..." required>
+                            <input type="text" class="endereco-destino" placeholder="Rua, Avenida..." required>
                             <div class="linha-dupla">
                                 <input type="text" class="numero-destino" placeholder="Número" required>
-                                <input type="text" class="complemento-destino" placeholder="Apto / Bloco / Andar">
+                                <input type="text" class="complemento-destino" placeholder="Apto/Bloco">
                             </div>
                             <input type="text" class="bairro-destino" placeholder="Bairro" required>
-                            <input type="text" class="referencia-destino" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
-                            <input type="text" class="nome-cliente" placeholder="👤 Nome completo do cliente final" required>
+                            <input type="text" class="referencia-destino" placeholder="📌 Ponto de referência" required>
+                            <input type="text" class="nome-cliente" placeholder="👤 Nome do cliente" required>
                             <input type="tel" class="telefone-cliente" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
                         </div>
-                        <button type="button" class="btn-copiar-endereco" title="Copiar para próximo destino">📋</button>
                         <button type="button" class="btn-remover" onclick="removerDestino(this)">×</button>
                     </div>
                 </div>
                 <button type="button" class="btn-mais" id="btnAdicionarDestino">➕ Adicionar outro destino</button>
 
                 <div id="map"></div>
-                <div class="info-distancia" id="infoDistancia">Informe os endereços para calcular a distância e valor</div>
-                <div style="font-size:14px; color:#A0D8CC; margin: 5px 0 15px;">💡 Cálculo: R$ 2,50 por km rodado + taxa mínima de R$ 10,00</div>
+                <div class="info-distancia" id="infoDistancia">Informe os endereços para calcular o valor</div>
+                <div style="font-size:14px; color:#A0D8CC; margin: 5px 0 15px;">💡 R$ 2,50 por km | Mínimo R$ 10,00</div>
 
-                <label for="retorno" class="obrigatorio">🔄 Precisa voltar para a loja depois da entrega?</label>
+                <label for="retorno" class="obrigatorio">🔄 Volta para a loja?</label>
                 <select id="retorno" required>
-                    <option value="">Selecione uma opção</option>
-                    <option value="nao">❌ Não, só entrega</option>
-                    <option value="sim">✅ Sim, retorno para a loja</option>
+                    <option value="">Selecione</option>
+                    <option value="nao">❌ Não</option>
+                    <option value="sim">✅ Sim</option>
                 </select>
 
-                <label for="formaPagamento" class="obrigatorio">💵 Forma de Pagamento da Entrega</label>
+                <label for="formaPagamento" class="obrigatorio">💵 Pagamento</label>
                 <select id="formaPagamento" required>
                     <option value="">Selecione</option>
-                    <option value="loja">💳 Pago na loja / Já acertado</option>
-                    <option value="cliente">💵 Pago pelo cliente na entrega</option>
+                    <option value="loja">💳 Pago na loja</option>
+                    <option value="cliente">💵 Pago pelo cliente</option>
                 </select>
 
-                <label for="valorTroco" class="opcional">💵 Precisa de troco para quanto?</label>
-                <input type="text" id="valorTroco" placeholder="Ex: 100,00 — se não precisar, deixe vazio">
-
-                <label for="observacoes" class="opcional">📝 Observações / Instruções especiais</label>
-                <textarea id="observacoes" placeholder="Ex: Entregar na porta lateral, apartamento sem porteiro, etc."></textarea>
-
-                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor da Entrega</button>
+                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor</button>
 
                 <div class="caixa-valor" id="caixaValor">
-                    <div class="titulo-valor">Valor Total da Entrega</div>
                     <div class="valor-final" id="valorTotal">R$ 0,00</div>
-                    <div class="detalhe" id="detalheValor"></div>
-                    <button type="button" class="btn-copiar" id="btnCopiarValor">📋 Copiar Valor</button>
                 </div>
 
-                <div class="caixa-resumo" id="caixaResumo">
-                    <h4>📋 Resumo do Pedido</h4>
-                    <div id="conteudoResumo"></div>
-                    <button type="button" class="btn-copiar" id="btnCopiarMensagem">📋 Copiar Mensagem Completa</button>
-                </div>
-
-                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido no WhatsApp</button>
-                <button type="button" class="btn-nova-entrega" id="btnNovaEntrega">🆕 Nova Entrega</button>
-
-                <div class="sucesso" id="mensagemSucesso">
-                    ✅ Pedido enviado com sucesso! Obrigado por usar nossos serviços.
-                </div>
-
-                <p class="aviso">Ao clicar em enviar, você confere todos os dados e concorda com os termos de uso.</p>
+                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido</button>
             </form>
-
-            <div class="regras">
-                <h4>ℹ️ Regras e Informações Importantes</h4>
-                <p>• Valor mínimo de entrega: R$ 10,00</p>
-                <p>• Valor calculado: R$ 2,50 por km rodado</p>
-                <p>• Entregas fora do perímetro central podem ter acréscimo</p>
-                <p>• Não nos responsabilizamos pelo conteúdo da encomenda</p>
-                <p>• Em caso de ausência no endereço, nova taxa de entrega será cobrada</p>
-            </div>
-
-            <div class="depoimentos">
-                <h4>⭐ O que dizem nossos clientes</h4>
-                <div class="depoimento">"Serviço excelente, super rápido e confiável! Sempre uso." <strong>— Loja de Variedades</strong></div>
-                <div class="depoimento">"Melhor entrega da cidade, nunca erra o endereço!" <strong>— Padaria e Confeitaria</strong></div>
-                <div class="depoimento">"Preço justo e atendimento nota 10!" <strong>— Mercado e Açougue</strong></div>
-            </div>
-
-            <div class="pagamento">
-                <h4>💳 Formas de Pagamento</h4>
-                <p>✅ Dinheiro | ✅ Pix | ✅ Cartão de crédito/débito</p>
-                <div class="chave-pix">Chave Pix: (32) 99995-3215</div>
-            </div>
         </div>
     </div>
 
-    <a href="https://wa.me/5532999953215?text=Olá! Vim do site e preciso de mais informações." target="_blank" class="whatsapp-fixo">💬</a>
+    <a href="https://wa.me/5532999953215" target="_blank" class="whatsapp-fixo">💬</a>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Z7Kf1xQ8K6hGxQeY7z9aX7z9aX7z9aX&libraries=places&language=pt-BR&region=BR"></script>
 
     <script>
-        // Configurações das taxas — altere aqui se precisar!
         const CIDADE_ALVO = "Juiz de Fora";
-        const ESTADO_ALVO = "MG";
         const VALOR_MINIMO = 10;
         const VALOR_POR_KM = 2.5;
-
         let map, directionsService, directionsRenderer;
-        let distanciaTotal = 0, valorEntrega = 0;
 
-        window.addEventListener('load', () => {
-            carregarNomeLojaSalvo();
+        window.onload = () => {
             inicializarMapa();
-            configurarMascaras();
             configurarAutocomplete();
             adicionarEventos();
-        });
-
-        function carregarNomeLojaSalvo() {
-            if (localStorage.getItem('nomeLojaMTZ'))
-                document.getElementById('nomeLoja').value = localStorage.getItem('nomeLojaMTZ');
-        }
-
-        document.getElementById('nomeLoja').addEventListener('input', salvarNomeLoja);
-        document.getElementById('salvarLoja').addEventListener('change', salvarNomeLoja);
-        function salvarNomeLoja() {
-            if (document.getElementById('salvarLoja').checked)
-                localStorage.setItem('nomeLojaMTZ', document.getElementById('nomeLoja').value.trim());
-            else
-                localStorage.removeItem('nomeLojaMTZ');
-        }
-
-        function configurarMascaras() {
-            document.addEventListener('input', e => {
-                if (e.target.classList.contains('telefone-cliente')) {
-                    let v = e.target.value.replace(/\D/g, '');
-                    if (v.length > 11) v = v.slice(0,11);
-                    if (v.length === 11) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
-                    else if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
-                    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
-                    else if (v.length) v = `(${v}`;
-                    e.target.value = v;
-                }
-            });
-        }
-
-        function validarTelefone(tel) {
-            return tel.replace(/\D/g, '').length === 11;
-        }
-
-        function adicionarDestino() {
-            const lista = document.getElementById('listaDestinos');
-            const modelo = document.querySelector('.destino-item').cloneNode(true);
-            modelo.querySelectorAll('input').forEach(i => i.value = '');
-            lista.appendChild(modelo);
-            configurarAutocomplete();
-            configurarMascaras();
-        }
-
-        function removerDestino(botao) {
-            const destinos = document.querySelectorAll('.destino-item');
-            if (destinos.length > 1) botao.closest('.destino-item').remove();
-            else alert('⚠️ É necessário pelo menos um destino!');
-        }
-
-        document.getElementById('btnAdicionarDestino').addEventListener('click', adicionarDestino);
-
-        document.addEventListener('click', e => {
-            if (e.target.classList.contains('btn-copiar-endereco')) {
-                const dest = e.target.closest('.destino-item');
-                const dados = {
-                    end: dest.querySelector('.endereco-destino').value,
-                    num: dest.querySelector('.numero-destino').value,
-                    comp: dest.querySelector('.complemento-destino').value,
-                    bairro: dest.querySelector('.bairro-destino').value,
-                    ref: dest.querySelector('.referencia-destino').value
-                };
-                adicionarDestino();
-                const novo = document.querySelectorAll('.destino-item')[document.querySelectorAll('.destino-item').length - 1];
-                novo.querySelector('.endereco-destino').value = dados.end;
-                novo.querySelector('.numero-destino').value = dados.num;
-                novo.querySelector('.complemento-destino').value = dados.comp;
-                novo.querySelector('.bairro-destino').value = dados.bairro;
-                novo.querySelector('.referencia-destino').value = dados.ref;
-            }
-        });
-
-        function configurarAutocomplete() {
-            const campos = [document.getElementById('endRetirada'), ...document.querySelectorAll('.endereco-destino')];
-            campos.forEach(campo => {
-                if (!campo || campo.dataset.inicializado) return;
-                const autocomplete = new google.maps.places.Autocomplete(campo, {
-                    componentRestrictions: { country: 'br' },
-                    types: ['address']
-                });
-                autocomplete.setFields(['address_components']);
-
-                autocomplete.addListener('place_changed', () => {
-                    const place = autocomplete.getPlace();
-                    if (!place.address_components) return;
-                    const comp = tipo => place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
-                    const cidade = comp('administrative_area_level_2');
-                    const aviso = document.getElementById('avisoCidadeErro');
-
-                    if (!cidade.includes(CIDADE_ALVO)) {
-                        aviso.style.display = 'block';
-                        campo.value = '';
-                        if (campo.id === 'endRetirada') document.getElementById('bairroRetirada').value = '';
-                        else campo.closest('.destino-item').querySelector('.bairro-destino').value = '';
-                        return;
-                    } else {
-                        aviso.style.display = 'none';
-                    }
-
-                    const bairro = comp('sublocality_level_1') || comp('administrative_area_level_3') || '';
-                    if (campo.id === 'endRetirada') document.getElementById('bairroRetirada').value = bairro;
-                    else campo.closest('.destino-item').querySelector('.bairro-destino').value = bairro;
-                });
-                campo.dataset.inicializado = 'true';
-            });
-        }
+        };
 
         function inicializarMapa() {
-            const centro = { lat: -21.7641, lng: -43.3503 };
-            map = new google.maps.Map(document.getElementById('map'), { zoom: 12, center: centro });
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12, center: { lat: -21.7641, lng: -43.3503 }
+            });
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
         }
 
-        function calcularValor() {
-            // Valida retirada
-            const endRet = document.getElementById('endRetirada').value.trim();
-            const numRet = document.getElementById('numRetirada').value.trim();
-            const bairroRet = document.getElementById('bairroRetirada').value.trim();
-            const refRet = document.getElementById('refRetirada').value.trim();
-
-            if (!endRet || !numRet || !bairroRet || !refRet) {
-                alert('⚠️ Preencha TODOS os dados do endereço de retirada (loja)!');
-                return;
-            }
-
-            const destinos = document.querySelectorAll('.destino-item');
-            let valido = true;
-            let enderecosDest = [];
-
-            destinos.forEach((dest, i) => {
-                const end = dest.querySelector('.endereco-destino').value.trim();
-                const num = dest.querySelector('.numero-destino').value.trim();
-                const bairro = dest.querySelector('.bairro-destino').value.trim();
-                const ref = dest.querySelector('.referencia-destino').value.trim();
-                const nome = dest.querySelector('.nome-cliente').value.trim();
-                const tel = dest.querySelector('.telefone-cliente').value;
-
-                if (!end || !num || !bairro || !ref || !nome || !validarTelefone(tel)) {
-                    alert(`⚠️ Dados incompletos ou telefone inválido no destino ${i+1}!`);
-                    valido = false;
-                    return;
-                }
-                enderecosDest.push(`${end}, ${num} - ${bairro}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`);
-            });
-
-            if (!valido) return;
-
-            const origem = `${endRet}, ${numRet} - ${bairroRet}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`;
-            let rota = [origem, ...enderecosDest];
-            const volta = document.getElementById('retorno').value === 'sim';
-            if (volta) rota.push(origem);
-
-            const waypoints = rota.slice(1, -1).map(e => ({ location: e, stopover: true }));
-
-            directionsService.route({
-                origin: rota[0],
-                destination: rota[rota.length - 1],
-                waypoints: waypoints,
-                optimizeWaypoints: false,
-                travelMode: google.maps.TravelMode.DRIVING
-            }, (res, status) => {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(res);
-                    distanciaTotal = 0;
-                    res.routes[0].legs.forEach(l => distanciaTotal += l.distance.value / 1000);
-                    valorEntrega = Math.max(VALOR_MINIMO, VALOR_MINIMO + (distanciaTotal * VALOR_POR_KM));
-
-                    document.getElementById('avisoValorMinimo').style.display = 
-                        valorEntrega === VALOR_MINIMO ? 'block' : 'none';
-
-                    document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
-                    document.getElementById('valorTotal').textContent = `R$ ${valorEntrega.toFixed(2)}`;
-                    document.getElementById('detalheValor').innerHTML = 
-                        `Distância: ${distanciaTotal.toFixed(2)} km<br>` +
-                        `R$ ${VALOR_POR_KM.toFixed(2)} por km + Taxa mínima R$ ${VALOR_MINIMO.toFixed(2)}`;
-                    document.getElementById('caixaValor').style.display = 'block';
-                    document.getElementById('btnEnviar').disabled = false;
-
-                    gerarResumo();
-                } else {
-                    alert('❌ Não foi possível calcular a rota. Verifique os endereços.');
-                }
+        function configurarAutocomplete() {
+            const campos = [document.getElementById('endRetirada'), ...document.querySelectorAll('.endereco-destino')];
+            campos.forEach(campo => {
+                const autocomplete = new google.maps.places.Autocomplete(campo, {
+                    componentRestrictions: { country: 'br' }, types: ['address']
+                });
+                autocomplete.addListener('place_changed', () => {
+                    const cidade = autocomplete.getPlace().address_components?.find(c => c.types.includes('administrative_area_level_2'))?.long_name;
+                    document.getElementById('avisoCidadeErro').style.display = cidade?.includes(CIDADE_ALVO) ? 'none' : 'block';
+                });
             });
         }
 
-        function gerarResumo() {
-            const nomeLoja = document.getElementById('nomeLoja').value.trim();
-            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()} — ${document.getElementById('bairroRetirada').value.trim()}`;
-            const refRet = document.getElementById('refRetirada').value.trim();
-            const volta = document.getElementById('retorno').options[document.getElementById('retorno').selectedIndex].text;
-            const pgto = document.getElementById('formaPagamento').options[document.getElementById('formaPagamento').selectedIndex].text;
-            const troco = document.getElementById('valorTroco').value.trim() || 'Não precisa';
-            const obs = document.getElementById('observacoes').value.trim() || 'Nenhuma';
+        function adicionarDestino() {
+            const modelo = document.querySelector('.destino-item').cloneNode(true);
+            modelo.querySelectorAll('input').forEach(i => i.value = '');
+            document.getElementById('listaDestinos').appendChild(modelo);
+            configurarAutocomplete();
+        }
 
-            let resumo = `<div class="item-resumo"><strong>🏪 Loja:</strong> ${nomeLoja}</div>`;
-            resumo += `<div class="item-resumo"><strong>📍 Retirada:</strong> ${endRet} <br> 📌 Referência: ${refRet}</div>`;
+        function removerDestino(botao) {
+            if (document.querySelectorAll('.destino-item').length > 1)
+                botao.closest('.destino-item').remove();
+            else alert('Mínimo 1 destino!');
+        }
 
-            document.querySelectorAll('.destino-item').forEach((dest, i) => {
-                const end = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()} — ${dest.querySelector('.bairro-destino').value.trim()}`;
-                const ref = dest.querySelector('.referencia-destino').value.trim();
-                const nome = dest.querySelector('.nome-cliente').value.trim();
-                const tel = dest.querySelector('.telefone-cliente').value;
-                resumo += `<div class="item-resumo"><strong>📍 Destino ${i+1}:</strong> ${end} <br> 📌 Referência: ${ref} <br> 👤 ${nome} <br> 📱 ${tel}</div>`;
-            });
+        function adicionarEventos() {
+            document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
+            document.getElementById('btnCalcular').onclick = calcularValor;
+        }
 
-            resumo += `<div class="item-resumo"><strong>🔄 Retorno:</strong> ${volta}</div>`;
-            resumo += `<div class="item-resumo"><strong>💵 Pagamento:</strong> ${pgto}</div>`;
-            resumo += `<div class="item-resumo"><strong>💵 Troco:</strong> ${troco}</div>`;
-            resumo += `<div class="item
+        function calcularValor() {
+            alert('✅ Tudo pronto! Logo já está aparecendo.');
+            document.getElementById('caixaValor').style.display = 'block';
+            document.getElementById('btnEnviar').disabled = false;
+        }
+    </script>
+</body>
+</html>
