@@ -69,7 +69,7 @@
             margin-bottom: 16px;
         }
 
-        /* === LOGO DESENHADA DIRETO NO CÓDIGO — NÃO QUEBRA MAIS === */
+        /* Logo criada no código — NUNCA MAIS QUEBRA! */
         .logo-mtz {
             width: 260px;
             height: 160px;
@@ -112,7 +112,6 @@
             color: transparent;
             margin-top: 12px;
             letter-spacing: 2px;
-            text-shadow: 0 2px 8px rgba(0,180,150,0.3);
         }
         .logo-mtz .subtexto {
             font-size: 20px;
@@ -140,7 +139,6 @@
             font-size: 14px;
             margin-bottom: 10px;
             line-height: 1.5;
-            box-shadow: inset 0 0 0 1px rgba(255,193,7,0.1);
         }
 
         .aviso-whatsapp {
@@ -239,40 +237,6 @@
         }
         .diferencial p { font-size: 13px; color: #A0D8CC; margin-top: 4px; }
 
-        .historico {
-            background: rgba(100,120,200,0.1);
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            text-align: left;
-            border-left: 4px solid #667EEA;
-        }
-        .historico h4 {
-            color: #B0C8F0;
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
-        .item-historico {
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            border: 1px solid rgba(102,126,234,0.2);
-            transition: all 0.2s;
-            color: #E0F0F0;
-        }
-        .item-historico:hover {
-            border-color: #667EEA;
-            background: rgba(102,126,234,0.15);
-        }
-        .sem-historico {
-            color: #88AABB;
-            font-size: 14px;
-            font-style: italic;
-        }
-
         label {
             display: block;
             text-align: left;
@@ -307,14 +271,11 @@
             border-top: none;
             border-radius: 0 0 14px 14px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            font-family: inherit;
-            font-size: 15px;
             background: #173842;
             z-index: 9999;
         }
         .pac-item { padding: 10px 15px; cursor: pointer; color: #E0F8F0; }
         .pac-item:hover { background: rgba(0,200,150,0.15); }
-        .pac-item-query { font-weight: 600; color: #00E0A8; }
 
         textarea { resize: none; height: 90px; }
 
@@ -340,6 +301,7 @@
             cursor: pointer; margin-top: 28px; flex-shrink: 0;
         }
 
+        /* BLOCO DE RETIRADA — LOJA, COMPLETO E OBRIGATÓRIO */
         .bloco-retirada {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
             padding: 18px;
@@ -414,7 +376,7 @@
             background: linear-gradient(135deg, rgba(255,179,0,0.15), rgba(255,143,0,0.1));
             padding: 25px 20px; border-radius: 20px; margin-top: 22px;
             border-left: 5px solid; border-image: linear-gradient(180deg, #FFB300, #FF8F00) 1;
-            box-shadow: 0 8px 20px rgba(255,179,0,0.18); display: none;
+            display: none;
         }
         .titulo-valor { color: #FFD780; font-weight: 700; font-size: 16px; }
         .valor-final {
@@ -503,7 +465,7 @@
         <div class="card">
             <div class="cabecalho">
                 <div class="logo">
-                    <!-- LOGO NOVA, SEM IMAGEM EXTERNA -->
+                    <!-- Logo sem imagem externa -->
                     <div class="logo-mtz">
                         <div class="moto"></div>
                         <div class="texto">MTZ</div>
@@ -565,11 +527,6 @@
                 </div>
             </div>
 
-            <div class="historico" id="blocoHistorico" style="display: none;">
-                <h4>📂 Últimos Pedidos (clique para usar)</h4>
-                <div id="listaHistorico"></div>
-            </div>
-
             <form id="formPedido">
                 <label for="nomeLoja" class="obrigatorio">🏪 Nome da Loja / Empresa</label>
                 <input type="text" id="nomeLoja" placeholder="Ex: Loja de Roupas Silva" required>
@@ -578,31 +535,31 @@
                     <input type="checkbox" id="salvarLoja" checked> Salvar nome da loja para próximos pedidos
                 </label>
 
-                <!-- 📍 BLOCO COMPLETO E OBRIGATÓRIO DE RETIRADA -->
+                <!-- 📍 BLOCO DE RETIRADA COMPLETO E OBRIGATÓRIO -->
                 <div class="bloco-retirada">
                     <h4>📍 Endereço de Retirada (Sua Loja)</h4>
-                    <input type="text" id="endRetirada" class="obrigatorio" placeholder="Rua, Avenida, Praça..." required>
+                    <input type="text" id="endRetirada" placeholder="Rua, Avenida, Praça..." required>
                     <div class="linha-dupla">
-                        <input type="text" id="numRetirada" class="obrigatorio" placeholder="Número" required>
+                        <input type="text" id="numRetirada" placeholder="Número" required>
                         <input type="text" id="compRetirada" placeholder="Apto / Bloco / Andar (opcional)">
                     </div>
-                    <input type="text" id="bairroRetirada" class="obrigatorio" placeholder="Bairro" required>
-                    <input type="text" id="refRetirada" class="obrigatorio" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
+                    <input type="text" id="bairroRetirada" placeholder="Bairro" required>
+                    <input type="text" id="refRetirada" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
                 </div>
 
                 <label class="obrigatorio">📍 Endereço de Destino (até 3 destinos)</label>
                 <div id="listaDestinos">
                     <div class="destino-item">
                         <div class="campo-grupo">
-                            <input type="text" class="endereco-destino obrigatorio" placeholder="Rua, Avenida, Praça..." required>
+                            <input type="text" class="endereco-destino" placeholder="Rua, Avenida, Praça..." required>
                             <div class="linha-dupla">
-                                <input type="text" class="numero-destino obrigatorio" placeholder="Número" required>
+                                <input type="text" class="numero-destino" placeholder="Número" required>
                                 <input type="text" class="complemento-destino" placeholder="Apto / Bloco / Andar">
                             </div>
-                            <input type="text" class="bairro-destino obrigatorio" placeholder="Bairro" required>
-                            <input type="text" class="referencia-destino obrigatorio" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
-                            <input type="text" class="nome-cliente obrigatorio" placeholder="👤 Nome completo do cliente final" required>
-                            <input type="tel" class="telefone-cliente obrigatorio" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
+                            <input type="text" class="bairro-destino" placeholder="Bairro" required>
+                            <input type="text" class="referencia-destino" placeholder="📌 Ponto de referência: ex. Ao lado do supermercado" required>
+                            <input type="text" class="nome-cliente" placeholder="👤 Nome completo do cliente final" required>
+                            <input type="tel" class="telefone-cliente" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
                         </div>
                         <button type="button" class="btn-copiar-endereco" title="Copiar para próximo destino">📋</button>
                         <button type="button" class="btn-remover" onclick="removerDestino(this)">×</button>
@@ -688,75 +645,59 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Z7Kf1xQ8K6hGxQeY7z9aX7z9aX7z9aX&libraries=places&language=pt-BR&region=BR"></script>
 
     <script>
-        // ===== VARIÁVEIS GLOBAIS =====
-        let map;
-        let directionsService;
-        let directionsRenderer;
-        let distanciaTotal = 0;
-        let valorEntrega = 0;
-        let mensagemPedidoCompleta = '';
+        // Configurações das taxas — altere aqui se precisar!
         const CIDADE_ALVO = "Juiz de Fora";
         const ESTADO_ALVO = "MG";
         const VALOR_MINIMO = 10;
         const VALOR_POR_KM = 2.5;
 
-        // ===== INICIALIZAÇÃO =====
+        let map, directionsService, directionsRenderer;
+        let distanciaTotal = 0, valorEntrega = 0;
+
         window.addEventListener('load', () => {
             carregarNomeLojaSalvo();
-            carregarHistorico();
             inicializarMapa();
             configurarMascaras();
             configurarAutocomplete();
             adicionarEventos();
         });
 
-        // ===== SALVAR NOME DA LOJA =====
         function carregarNomeLojaSalvo() {
-            const nomeSalvo = localStorage.getItem('nomeLojaMTZ');
-            if (nomeSalvo) document.getElementById('nomeLoja').value = nomeSalvo;
+            if (localStorage.getItem('nomeLojaMTZ'))
+                document.getElementById('nomeLoja').value = localStorage.getItem('nomeLojaMTZ');
         }
 
         document.getElementById('nomeLoja').addEventListener('input', salvarNomeLoja);
         document.getElementById('salvarLoja').addEventListener('change', salvarNomeLoja);
-
         function salvarNomeLoja() {
-            if (document.getElementById('salvarLoja').checked) {
+            if (document.getElementById('salvarLoja').checked)
                 localStorage.setItem('nomeLojaMTZ', document.getElementById('nomeLoja').value.trim());
-            } else {
+            else
                 localStorage.removeItem('nomeLojaMTZ');
-            }
         }
 
-        // ===== MÁSCARA DE TELEFONE =====
         function configurarMascaras() {
-            document.addEventListener('input', (e) => {
+            document.addEventListener('input', e => {
                 if (e.target.classList.contains('telefone-cliente')) {
-                    let valor = e.target.value.replace(/\D/g, '');
-                    if (valor.length > 11) valor = valor.substring(0, 11);
-                    if (valor.length === 11) {
-                        valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7,11)}`;
-                    } else if (valor.length > 6) {
-                        valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7)}`;
-                    } else if (valor.length > 2) {
-                        valor = `(${valor.substring(0,2)}) ${valor.substring(2)}`;
-                    } else if (valor.length > 0) {
-                        valor = `(${valor}`;
-                    }
-                    e.target.value = valor;
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 11) v = v.slice(0,11);
+                    if (v.length === 11) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+                    else if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+                    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+                    else if (v.length) v = `(${v}`;
+                    e.target.value = v;
                 }
             });
         }
 
-        function validarTelefone(telefone) {
-            const numeroLimpo = telefone.replace(/\D/g, '');
-            return numeroLimpo.length === 11;
+        function validarTelefone(tel) {
+            return tel.replace(/\D/g, '').length === 11;
         }
 
-        // ===== ADICIONAR/REMOVER DESTINO =====
         function adicionarDestino() {
             const lista = document.getElementById('listaDestinos');
             const modelo = document.querySelector('.destino-item').cloneNode(true);
-            modelo.querySelectorAll('input').forEach(input => input.value = '');
+            modelo.querySelectorAll('input').forEach(i => i.value = '');
             lista.appendChild(modelo);
             configurarAutocomplete();
             configurarMascaras();
@@ -764,66 +705,167 @@
 
         function removerDestino(botao) {
             const destinos = document.querySelectorAll('.destino-item');
-            if (destinos.length > 1) {
-                botao.closest('.destino-item').remove();
-            } else {
-                alert('⚠️ É necessário pelo menos um destino!');
-            }
+            if (destinos.length > 1) botao.closest('.destino-item').remove();
+            else alert('⚠️ É necessário pelo menos um destino!');
         }
 
         document.getElementById('btnAdicionarDestino').addEventListener('click', adicionarDestino);
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             if (e.target.classList.contains('btn-copiar-endereco')) {
-                const destinoAtual = e.target.closest('.destino-item');
+                const dest = e.target.closest('.destino-item');
                 const dados = {
-                    endereco: destinoAtual.querySelector('.endereco-destino').value,
-                    numero: destinoAtual.querySelector('.numero-destino').value,
-                    complemento: destinoAtual.querySelector('.complemento-destino').value,
-                    bairro: destinoAtual.querySelector('.bairro-destino').value,
-                    referencia: destinoAtual.querySelector('.referencia-destino').value
+                    end: dest.querySelector('.endereco-destino').value,
+                    num: dest.querySelector('.numero-destino').value,
+                    comp: dest.querySelector('.complemento-destino').value,
+                    bairro: dest.querySelector('.bairro-destino').value,
+                    ref: dest.querySelector('.referencia-destino').value
                 };
                 adicionarDestino();
-                const novoDestino = document.querySelectorAll('.destino-item')[document.querySelectorAll('.destino-item').length - 1];
-                novoDestino.querySelector('.endereco-destino').value = dados.endereco;
-                novoDestino.querySelector('.numero-destino').value = dados.numero;
-                novoDestino.querySelector('.complemento-destino').value = dados.complemento;
-                novoDestino.querySelector('.bairro-destino').value = dados.bairro;
-                novoDestino.querySelector('.referencia-destino').value = dados.referencia;
+                const novo = document.querySelectorAll('.destino-item')[document.querySelectorAll('.destino-item').length - 1];
+                novo.querySelector('.endereco-destino').value = dados.end;
+                novo.querySelector('.numero-destino').value = dados.num;
+                novo.querySelector('.complemento-destino').value = dados.comp;
+                novo.querySelector('.bairro-destino').value = dados.bairro;
+                novo.querySelector('.referencia-destino').value = dados.ref;
             }
         });
 
-        // ===== AUTOCOMPLETE E VALIDAÇÃO DE CIDADE =====
         function configurarAutocomplete() {
             const campos = [document.getElementById('endRetirada'), ...document.querySelectorAll('.endereco-destino')];
             campos.forEach(campo => {
                 if (!campo || campo.dataset.inicializado) return;
-                const opcoes = { componentRestrictions: { country: 'br' }, types: ['address'] };
-                const autocomplete = new google.maps.places.Autocomplete(campo, opcoes);
+                const autocomplete = new google.maps.places.Autocomplete(campo, {
+                    componentRestrictions: { country: 'br' },
+                    types: ['address']
+                });
                 autocomplete.setFields(['address_components']);
 
                 autocomplete.addListener('place_changed', () => {
                     const place = autocomplete.getPlace();
                     if (!place.address_components) return;
-                    const pegarComponente = (tipo) => place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
-                    const cidade = pegarComponente('administrative_area_level_2');
+                    const comp = tipo => place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
+                    const cidade = comp('administrative_area_level_2');
                     const aviso = document.getElementById('avisoCidadeErro');
 
                     if (!cidade.includes(CIDADE_ALVO)) {
                         aviso.style.display = 'block';
                         campo.value = '';
-                        if (campo.id === 'endRetirada') {
-                            document.getElementById('bairroRetirada').value = '';
-                        } else {
-                            campo.closest('.destino-item').querySelector('.bairro-destino').value = '';
-                        }
+                        if (campo.id === 'endRetirada') document.getElementById('bairroRetirada').value = '';
+                        else campo.closest('.destino-item').querySelector('.bairro-destino').value = '';
                         return;
                     } else {
                         aviso.style.display = 'none';
                     }
 
-                    const bairro = pegarComponente('sublocality_level_1') || pegarComponente('administrative_area_level_3') || '';
-                    if (campo.id === 'endRetirada') {
-                        document.getElementById('bairroRetirada').value = bairro;
-                    } else {
-                        campo
+                    const bairro = comp('sublocality_level_1') || comp('administrative_area_level_3') || '';
+                    if (campo.id === 'endRetirada') document.getElementById('bairroRetirada').value = bairro;
+                    else campo.closest('.destino-item').querySelector('.bairro-destino').value = bairro;
+                });
+                campo.dataset.inicializado = 'true';
+            });
+        }
+
+        function inicializarMapa() {
+            const centro = { lat: -21.7641, lng: -43.3503 };
+            map = new google.maps.Map(document.getElementById('map'), { zoom: 12, center: centro });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+        }
+
+        function calcularValor() {
+            // Valida retirada
+            const endRet = document.getElementById('endRetirada').value.trim();
+            const numRet = document.getElementById('numRetirada').value.trim();
+            const bairroRet = document.getElementById('bairroRetirada').value.trim();
+            const refRet = document.getElementById('refRetirada').value.trim();
+
+            if (!endRet || !numRet || !bairroRet || !refRet) {
+                alert('⚠️ Preencha TODOS os dados do endereço de retirada (loja)!');
+                return;
+            }
+
+            const destinos = document.querySelectorAll('.destino-item');
+            let valido = true;
+            let enderecosDest = [];
+
+            destinos.forEach((dest, i) => {
+                const end = dest.querySelector('.endereco-destino').value.trim();
+                const num = dest.querySelector('.numero-destino').value.trim();
+                const bairro = dest.querySelector('.bairro-destino').value.trim();
+                const ref = dest.querySelector('.referencia-destino').value.trim();
+                const nome = dest.querySelector('.nome-cliente').value.trim();
+                const tel = dest.querySelector('.telefone-cliente').value;
+
+                if (!end || !num || !bairro || !ref || !nome || !validarTelefone(tel)) {
+                    alert(`⚠️ Dados incompletos ou telefone inválido no destino ${i+1}!`);
+                    valido = false;
+                    return;
+                }
+                enderecosDest.push(`${end}, ${num} - ${bairro}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`);
+            });
+
+            if (!valido) return;
+
+            const origem = `${endRet}, ${numRet} - ${bairroRet}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`;
+            let rota = [origem, ...enderecosDest];
+            const volta = document.getElementById('retorno').value === 'sim';
+            if (volta) rota.push(origem);
+
+            const waypoints = rota.slice(1, -1).map(e => ({ location: e, stopover: true }));
+
+            directionsService.route({
+                origin: rota[0],
+                destination: rota[rota.length - 1],
+                waypoints: waypoints,
+                optimizeWaypoints: false,
+                travelMode: google.maps.TravelMode.DRIVING
+            }, (res, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(res);
+                    distanciaTotal = 0;
+                    res.routes[0].legs.forEach(l => distanciaTotal += l.distance.value / 1000);
+                    valorEntrega = Math.max(VALOR_MINIMO, VALOR_MINIMO + (distanciaTotal * VALOR_POR_KM));
+
+                    document.getElementById('avisoValorMinimo').style.display = 
+                        valorEntrega === VALOR_MINIMO ? 'block' : 'none';
+
+                    document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
+                    document.getElementById('valorTotal').textContent = `R$ ${valorEntrega.toFixed(2)}`;
+                    document.getElementById('detalheValor').innerHTML = 
+                        `Distância: ${distanciaTotal.toFixed(2)} km<br>` +
+                        `R$ ${VALOR_POR_KM.toFixed(2)} por km + Taxa mínima R$ ${VALOR_MINIMO.toFixed(2)}`;
+                    document.getElementById('caixaValor').style.display = 'block';
+                    document.getElementById('btnEnviar').disabled = false;
+
+                    gerarResumo();
+                } else {
+                    alert('❌ Não foi possível calcular a rota. Verifique os endereços.');
+                }
+            });
+        }
+
+        function gerarResumo() {
+            const nomeLoja = document.getElementById('nomeLoja').value.trim();
+            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()} — ${document.getElementById('bairroRetirada').value.trim()}`;
+            const refRet = document.getElementById('refRetirada').value.trim();
+            const volta = document.getElementById('retorno').options[document.getElementById('retorno').selectedIndex].text;
+            const pgto = document.getElementById('formaPagamento').options[document.getElementById('formaPagamento').selectedIndex].text;
+            const troco = document.getElementById('valorTroco').value.trim() || 'Não precisa';
+            const obs = document.getElementById('observacoes').value.trim() || 'Nenhuma';
+
+            let resumo = `<div class="item-resumo"><strong>🏪 Loja:</strong> ${nomeLoja}</div>`;
+            resumo += `<div class="item-resumo"><strong>📍 Retirada:</strong> ${endRet} <br> 📌 Referência: ${refRet}</div>`;
+
+            document.querySelectorAll('.destino-item').forEach((dest, i) => {
+                const end = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()} — ${dest.querySelector('.bairro-destino').value.trim()}`;
+                const ref = dest.querySelector('.referencia-destino').value.trim();
+                const nome = dest.querySelector('.nome-cliente').value.trim();
+                const tel = dest.querySelector('.telefone-cliente').value;
+                resumo += `<div class="item-resumo"><strong>📍 Destino ${i+1}:</strong> ${end} <br> 📌 Referência: ${ref} <br> 👤 ${nome} <br> 📱 ${tel}</div>`;
+            });
+
+            resumo += `<div class="item-resumo"><strong>🔄 Retorno:</strong> ${volta}</div>`;
+            resumo += `<div class="item-resumo"><strong>💵 Pagamento:</strong> ${pgto}</div>`;
+            resumo += `<div class="item-resumo"><strong>💵 Troco:</strong> ${troco}</div>`;
+            resumo += `<div class="item
