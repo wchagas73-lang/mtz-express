@@ -46,7 +46,6 @@
 
         .cabecalho { margin-bottom: 24px; }
 
-        /* === LOGO COM A MOTO === */
         .logo img {
             max-width: 320px;
             width: 100%;
@@ -109,6 +108,17 @@
             margin: 12px 0;
         }
 
+        .aviso-cidade {
+            background: rgba(0,180,140,0.1);
+            color: #A0F0D0;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #00C896;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 12px 0;
+        }
+
         .contato-principal {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
             padding: 16px;
@@ -154,6 +164,7 @@
             font-size: 15px;
         }
         label.obrigatorio::after { content: " *"; color: #FF6B75; }
+        label.opcional { color: #B0E0D0; font-weight: 600; }
 
         input, select, textarea {
             width: 100%;
@@ -209,40 +220,72 @@
             font-size: 20px; cursor: pointer; margin-top: 28px; flex-shrink: 0;
         }
 
-        #map {
-            height: 260px; width: 100%; border-radius: 16px;
-            margin-top: 12px; margin-bottom: 8px; border: 2px solid rgba(0,180,150,0.2);
-        }
-
         .info-distancia {
-            font-size: 15px; color: #A0D8CC; font-weight: 600;
-            margin: 8px 0;
+            font-size: 16px; color: #A0D8CC; font-weight: 600;
+            margin: 12px 0; padding: 12px;
+            background: rgba(0,180,140,0.08); border-radius: 12px;
         }
 
         .btn-calcular {
             margin-top: 15px; width: 100%;
-            background: linear-gradient(90deg, #FFB300, #FF8F00);
-            color: #1A1A1A; border: none; padding: 16px; border-radius: 14px;
+            background: linear-gradient(90deg, #00A86B, #008F60);
+            color: #fff; border: none; padding: 16px; border-radius: 14px;
             font-size: 17px; font-weight: 700; cursor: pointer;
         }
+        .btn-calcular:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .caixa-valor {
-            background: linear-gradient(135deg, rgba(255,179,0,0.15), rgba(255,143,0,0.1));
+            background: linear-gradient(135deg, rgba(0,168,107,0.15), rgba(0,143,96,0.1));
             padding: 25px 20px; border-radius: 20px; margin-top: 22px;
-            border-left: 5px solid; border-image: linear-gradient(180deg, #FFB300, #FF8F00) 1;
+            border-left: 5px solid #00C896;
             display: none;
         }
         .valor-final {
             font-size: 42px; font-weight: 800;
-            background: linear-gradient(90deg, #FFB300, #FF6F00);
+            background: linear-gradient(90deg, #00E0A8, #00C8E0);
             -webkit-background-clip: text; background-clip: text; color: transparent;
             margin: 8px 0 5px;
         }
 
-        .caixa-resumo {
-            background: linear-gradient(135deg, rgba(0,200,150,0.12), rgba(0,180,200,0.08));
-            padding: 20px; border-radius: 20px; margin-top: 24px;
-            border-left: 5px solid #00C896; text-align: left; display: none;
+        .tabela-taxas {
+            margin-top: 28px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: left;
+        }
+        .tabela-taxas h4 {
+            color: #00E0A8;
+            font-size: 18px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: linear-gradient(90deg, #00A86B, #008F60);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+        th:first-child { border-radius: 10px 0 0 0; }
+        th:last-child { border-radius: 0 10px 0 0; text-align: right; }
+        td {
+            padding: 10px 12px;
+            color: #E0F8F0;
+            border-bottom: 1px solid rgba(0,180,140,0.15);
+            font-size: 15px;
+        }
+        td:last-child { text-align: right; font-weight: 700; color: #80FFD0; }
+        tr:last-child td { border-bottom: none; }
+        .aviso-extra {
+            font-size: 13px;
+            color: #A0D8CC;
+            margin-top: 12px;
+            text-align: center;
         }
 
         .btn-enviar {
@@ -260,6 +303,7 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 35px; z-index: 999; text-decoration: none; color: white;
         }
+        .carregando { color: #FFD700; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -267,7 +311,6 @@
         <div class="card">
             <div class="cabecalho">
                 <div class="logo">
-                    <!-- === SUA LOGO JÁ COLOCADA AQUI === -->
                     <img src="https://i.ibb.co/bgh9qcpR/1783405332697.jpg" alt="MTZ Express">
                 </div>
                 <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
@@ -290,7 +333,11 @@
                 </div>
 
                 <div class="aviso-erro" id="avisoCidadeErro">
-                    ⚠️ Endereço de outra cidade! Atendemos somente Juiz de Fora-MG.
+                    ⚠️ Endereço fora da área de atendimento! Atendemos somente Juiz de Fora-MG.
+                </div>
+
+                <div class="aviso-cidade">
+                    🔒 Sistema configurado exclusivamente para <strong>Juiz de Fora - MG</strong>
                 </div>
 
                 <div class="contato-principal">
@@ -351,95 +398,249 @@
                 </div>
                 <button type="button" class="btn-mais" id="btnAdicionarDestino">➕ Adicionar outro destino</button>
 
-                <div id="map"></div>
-                <div class="info-distancia" id="infoDistancia">Informe os endereços para calcular o valor</div>
-                <div style="font-size:14px; color:#A0D8CC; margin: 5px 0 15px;">💡 R$ 2,50 por km | Mínimo R$ 10,00</div>
+                <div class="info-distancia" id="infoDistancia">Informe os endereços e clique em Calcular Valor</div>
 
-                <label for="retorno" class="obrigatorio">🔄 Volta para a loja?</label>
+                <label for="valorAdicional" class="opcional">➕ Valor Adicional / Gorjeta (R$) - Opcional</label>
+                <input type="number" step="0.01" id="valorAdicional" placeholder="Ex: 5,00">
+
+                <label for="observacoes" class="opcional">📝 Observações do Pedido - Opcional</label>
+                <textarea id="observacoes" rows="3" placeholder="Ex: Deixar na portaria, troco para 50..."></textarea>
+
+                <label for="retorno" class="obrigatorio">🔄 Volta para a loja depois da entrega?</label>
                 <select id="retorno" required>
                     <option value="">Selecione</option>
-                    <option value="nao">❌ Não</option>
-                    <option value="sim">✅ Sim</option>
+                    <option value="nao">❌ Não, só entrega</option>
+                    <option value="sim">✅ Sim, retorno para a loja</option>
                 </select>
 
-                <label for="formaPagamento" class="obrigatorio">💵 Pagamento</label>
+                <label for="formaPagamento" class="obrigatorio">💵 Forma de Pagamento</label>
                 <select id="formaPagamento" required>
                     <option value="">Selecione</option>
-                    <option value="loja">💳 Pago na loja</option>
-                    <option value="cliente">💵 Pago pelo cliente</option>
+                    <option value="loja">💳 Pago na loja / Já acertado</option>
+                    <option value="cliente">💵 Pago pelo cliente na entrega</option>
                 </select>
 
-                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor</button>
+                <button type="button" class="btn-calcular" id="btnCalcular">🧮 Calcular Valor Exato</button>
 
                 <div class="caixa-valor" id="caixaValor">
+                    <p style="color:#A0D8CC; font-size:16px; font-weight:600;">Valor Total da Entrega</p>
                     <div class="valor-final" id="valorTotal">R$ 0,00</div>
                 </div>
 
-                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido</button>
+                <div class="tabela-taxas">
+                    <h4>📋 Tabela de Taxas Vigentes</h4>
+                    <table>
+                        <thead>
+                            <tr><th>Distância</th><th>Taxa R$</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Até 1 km</td><td>8,00</td></tr>
+                            <tr><td>1,1 a 2 km</td><td>9,00</td></tr>
+                            <tr><td>2,1 a 3 km</td><td>10,00</td></tr>
+                            <tr><td>3,1 a 4 km</td><td>11,00</td></tr>
+                            <tr><td>4,1 a 5 km</td><td>12,00</td></tr>
+                            <tr><td>5,1 a 6 km</td><td>13,00</td></tr>
+                            <tr><td>6,1 a 7 km</td><td>14,00</td></tr>
+                            <tr><td>7,1 a 8 km</td><td>15,00</td></tr>
+                            <tr><td>8,1 a 9 km</td><td>16,00</td></tr>
+                            <tr><td>9,1 a 10 km</td><td>17,00</td></tr>
+                            <tr><td>10,1 a 11 km</td><td>18,00</td></tr>
+                            <tr><td>11,1 a 12 km</td><td>19,00</td></tr>
+                            <tr><td>12,1 a 13 km</td><td>20,00</td></tr>
+                            <tr><td>13,1 a 14 km</td><td>21,00</td></tr>
+                            <tr><td>14,1 a 15 km</td><td>22,00</td></tr>
+                            <tr><td>15,1 a 16 km</td><td>24,00</td></tr>
+                            <tr><td>16,1 a 17 km</td><td>25,50</td></tr>
+                            <tr><td>17,1 a 18 km</td><td>27,00</td></tr>
+                            <tr><td>18,1 a 19 km</td><td>28,50</td></tr>
+                            <tr><td>19,1 a 20 km</td><td>30,00</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="aviso-extra">*Acima de 20 km, consulte-nos para valor combinado</p>
+                </div>
+
+                <button type="button" class="btn-enviar" id="btnEnviar" disabled>📤 Enviar Pedido no WhatsApp</button>
             </form>
         </div>
     </div>
 
     <a href="https://wa.me/5532999953215" target="_blank" class="whatsapp-fixo">💬</a>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Z7Kf1xQ8K6hGxQeY7z9aX7z9aX7z9aX&libraries=places&language=pt-BR&region=BR"></script>
-
     <script>
         const CIDADE_ALVO = "Juiz de Fora";
-        const VALOR_MINIMO = 10;
-        const VALOR_POR_KM = 2.5;
-        let map, directionsService, directionsRenderer;
+        const ESTADO = "MG";
+        let distanciaTotal = 0;
 
-        window.onload = () => {
-            inicializarMapa();
-            configurarAutocomplete();
-            adicionarEventos();
-        };
-
-        function inicializarMapa() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12, center: { lat: -21.7641, lng: -43.3503 }
-            });
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+        // 📏 TABELA DE VALORES EXATA
+        function getValorPorDistancia(km) {
+            if (km <= 1) return 8.00;
+            if (km <= 2) return 9.00;
+            if (km <= 3) return 10.00;
+            if (km <= 4) return 11.00;
+            if (km <= 5) return 12.00;
+            if (km <= 6) return 13.00;
+            if (km <= 7) return 14.00;
+            if (km <= 8) return 15.00;
+            if (km <= 9) return 16.00;
+            if (km <= 10) return 17.00;
+            if (km <= 11) return 18.00;
+            if (km <= 12) return 19.00;
+            if (km <= 13) return 20.00;
+            if (km <= 14) return 21.00;
+            if (km <= 15) return 22.00;
+            if (km <= 16) return 24.00;
+            if (km <= 17) return 25.50;
+            if (km <= 18) return 27.00;
+            if (km <= 19) return 28.50;
+            if (km <= 20) return 30.00;
+            return null;
         }
 
-        function configurarAutocomplete() {
-            const campos = [document.getElementById('endRetirada'), ...document.querySelectorAll('.endereco-destino')];
-            campos.forEach(campo => {
-                const autocomplete = new google.maps.places.Autocomplete(campo, {
-                    componentRestrictions: { country: 'br' }, types: ['address']
-                });
-                autocomplete.addListener('place_changed', () => {
-                    const cidade = autocomplete.getPlace().address_components?.find(c => c.types.includes('administrative_area_level_2'))?.long_name;
-                    document.getElementById('avisoCidadeErro').style.display = cidade?.includes(CIDADE_ALVO) ? 'none' : 'block';
-                });
-            });
+        // 📍 Pegar coordenadas (SEM CHAVE, 100% GRÁTIS)
+        async function pegarCoordenadas(enderecoCompleto) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoCompleto)}&country=Brazil&city=${encodeURIComponent(CIDADE_ALVO)}`;
+            const resposta = await fetch(url);
+            const dados = await resposta.json();
+            if (dados.length === 0) return null;
+            return { lat: parseFloat(dados[0].lat), lon: parseFloat(dados[0].lon) };
+        }
+
+        // 📏 Calcular distância entre dois pontos (fórmula exata)
+        function calcularDistanciaKm(p1, p2) {
+            const R = 6371; // Raio da Terra em km
+            const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+            const dLon = (p2.lon - p1.lon) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
         }
 
         function adicionarDestino() {
             const modelo = document.querySelector('.destino-item').cloneNode(true);
             modelo.querySelectorAll('input').forEach(i => i.value = '');
             document.getElementById('listaDestinos').appendChild(modelo);
-            configurarAutocomplete();
         }
 
         function removerDestino(botao) {
             if (document.querySelectorAll('.destino-item').length > 1)
                 botao.closest('.destino-item').remove();
-            else alert('Mínimo 1 destino!');
+            else alert('⚠️ É necessário pelo menos um destino!');
         }
 
-        function adicionarEventos() {
-            document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
-            document.getElementById('btnCalcular').onclick = calcularValor;
-        }
+        // 🧮 Cálculo completo
+        async function calcularValorExato() {
+            document.getElementById('btnCalcular').disabled = true;
+            document.getElementById('infoDistancia').innerHTML = '<span class="carregando">🔄 Calculando distância... Aguarde um momento...</span>';
+            document.getElementById('avisoCidadeErro').style.display = 'none';
 
-        function calcularValor() {
-            alert('✅ Tudo pronto! Logo já está aparecendo.');
+            // Monta endereço de retirada
+            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()}, ${document.getElementById('bairroRetirada').value.trim()}, ${CIDADE_ALVO}, ${ESTADO}`;
+            const destinos = document.querySelectorAll('.destino-item');
+            let pontos = [];
+
+            // Pegar coordenada da retirada
+            const coordRet = await pegarCoordenadas(endRet);
+            if (!coordRet) {
+                alert('❌ Não encontrei o endereço de RETIRADA. Verifique se está correto e se é em Juiz de Fora.');
+                document.getElementById('btnCalcular').disabled = false;
+                document.getElementById('infoDistancia').textContent = 'Endereço não encontrado';
+                return;
+            }
+            pontos.push(coordRet);
+
+            // Pegar coordenadas dos destinos
+            for (const dest of destinos) {
+                const endDest = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()}, ${dest.querySelector('.bairro-destino').value.trim()}, ${CIDADE_ALVO}, ${ESTADO}`;
+                const coordDest = await pegarCoordenadas(endDest);
+                if (!coordDest) {
+                    alert(`❌ Não encontrei o DESTINO: ${endDest}\nVerifique os dados.`);
+                    document.getElementById('btnCalcular').disabled = false;
+                    document.getElementById('infoDistancia').textContent = 'Endereço de destino não encontrado';
+                    return;
+                }
+                pontos.push(coordDest);
+            }
+
+            // Adiciona volta para loja se escolhido
+            if (document.getElementById('retorno').value === 'sim') {
+                pontos.push(coordRet);
+            }
+
+            // Calcula distância total
+            distanciaTotal = 0;
+            for (let i = 0; i < pontos.length - 1; i++) {
+                distanciaTotal += calcularDistanciaKm(pontos[i], pontos[i+1]);
+            }
+            distanciaTotal = Math.round(distanciaTotal * 100) / 100;
+
+            // Verifica se está acima de 20km
+            let valorBase = getValorPorDistancia(distanciaTotal);
+            if (valorBase === null) {
+                alert(`📏 Distância total: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km! Entre em contato para combinarmos o valor.`);
+                document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong> (acima do valor fixo)`;
+                document.getElementById('btnCalcular').disabled = false;
+                return;
+            }
+
+            // Soma valor adicional
+            const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
+            const valorFinal = valorBase + adicional;
+
+            // Mostra resultado
+            document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
+            document.getElementById('valorTotal').textContent = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('caixaValor').style.display = 'block';
             document.getElementById('btnEnviar').disabled = false;
+
+            alert(`✅ Valor calculado com sucesso!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor base: ${valorBase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n💵 Total: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
+            document.getElementById('btnCalcular').disabled = false;
         }
+
+        // 📩 Enviar pedido WhatsApp
+        document.getElementById('btnEnviar').onclick = function() {
+            const nomeLoja = document.getElementById('nomeLoja').value.trim();
+            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()} - ${document.getElementById('bairroRetirada').value.trim()}`;
+            const refRet = document.getElementById('refRetirada').value.trim();
+            const retorno = document.getElementById('retorno').value === 'sim' ? 'Sim' : 'Não';
+            const pagamento = document.getElementById('formaPagamento').options[document.getElementById('formaPagamento').selectedIndex].text;
+            const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
+            const obs = document.getElementById('observacoes').value.trim();
+            const valorTotal = document.getElementById('valorTotal').textContent;
+
+            let texto = `🚀 NOVO PEDIDO - MTZ Express\n\n`;
+            texto += `🏪 Loja: ${nomeLoja}\n`;
+            texto += `📍 Retirada: ${endRet}\n`;
+            texto += `📌 Referência: ${refRet}\n\n`;
+
+            const destinos = document.querySelectorAll('.destino-item');
+            destinos.forEach((dest, i) => {
+                const endDest = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()} - ${dest.querySelector('.bairro-destino').value.trim()}`;
+                const nomeCli = dest.querySelector('.nome-cliente').value.trim();
+                const telCli = dest.querySelector('.telefone-cliente').value.trim();
+                texto += `🎯 Destino ${i+1}: ${endDest}\n`;
+                texto += `👤 Cliente: ${nomeCli} | 📱 ${telCli}\n`;
+                if (dest.querySelector('.referencia-destino').value.trim()) texto += `📌 Ref: ${dest.querySelector('.referencia-destino').value.trim()}\n`;
+                texto += `---\n`;
+            });
+
+            texto += `🔄 Volta para loja: ${retorno}\n`;
+            texto += `💵 Pagamento: ${pagamento}\n`;
+            texto += `📏 Distância total: ${distanciaTotal.toFixed(2)} km\n`;
+            if (adicional > 0) texto += `➕ Adicional/Gorjeta: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
+            texto += `💰 VALOR TOTAL: ${valorTotal}\n`;
+            if (obs) texto += `📝 Observações: ${obs}`;
+
+            const url = `https://wa.me/5532999953215?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        };
+
+        // Iniciar
+        window.onload = () => {
+            document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
+            document.getElementById('btnCalcular').onclick = calcularValorExato;
+        };
     </script>
 </body>
 </html>
