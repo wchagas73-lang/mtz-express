@@ -1,68 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTZ Express</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTZ Express | Transporte e Entregas</title>
 
-<style>
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f8f7;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-.card{
-    background:#fff;
-    width:90%;
-    max-width:420px;
-    padding:40px;
-    border-radius:20px;
-    box-shadow:0 15px 40px rgba(0,0,0,.15);
-    text-align:center;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-h1{
-    color:#00875A;
-    font-size:42px;
-    margin-bottom:10px;
-}
+        .card {
+            background: #fff;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .15);
+            text-align: center;
+        }
 
-p{
-    color:#555;
-    font-size:18px;
-}
+        h1 {
+            color: #00875A;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
 
-button{
-    margin-top:30px;
-    background:#00875A;
-    color:#fff;
-    border:none;
-    padding:16px 35px;
-    border-radius:12px;
-    font-size:18px;
-    cursor:pointer;
-    transition:.3s;
-}
+        p {
+            color: #555;
+            font-size: 18px;
+            line-height: 1.5;
+        }
 
-button:hover{
-    background:#006F49;
-}
-</style>
+        button {
+            margin-top: 30px;
+            background: #00875A;
+            color: #fff;
+            border: none;
+            padding: 16px 35px;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+        }
 
+        button:hover {
+            background: #006F49;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 111, 73, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
 </head>
-    </head>
 <body>
-
-<div class="card">
-  <h1>MTZ Express</h1>
-  <p>Transporte rápido, seguro e profissional.</p>
-  <button>Solicitar Entrega</button>
-</div>
-
+    <div class="card">
+        <h1>MTZ Express</h1>
+        <p>Transporte rápido, seguro e profissional.</p>
+        
+        <!-- BOTÃO COM LINK DO WHATSAPP -->
+        <a href="https://wa.me/5532999999999?text=Olá! Gostaria de solicitar uma entrega." target="_blank" style="text-decoration: none;">
+            <button>Solicitar Entrega</button>
+        </a>
+    </div>
 </body>
 </html>
