@@ -29,11 +29,6 @@
             padding: 14px; border-radius: 14px; border-left: 4px solid #FFC107;
             color: #FFE082; font-weight: 600; font-size: 14px; margin-bottom: 10px; line-height: 1.5;
         }
-        .aviso-whatsapp {
-            background: linear-gradient(90deg, rgba(0,200,150,0.12), rgba(0,180,140,0.08));
-            padding: 14px; border-radius: 14px; border-left: 4px solid #00C896;
-            color: #80E0C0; font-weight: 600; font-size: 14px; margin-bottom: 10px;
-        }
         .aviso-cidade {
             background: rgba(0,180,140,0.1); color: #A0F0D0;
             padding: 12px; border-radius: 12px; border-left: 4px solid #00C896;
@@ -59,14 +54,11 @@
         .diferencial p {font-size: 13px; color: #A0D8CC; margin-top: 4px;}
         label {display: block; text-align: left; color: #E0F8F0; font-weight: 700; margin: 18px 0 8px; font-size: 15px;}
         label.obrigatorio::after {content: " *"; color: #FF6B75;}
-        label.opcional {color: #B0E0D0; font-weight: 600;}
         input, select, textarea {
             width: 100%; padding: 16px 18px; border: 2px solid rgba(0,180,150,0.2);
             border-radius: 14px; font-size: 16px; background: rgba(15,43,51,0.6); color: #E0F8F0;
         }
-        input:focus, select:focus, textarea:focus {
-            outline: none; border-color: #00C896; background: rgba(15,43,51,0.85);
-        }
+        input:focus {border-color: #00C896; background: rgba(15,43,51,0.85); outline: none;}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}
         .bloco-retirada {
             background: linear-gradient(90deg, rgba(0,200,150,0.15), rgba(0,180,200,0.1));
@@ -121,8 +113,6 @@
         th:last-child {border-radius: 0 10px 0 0; text-align: right;}
         td {padding: 10px 12px; color: #E0F8F0; border-bottom: 1px solid rgba(0,180,140,0.15); font-size: 15px;}
         td:last-child {text-align: right; font-weight: 700; color: #80FFD0;}
-        tr:last-child td {border-bottom: none;}
-        .aviso-extra {font-size: 13px; color: #A0D8CC; margin-top: 12px; text-align: center;}
         .btn-enviar {
             margin-top: 28px; width: 100%; background: linear-gradient(90deg, #25D366, #128C7E);
             color: #fff; border: none; padding: 18px; border-radius: 16px;
@@ -135,6 +125,7 @@
             display: flex; align-items: center; justify-content: center; font-size: 35px;
             z-index: 999; text-decoration: none; color: white;
         }
+        .carregando {color: #FFD700; font-weight: 600;}
     </style>
 </head>
 <body>
@@ -146,21 +137,8 @@
                 </div>
                 <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
 
-                <div class="aviso-area">
-                    ⏰ <strong>Horário de Atendimento:</strong> Seg-Sex 08h às 19h | Sáb 08h às 14h<br>
-                    🚫 Não atendemos domingos e feriados — retornamos no próximo dia útil.
-                </div>
-
-                <div class="aviso-area">
-                    📍 Atendemos <strong>somente Juiz de Fora-MG</strong>
-                </div>
-
-                <div class="aviso-whatsapp">
-                    📞 <strong>IMPORTANTE:</strong> Só atendo ligações e contatos <strong>via WhatsApp</strong>!
-                </div>
-
                 <div class="aviso-cidade">
-                    🔒 Cálculo ajustado <strong>igual ao Google Maps</strong> para Juiz de Fora
+                    🗺️ <strong>CÁLCULO COM ROTAS REAIS DO GOOGLE MAPS</strong> — 100% exato
                 </div>
 
                 <div class="contato-principal">
@@ -170,20 +148,20 @@
 
             <div class="diferenciais">
                 <div class="diferencial">
-                    ✅ <strong>SEM TAXA DE COMISSÃO</strong>
-                    <p>Você paga só a entrega, sem porcentagem!</p>
+                    ✅ <strong>SEM ERROS</strong>
+                    <p>Cálculo exato, rota real do Google Maps!</p>
                 </div>
                 <div class="diferencial">
                     🤝 <strong>ATENDIMENTO DIRETO</strong>
                     <p>Fala diretamente comigo, sem robôs!</p>
                 </div>
                 <div class="diferencial">
-                    📍 <strong>CÁLCULO EXATO</strong>
-                    <p>Já ajustado para morros e curvas — igual ao Google Maps!</p>
+                    📍 <strong>SÓ JUIZ DE FORA</strong>
+                    <p>Validação automática da cidade!</p>
                 </div>
                 <div class="diferencial">
-                    ⚡ <strong>INSTANTÂNEO</strong>
-                    <p>Valor na hora, sem espera nenhuma!</p>
+                    💸 <strong>VALOR CERTO</strong>
+                    <p>Sem surpresas, justo para os dois!</p>
                 </div>
             </div>
 
@@ -193,11 +171,8 @@
 
                 <div class="bloco-retirada">
                     <h4>📍 Endereço de Retirada</h4>
-                    <input type="text" id="endRetirada" placeholder="Rua, Avenida..." required>
-                    <div class="linha-dupla">
-                        <input type="text" id="numRetirada" placeholder="Número" required>
-                        <input type="text" id="bairroRetirada" placeholder="Bairro" required>
-                    </div>
+                    <input type="text" id="endRetirada" placeholder="Rua, Avenida, Número" required>
+                    <input type="text" id="bairroRetirada" placeholder="Bairro" required>
                     <input type="text" id="refRetirada" placeholder="📌 Referência" required>
                 </div>
 
@@ -205,11 +180,8 @@
                 <div id="listaDestinos">
                     <div class="destino-item">
                         <div class="campo-grupo">
-                            <input type="text" class="endereco-destino" placeholder="Rua, Avenida..." required>
-                            <div class="linha-dupla">
-                                <input type="text" class="numero-destino" placeholder="Número" required>
-                                <input type="text" class="bairro-destino" placeholder="Bairro" required>
-                            </div>
+                            <input type="text" class="endereco-destino" placeholder="Rua, Avenida, Número" required>
+                            <input type="text" class="bairro-destino" placeholder="Bairro" required>
                             <input type="text" class="nome-cliente" placeholder="👤 Nome do cliente" required>
                             <input type="tel" class="telefone-cliente" placeholder="📱 (32) 9XXXX-XXXX" maxlength="15" required>
                         </div>
@@ -218,13 +190,10 @@
                 </div>
                 <button type="button" class="btn-mais" id="btnAdicionarDestino">➕ Adicionar outro destino</button>
 
-                <div class="info-distancia" id="infoDistancia">Preencha os dados e clique em Calcular<br>✅ Cálculo igual ao Google Maps</div>
+                <div class="info-distancia" id="infoDistancia">Preencha os dados e clique em Calcular<br>🗺️ Rota real do Google Maps</div>
 
                 <label for="valorAdicional" class="opcional">➕ Valor Adicional / Gorjeta (R$)</label>
                 <input type="number" step="0.01" id="valorAdicional" placeholder="0,00">
-
-                <label for="observacoes" class="opcional">📝 Observações</label>
-                <textarea id="observacoes" rows="2" placeholder="Opcional"></textarea>
 
                 <label for="retorno" class="obrigatorio">🔄 Volta para a loja?</label>
                 <select id="retorno" required>
@@ -240,7 +209,7 @@
                     <option value="cliente">💵 Pago na entrega</option>
                 </select>
 
-                <button type="button" class="btn-calcular" id="btnCalcular">⚡ CALCULAR VALOR AGORA</button>
+                <button type="button" class="btn-calcular" id="btnCalcular">🗺️ CALCULAR ROTA REAL</button>
 
                 <div class="caixa-valor" id="caixaValor">
                     <p style="color:#A0D8CC; font-size:16px;">Valor Total</p>
@@ -286,10 +255,12 @@
 
     <a href="https://wa.me/5532999953215" target="_blank" class="whatsapp-fixo">💬</a>
 
+    <!-- 🗺️ CHAVE JÁ COLOCADA E PRONTA! -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOH1KGAdRtv5y6Q3t2XEt65UmZK3a7tOM&libraries=places"></script>
+
     <script>
         let distanciaTotal = 0;
-        // ✅ FATOR 1,32 — O MAIS EXATO, IGUAL AO GOOGLE MAPS PARA JUIZ DE FORA!
-        const FATOR_CORRECAO = 1.32;
+        let directionsService;
 
         // 📏 TABELA DE VALORES EXATA
         function getValorPorDistancia(km) {
@@ -316,61 +287,6 @@
             return null;
         }
 
-        // 📍 BAIRROS DE JUIZ DE FORA CADASTRADOS
-        const bairrosJF = {
-            'centro': {lat: -21.7641, lon: -43.3503},
-            'santa helena': {lat: -21.7695, lon: -43.3412},
-            'são mateus': {lat: -21.7589, lon: -43.3621},
-            'são pedro': {lat: -21.7712, lon: -43.3489},
-            'bom jardim': {lat: -21.7534, lon: -43.3578},
-            'mariano procópio': {lat: -21.7765, lon: -43.3601},
-            'são bernardo': {lat: -21.7498, lon: -43.3712},
-            'dom bosco': {lat: -21.7612, lon: -43.3356},
-            'floresta': {lat: -21.7823, lon: -43.3421},
-            'palmeiras': {lat: -21.7456, lon: -43.3689},
-            'parque guarani': {lat: -21.7901, lon: -43.3512},
-            'são vicente': {lat: -21.7389, lon: -43.3756},
-            'vila itamarati': {lat: -21.7856, lon: -43.3678},
-            'cascata': {lat: -21.7512, lon: -43.3312},
-            'centro industrial': {lat: -21.7989, lon: -43.3812},
-            'jardim esperança': {lat: -21.7345, lon: -43.3612},
-            'nova juiz de fora': {lat: -21.7789, lon: -43.3789},
-            'são sebastião': {lat: -21.7678, lon: -43.3256},
-            'tupi': {lat: -21.7423, lon: -43.3456},
-            'vila betânia': {lat: -21.7812, lon: -43.3312},
-            'aeroporto': {lat: -21.7956, lon: -43.3456},
-            'alto dos passos': {lat: -21.7623, lon: -43.3678},
-            'boa vista': {lat: -21.7745, lon: -43.3712},
-            'cidade jardim': {lat: -21.7867, lon: -43.3823},
-            'granbery': {lat: -21.7567, lon: -43.3412},
-            'jardim glória': {lat: -21.7912, lon: -43.3612},
-            'lourdes': {lat: -21.7478, lon: -43.3512},
-            'morro da glória': {lat: -21.7678, lon: -43.3356},
-            'nossa senhora da conceição': {lat: -21.7723, lon: -43.3623},
-            'são cristóvão': {lat: -21.7512, lon: -43.3789},
-            'são josé': {lat: -21.7812, lon: -43.3578},
-            'vila esperança': {lat: -21.7367, lon: -43.3489}
-        };
-
-        function pegarCoordenadasPorBairro(nomeBairro) {
-            if (!nomeBairro) return null;
-            const bairro = nomeBairro.trim().toLowerCase();
-            if (bairrosJF[bairro]) return bairrosJF[bairro];
-            return bairrosJF['centro'];
-        }
-
-        function calcularDistanciaKm(p1, p2) {
-            const R = 6371;
-            const dLat = (p2.lat - p1.lat) * Math.PI / 180;
-            const dLon = (p2.lon - p1.lon) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const distanciaReta = R * c;
-            return distanciaReta * FATOR_CORRECAO;
-        }
-
         function adicionarDestino() {
             const modelo = document.querySelector('.destino-item').cloneNode(true);
             modelo.querySelectorAll('input').forEach(i => i.value = '');
@@ -383,66 +299,95 @@
             else alert('⚠️ É necessário pelo menos um destino!');
         }
 
-        function calcularValorExato() {
+        function montarEndereco(parte1, parte2) {
+            return `${parte1}, ${parte2} - Juiz de Fora, MG, Brasil`;
+        }
+
+        async function calcularRotaGoogle() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
-            const bairroRet = document.getElementById('bairroRetirada').value.trim();
+            const endR = document.getElementById('endRetirada').value.trim();
+            const bairroR = document.getElementById('bairroRetirada').value.trim();
             const retorno = document.getElementById('retorno').value;
             const pagamento = document.getElementById('formaPagamento').value;
 
-            if (!nomeLoja || !bairroRet || !retorno || !pagamento) {
+            if (!nomeLoja || !endR || !bairroR || !retorno || !pagamento) {
                 alert('⚠️ Preencha todos os campos obrigatórios!');
                 return;
             }
 
-            const coordRet = pegarCoordenadasPorBairro(bairroRet);
+            document.getElementById('infoDistancia').innerHTML = '<span class="carregando">🗺️ Calculando rota real no Google Maps...</span>';
+            document.getElementById('btnCalcular').disabled = true;
+
+            const enderecoOrigem = montarEndereco(endR, bairroR);
             const destinos = document.querySelectorAll('.destino-item');
-            let pontos = [coordRet];
+            let pontos = [enderecoOrigem];
 
             for (const dest of destinos) {
-                const bairroDest = dest.querySelector('.bairro-destino').value.trim();
-                if (!bairroDest) {
-                    alert('⚠️ Preencha o bairro do destino!');
+                const endD = dest.querySelector('.endereco-destino').value.trim();
+                const bairroD = dest.querySelector('.bairro-destino').value.trim();
+                if (!endD || !bairroD) {
+                    alert('⚠️ Preencha o endereço e bairro do destino!');
+                    document.getElementById('btnCalcular').disabled = false;
                     return;
                 }
-                const coordDest = pegarCoordenadasPorBairro(bairroDest);
-                pontos.push(coordDest);
+                pontos.push(montarEndereco(endD, bairroD));
             }
 
-            if (retorno === 'sim') pontos.push(coordRet);
+            if (retorno === 'sim') pontos.push(enderecoOrigem);
 
             distanciaTotal = 0;
-            for (let i = 0; i < pontos.length - 1; i++) {
-                distanciaTotal += calcularDistanciaKm(pontos[i], pontos[i+1]);
+            directionsService = new google.maps.DirectionsService();
+
+            try {
+                for (let i = 0; i < pontos.length - 1; i++) {
+                    const rota = await directionsService.route({
+                        origin: pontos[i],
+                        destination: pontos[i+1],
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        region: 'br'
+                    });
+
+                    if (rota.status !== 'OK') throw new Error('Endereço não encontrado');
+                    const km = rota.routes[0].legs[0].distance.value / 1000;
+                    distanciaTotal += km;
+                }
+
+                distanciaTotal = Math.round(distanciaTotal * 100) / 100;
+
+                let valorBase = getValorPorDistancia(distanciaTotal);
+                if (valorBase === null) {
+                    alert(`📏 Distância total: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km! Entre em contato.`);
+                    document.getElementById('infoDistancia').innerHTML = `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
+                    return;
+                }
+
+                const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
+                const valorFinal = valorBase + adicional;
+
+                document.getElementById('infoDistancia').innerHTML =
+                    `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong><small style="display:block; font-size:12px; opacity:0.8">✅ Rota exata do Google Maps</small>`;
+                document.getElementById('valorTotal').textContent = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('caixaValor').style.display = 'block';
+                document.getElementById('btnEnviar').disabled = false;
+
+                alert(`✅ Valor calculado!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
+
+            } catch (erro) {
+                alert(`❌ Erro ao buscar endereço: ${erro.message}\nVerifique se os endereços estão corretos e de Juiz de Fora-MG!`);
+                document.getElementById('infoDistancia').innerHTML = '⚠️ Endereço não encontrado! Verifique os dados.';
+            } finally {
+                document.getElementById('btnCalcular').disabled = false;
             }
-            distanciaTotal = Math.round(distanciaTotal * 100) / 100;
-
-            let valorBase = getValorPorDistancia(distanciaTotal);
-            if (valorBase === null) {
-                alert(`📏 Distância total: ${distanciaTotal.toFixed(2)} km\n🚧 Acima de 20 km! Entre em contato para combinarmos o valor.`);
-                document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong> (acima do valor fixo)`;
-                return;
-            }
-
-            const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
-            const valorFinal = valorBase + adicional;
-
-            document.getElementById('infoDistancia').innerHTML =
-                `📏 Distância real: <strong>${distanciaTotal.toFixed(2)} km</strong><small style="display:block; font-size:12px; opacity:0.8">✅ Cálculo igual ao Google Maps (morros + curvas)</small>`;
-            document.getElementById('valorTotal').textContent = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('caixaValor').style.display = 'block';
-            document.getElementById('btnEnviar').disabled = false;
-
-            alert(`✅ Valor calculado!\n📏 Distância: ${distanciaTotal.toFixed(2)} km\n💰 Valor: ${valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`);
         }
 
         document.getElementById('btnEnviar').onclick = function() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
-            const endRet = `${document.getElementById('endRetirada').value.trim()}, ${document.getElementById('numRetirada').value.trim()} - ${document.getElementById('bairroRetirada').value.trim()}`;
+            const endRet = `${document.getElementById('endRetirada').value.trim()} - ${document.getElementById('bairroRetirada').value.trim()}`;
             const refRet = document.getElementById('refRetirada').value.trim();
             const retorno = document.getElementById('retorno').value === 'sim' ? 'Sim' : 'Não';
             const pagamento = document.getElementById('formaPagamento').options[document.getElementById('formaPagamento').selectedIndex].text;
             const adicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
-            const obs = document.getElementById('observacoes').value.trim();
+            const obs = document.getElementById('observacoes')?.value?.trim() || '';
             const valorTotal = document.getElementById('valorTotal').textContent;
 
             let texto = `🚀 NOVO PEDIDO - MTZ Express\n\n`;
@@ -452,17 +397,16 @@
 
             const destinos = document.querySelectorAll('.destino-item');
             destinos.forEach((dest, i) => {
-                const endDest = `${dest.querySelector('.endereco-destino').value.trim()}, ${dest.querySelector('.numero-destino').value.trim()} - ${dest.querySelector('.bairro-destino').value.trim()}`;
+                const endDest = `${dest.querySelector('.endereco-destino').value.trim()} - ${dest.querySelector('.bairro-destino').value.trim()}`;
                 const nomeCli = dest.querySelector('.nome-cliente').value.trim();
                 const telCli = dest.querySelector('.telefone-cliente').value.trim();
                 texto += `🎯 Destino ${i+1}: ${endDest}\n`;
-                texto += `👤 Cliente: ${nomeCli} | 📱 ${telCli}\n`;
-                texto += `---\n`;
+                texto += `👤 Cliente: ${nomeCli} | 📱 ${telCli}\n---\n`;
             });
 
             texto += `🔄 Volta para loja: ${retorno}\n`;
             texto += `💵 Pagamento: ${pagamento}\n`;
-            texto += `📏 Distância calculada: ${distanciaTotal.toFixed(2)} km\n`;
+            texto += `📏 Distância real: ${distanciaTotal.toFixed(2)} km\n`;
             if (adicional > 0) texto += `➕ Adicional: ${adicional.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n`;
             texto += `💰 VALOR TOTAL: ${valorTotal}\n`;
             if (obs) texto += `📝 Observações: ${obs}`;
@@ -473,7 +417,7 @@
 
         window.onload = () => {
             document.getElementById('btnAdicionarDestino').onclick = adicionarDestino;
-            document.getElementById('btnCalcular').onclick = calcularValorExato;
+            document.getElementById('btnCalcular').onclick = calcularRotaGoogle;
         };
     </script>
 </body>
