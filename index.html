@@ -68,11 +68,60 @@
             gap: 12px;
             margin-bottom: 16px;
         }
-        .logo-img {
+
+        /* === LOGO DESENHADA DIRETO NO CÓDIGO — NÃO QUEBRA MAIS === */
+        .logo-mtz {
             width: 260px;
-            height: auto;
-            filter: drop-shadow(0 8px 16px rgba(0,180,150,0.25));
+            height: 160px;
+            background: linear-gradient(135deg, #0F2B33, #1A3F4A);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0,180,150,0.2);
+            border: 2px solid rgba(0,200,150,0.2);
         }
+        .logo-mtz .moto {
+            width: 180px;
+            height: 80px;
+            background: linear-gradient(90deg, #88E058, #00C896, #0098D0);
+            clip-path: polygon(0% 40%, 20% 20%, 50% 10%, 80% 20%, 100% 40%, 90% 60%, 70% 80%, 30% 80%, 10% 60%);
+            position: relative;
+            opacity: 0.95;
+        }
+        .logo-mtz .moto::before, .logo-mtz .moto::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #E0E0E0, #FFFFFF);
+            border-radius: 50%;
+            box-shadow: inset -3px -3px 8px rgba(0,0,0,0.2);
+        }
+        .logo-mtz .moto::before { left: 25px; }
+        .logo-mtz .moto::after { right: 25px; }
+        .logo-mtz .texto {
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #FFFFFF, #E0F8F0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-top: 12px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px rgba(0,180,150,0.3);
+        }
+        .logo-mtz .subtexto {
+            font-size: 20px;
+            font-weight: 700;
+            color: #B2DFD0;
+            letter-spacing: 4px;
+            margin-top: -6px;
+        }
+
         .slogan {
             font-size: 16px;
             color: #B2DFD0;
@@ -271,22 +320,6 @@
 
         .linha-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        .botoes-pgto { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-sim, .btn-nao {
-            flex: 1; padding: 14px; border: none; border-radius: 12px;
-            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-        }
-        .btn-sim { background: linear-gradient(90deg, #00C896, #00A878); color: white; }
-        .btn-sim.selecionado { background: #008860; transform: scale(0.98); }
-        .btn-nao { background: rgba(220,53,69,0.2); color: #FF8A90; }
-        .btn-nao.selecionado { background: rgba(220,53,69,0.35); transform: scale(0.98); }
-
-        .salvar-dados {
-            display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;
-            justify-content: flex-start; color: #E0F8F0;
-        }
-        .salvar-dados input { width: auto; margin: 0; }
-
         .btn-mais {
             width: 100%; padding: 14px; border: 2px dashed #00C896;
             background: rgba(0,200,150,0.1); color: #00E0A8; border-radius: 12px;
@@ -448,6 +481,12 @@
             margin: 8px 0; border: 2px dashed #00C896;
         }
 
+        .salvar-dados {
+            display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;
+            justify-content: flex-start; color: #E0F8F0;
+        }
+        .salvar-dados input { width: auto; margin: 0; }
+
         .whatsapp-fixo {
             position: fixed; bottom: 20px; right: 20px;
             width: 65px; height: 65px;
@@ -464,7 +503,12 @@
         <div class="card">
             <div class="cabecalho">
                 <div class="logo">
-                    <img src="https://i.imgur.com/9Z7X2pL.png" alt="MTZ Express — Entregas Rápidas" class="logo-img">
+                    <!-- LOGO NOVA, SEM IMAGEM EXTERNA -->
+                    <div class="logo-mtz">
+                        <div class="moto"></div>
+                        <div class="texto">MTZ</div>
+                        <div class="subtexto">EXPRESS</div>
+                    </div>
                 </div>
                 <p class="slogan">Entregas rápidas, seguras e com preço justo — direto com o motoboy!</p>
 
@@ -534,7 +578,7 @@
                     <input type="checkbox" id="salvarLoja" checked> Salvar nome da loja para próximos pedidos
                 </label>
 
-                <!-- 📍 BLOCO DE ENDEREÇO DE RETIRADA — LOJA, COMPLETO E OBRIGATÓRIO -->
+                <!-- 📍 BLOCO COMPLETO E OBRIGATÓRIO DE RETIRADA -->
                 <div class="bloco-retirada">
                     <h4>📍 Endereço de Retirada (Sua Loja)</h4>
                     <input type="text" id="endRetirada" class="obrigatorio" placeholder="Rua, Avenida, Praça..." required>
@@ -666,7 +710,7 @@
             adicionarEventos();
         });
 
-        // ===== SALVAR E MANTER NOME DA LOJA =====
+        // ===== SALVAR NOME DA LOJA =====
         function carregarNomeLojaSalvo() {
             const nomeSalvo = localStorage.getItem('nomeLojaMTZ');
             if (nomeSalvo) document.getElementById('nomeLoja').value = nomeSalvo;
@@ -683,7 +727,7 @@
             }
         }
 
-        // ===== MÁSCARA DE TELEFONE + VALIDAÇÃO 11 DÍGITOS =====
+        // ===== MÁSCARA DE TELEFONE =====
         function configurarMascaras() {
             document.addEventListener('input', (e) => {
                 if (e.target.classList.contains('telefone-cliente')) {
@@ -708,14 +752,12 @@
             return numeroLimpo.length === 11;
         }
 
-        // ===== ADICIONAR / REMOVER / COPIAR DESTINO =====
+        // ===== ADICIONAR/REMOVER DESTINO =====
         function adicionarDestino() {
             const lista = document.getElementById('listaDestinos');
             const modelo = document.querySelector('.destino-item').cloneNode(true);
-            
             modelo.querySelectorAll('input').forEach(input => input.value = '');
             lista.appendChild(modelo);
-
             configurarAutocomplete();
             configurarMascaras();
         }
@@ -729,6 +771,8 @@
             }
         }
 
+        document.getElementById('btnAdicionarDestino').addEventListener('click', adicionarDestino);
+
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('btn-copiar-endereco')) {
                 const destinoAtual = e.target.closest('.destino-item');
@@ -739,7 +783,6 @@
                     bairro: destinoAtual.querySelector('.bairro-destino').value,
                     referencia: destinoAtual.querySelector('.referencia-destino').value
                 };
-
                 adicionarDestino();
                 const novoDestino = document.querySelectorAll('.destino-item')[document.querySelectorAll('.destino-item').length - 1];
                 novoDestino.querySelector('.endereco-destino').value = dados.endereco;
@@ -750,27 +793,19 @@
             }
         });
 
-        // ===== AUTOCOMPLETE + VALIDAÇÃO DE JUIZ DE FORA =====
+        // ===== AUTOCOMPLETE E VALIDAÇÃO DE CIDADE =====
         function configurarAutocomplete() {
             const campos = [document.getElementById('endRetirada'), ...document.querySelectorAll('.endereco-destino')];
             campos.forEach(campo => {
                 if (!campo || campo.dataset.inicializado) return;
-                
-                const opcoes = {
-                    componentRestrictions: { country: 'br' },
-                    types: ['address']
-                };
-
+                const opcoes = { componentRestrictions: { country: 'br' }, types: ['address'] };
                 const autocomplete = new google.maps.places.Autocomplete(campo, opcoes);
                 autocomplete.setFields(['address_components']);
 
                 autocomplete.addListener('place_changed', () => {
                     const place = autocomplete.getPlace();
                     if (!place.address_components) return;
-
-                    const pegarComponente = (tipo) => 
-                        place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
-
+                    const pegarComponente = (tipo) => place.address_components.find(c => c.types.includes(tipo))?.long_name || '';
                     const cidade = pegarComponente('administrative_area_level_2');
                     const aviso = document.getElementById('avisoCidadeErro');
 
@@ -791,88 +826,4 @@
                     if (campo.id === 'endRetirada') {
                         document.getElementById('bairroRetirada').value = bairro;
                     } else {
-                        campo.closest('.destino-item').querySelector('.bairro-destino').value = bairro;
-                    }
-                });
-
-                campo.dataset.inicializado = 'true';
-            });
-        }
-
-        // ===== MAPA E ROTAS =====
-        function inicializarMapa() {
-            const centro = { lat: -21.7641, lng: -43.3503 };
-            map = new google.maps.Map(document.getElementById('map'), { zoom: 12, center: centro });
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-        }
-
-        // ===== CALCULAR VALOR =====
-        function calcularValor() {
-            // Valida endereço de retirada
-            const endRet = document.getElementById('endRetirada').value.trim();
-            const numRet = document.getElementById('numRetirada').value.trim();
-            const bairroRet = document.getElementById('bairroRetirada').value.trim();
-            const refRet = document.getElementById('refRetirada').value.trim();
-
-            if (!endRet || !numRet || !bairroRet || !refRet) {
-                alert('⚠️ Preencha TODOS os dados do endereço de retirada (loja)!');
-                return;
-            }
-
-            const destinos = document.querySelectorAll('.destino-item');
-            let valido = true;
-            let enderecosDestino = [];
-
-            destinos.forEach((dest, indice) => {
-                const end = dest.querySelector('.endereco-destino').value.trim();
-                const num = dest.querySelector('.numero-destino').value.trim();
-                const bairro = dest.querySelector('.bairro-destino').value.trim();
-                const ref = dest.querySelector('.referencia-destino').value.trim();
-                const nomeCli = dest.querySelector('.nome-cliente').value.trim();
-                const tel = dest.querySelector('.telefone-cliente').value;
-
-                if (!end || !num || !bairro || !ref || !nomeCli || !validarTelefone(tel)) {
-                    alert(`⚠️ Dados incompletos ou telefone inválido no destino ${indice + 1}! Verifique todos os campos.`);
-                    valido = false;
-                    return;
-                }
-
-                enderecosDestino.push(`${end}, ${num} - ${bairro}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`);
-            });
-
-            if (!valido) return;
-
-            const origem = `${endRet}, ${numRet} - ${bairroRet}, ${CIDADE_ALVO} - ${ESTADO_ALVO}`;
-            let rota = [origem, ...enderecosDestino];
-            const volta = document.getElementById('retorno').value === 'sim';
-            if (volta) rota.push(origem);
-
-            const waypoints = rota.slice(1, -1).map(e => ({ location: e, stopover: true }));
-
-            directionsService.route({
-                origin: rota[0],
-                destination: rota[rota.length - 1],
-                waypoints: waypoints,
-                optimizeWaypoints: false,
-                travelMode: google.maps.TravelMode.DRIVING
-            }, (resultado, status) => {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(resultado);
-                    distanciaTotal = 0;
-                    resultado.routes[0].legs.forEach(parte => distanciaTotal += parte.distance.value / 1000);
-
-                    valorEntrega = Math.max(VALOR_MINIMO, VALOR_MINIMO + (distanciaTotal * VALOR_POR_KM));
-
-                    if (valorEntrega === VALOR_MINIMO) {
-                        document.getElementById('avisoValorMinimo').style.display = 'block';
-                    } else {
-                        document.getElementById('avisoValorMinimo').style.display = 'none';
-                    }
-
-                    document.getElementById('infoDistancia').innerHTML = `📏 Distância total: <strong>${distanciaTotal.toFixed(2)} km</strong>`;
-                    document.getElementById('valorTotal').textContent = `R$ ${valorEntrega.toFixed(2)}`;
-                    document.getElementById('detalheValor').innerHTML = 
-                        `Distância: ${distanciaTotal.toFixed(2)} km<br>` +
-                        `R$ ${VALOR_POR_KM.toFixed(2)} por km + Taxa mínima R$ ${VALOR_MINIMO.toFixed(2)}`;
-                    document.getElementById('caixaValor').style.display = 'block
+                        campo
