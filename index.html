@@ -240,12 +240,12 @@
                         </div>
                     </div>
 
-                    <!-- ✅ BOTÃO QUE APARECE DEPOIS DE CALCULAR E ENVIA PRO SEU WHATSAPP -->
+                    <!-- ✅ BOTÃO ENVIAR WHATSAPP -->
                     <button type="button" class="btn btn-whats escondido" id="btnEnviar" onclick="enviarPedido()">📤 ENVIAR PEDIDO NO WHATSAPP</button>
                 </form>
             </div>
 
-            <!-- 🛵 ÁREA DO MOTOBOY PARCEIRO --- ABRE PERFEITAMENTE -->
+            <!-- 🛵 ÁREA DO MOTOBOY PARCEIRO -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso verde">🔒 Área exclusiva do Motoboy Parceiro</div>
                 <button class="btn btn-amarelo" id="btnLocalizar" onclick="pegarLocalizacao()">📍 ATIVAR MINHA LOCALIZAÇÃO</button>
@@ -271,7 +271,7 @@
                 </div>
             </div>
 
-            <!-- 📊 PAINEL DE GESTÃO --- ABRE NORMAL -->
+            <!-- 📊 PAINEL DE GESTÃO -->
             <div class="conteudo-aba" id="abaDashboard">
                 <div id="telaLogin" class="area-senha">
                     <div class="aviso segredo">🔒 ÁREA CONFIDENCIAL</div>
@@ -555,30 +555,3 @@
 
             const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}`;
             coordenadasLoja = await buscarCoordenadas(endLojaComp);
-            if(!coordenadasLoja) {
-                alert('❌ Não encontrei o endereço da loja, verifique por favor!');
-                document.getElementById('avisoCarregando').classList.add('escondido');
-                document.getElementById('btnCalcular').disabled = false;
-                return;
-            }
-
-            const kmDesloc = await calcularRota({lat: localMoto[0], lon: localMoto[1]}, coordenadasLoja) || 3;
-            const valDesloc = kmDesloc * TAXA_KM;
-
-            let totalEntregas = 0;
-            listaCoordenadasEntregas = [];
-            for(const bloco of entregas) {
-                const rua = bloco.querySelector('.ruaDest').value.trim();
-                const num = bloco.querySelector('.numDest').value.trim();
-                const bairro = bloco.querySelector('.bairroDest').value.trim();
-                const endComp = `${rua}, ${num}, ${bairro}`;
-                const coord = await buscarCoordenadas(endComp);
-                if(!coord) {
-                    alert(`❌ Não encontrei o endereço: ${endComp}`);
-                    document.getElementById('avisoCarregando').classList.add('escondido');
-                    document.getElementById('btnCalcular').disabled = false;
-                    return;
-                }
-                listaCoordenadasEntregas.push({coord, nome: bloco.querySelector('.nomeCliente').value.trim(), end: endComp});
-                const km = await calcularRota(coordenadasLoja, coord) || 2;
-                total
