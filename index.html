@@ -62,8 +62,8 @@
         .btn-pequeno {width: auto; padding: 10px 15px; font-size: 14px;}
         .btn-limpar {width: auto; padding: 10px 20px; margin-top: 0;}
         
-        .conteudo-aba {display: none !important;}
-        .conteudo-aba.visivel {display: block !important;}
+        .conteudo-aba {display: none;}
+        .conteudo-aba.visivel {display: block;}
         .bloco-entrega {border: 1px solid rgba(0,180,140,0.2); border-radius: 16px; padding: 18px; margin: 20px 0; background: rgba(0,180,140,0.03);}
         .titulo-entrega {font-size: 18px; font-weight: 700; color: #00E0A8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         
@@ -72,7 +72,7 @@
         .valor-final {font-size: 42px; font-weight: 800; color: #FFE082; text-align: center; margin: 15px 0;}
         .escondido {display: none !important;}
         .carregando {text-align: center; padding: 15px; color: #FFE082; font-weight: 600;}
-        #mapa {height: 300px; border-radius: 15px; margin: 15px 0; display: none;}
+        #mapa {height: 300px; border-radius: 15px; margin: 15px 0;}
         .etapa {padding: 15px; border-radius: 12px; margin: 12px 0; background: rgba(255,255,255,0.05);}
         .etapa.concluida {border-left: 4px solid #00C896; background: rgba(0,200,150,0.1);}
         .etapa.pendente {border-left: 4px solid #FFC107;}
@@ -310,6 +310,7 @@
         let contEntregas = 0;
         let coordenadasLoja = null;
         let listaCoordenadasEntregas = [];
+        let mapaInicializado = false;
 
         window.addEventListener('load', () => {
             const nomeSalvo = localStorage.getItem('mtz_nomeLoja');
@@ -323,15 +324,15 @@
             document.getElementById('nomeLoja').addEventListener('input', () => localStorage.setItem('mtz_nomeLoja', document.getElementById('nomeLoja').value));
             document.getElementById('wppLoja').addEventListener('input', () => localStorage.setItem('mtz_wppLoja', document.getElementById('wppLoja').value.replace(/\D/g,'')));
             
-            initMapa();
-            pegarLocalizacaoAutomatica();
             document.getElementById('btnCalcular').addEventListener('click', calcularValorTotal);
         });
 
         function initMapa() {
+            if(mapaInicializado) return;
             mapa = L.map('mapa').setView(localMoto, 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap'}).addTo(mapa);
             L.marker(localMoto).addTo(mapa).bindPopup('Sua localização').openPopup();
+            mapaInicializado = true;
         }
 
         function pegarLocalizacaoAutomatica() {
@@ -346,7 +347,7 @@
                     }
                 },
                 () => {
-                    document.getElementById('localMoto').textContent = '⚠️ Usando localização padrão (Linhares)';
+                    document.getElementById('localMoto').textContent = '⚠️ Usando localização padrão (Juiz de Fora)';
                 }
             );
         }
@@ -442,9 +443,13 @@
             if(abaAtiva) abaAtiva.classList.add('visivel');
             event.currentTarget.classList.remove('inativa');
             event.currentTarget.classList.add('ativa');
+            
             if(nomeAba === 'motoboy') {
-                setTimeout(() => mapa.invalidateSize(), 150);
-                document.getElementById('mapa').style.display = 'block';
+                initMapa();
+                setTimeout(() => {
+                    if(mapa) mapa.invalidateSize();
+                }, 100);
+                pegarLocalizacaoAutomatica();
             }
         }
 
@@ -573,8 +578,7 @@
             });
             if(!valido) { alert('⚠️ Preencha todos os dados das entregas!'); return; }
 
-            document.getElementById('avisoCarreg
-ando').classList.remove('escondido');
+            document.getElementById('avisoCarregando').classList.remove('escondido');
             document.getElementById('btnCalcular').disabled = true;
 
             const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}`;
@@ -771,4 +775,4 @@ ando').classList.remove('escondido');
         }
     </script>
 </body>
-                    </html>
+    </html>
