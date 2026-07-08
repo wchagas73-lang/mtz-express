@@ -30,9 +30,11 @@
         .link-insta:hover {text-decoration: underline;}
         
         label {display: block; margin: 16px 0 6px; font-weight: 700; font-size: 15px;}
+        label span {color: #FF6B6B; margin-left: 3px;}
         input, select, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         input:disabled {background: rgba(15,43,51,0.3); border-color: rgba(0,180,140,0.1); color: #B2DFDB;}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+        .campo-pequeno {max-width: 120px;}
         
         .btn {width: 100%; padding: 15px; border: none; border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.2s;}
         .btn-amarelo {background: linear-gradient(90deg, #FFC107, #FF9800); color: #212121;}
@@ -55,6 +57,7 @@
         .caixa-devolucao {background: rgba(156,39,176,0.08); padding: 18px; border-radius: 16px; border-left: 4px solid #9C27B0; margin: 20px 0; display: none;}
         .aviso-loja {font-size: 14px; color: #FFD700; margin-top: 8px;}
         .status-auto {font-size: 14px; color: #80FFD0; margin-top: 5px;}
+        .aviso-campos {font-size: 13px; color: #FFD700; margin: -8px 0 10px 0;}
 
         /* ÍCONES FIXOS */
         .icones-fixos {position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999;}
@@ -78,23 +81,25 @@
             <!-- 🛵 ÁREA DO MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso auto">
-                    ✅ **LOCALIZAÇÃO AUTOMÁTICA — ATUALIZA DE 10 EM 10 MINUTOS!**<br>
-                    🔑 Senha atual: **1120**
+                    ✅ **LOCALIZAÇÃO MAIS RÁPIDA — SENHA PROTEGIDA!**<br>
+                    🔑 Senha: **1120** — preenchimento invisível
                 </div>
 
-                <label>🔒 Senha de acesso exclusiva</label>
-                <input type="password" id="senhaMotoboy" placeholder="Digite sua senha: 1120">
+                <label>🔒 Senha de acesso exclusiva <span>*</span></label>
+                <!-- ✅ SENHA 100% INVISÍVEL -->
+                <input type="password" id="senhaMotoboy" placeholder="Digite sua senha" required>
 
                 <label>📍 Minha localização atual</label>
-                <button class="btn btn-amarelo" id="btnIniciarAuto">🔄 INICIAR LOCALIZAÇÃO AUTOMÁTICA</button>
+                <button class="btn btn-amarelo" id="btnIniciarAuto">🔄 INICIAR LOCALIZAÇÃO RÁPIDA</button>
                 <p class="status-auto" id="statusAuto">⏳ Aguardando iniciar...</p>
                 
                 <input type="text" id="ruaMoto" placeholder="Rua / Avenida" disabled>
                 <div class="linha-dupla">
                     <div><input type="text" id="numMoto" placeholder="Número" disabled></div>
-                    <div><input type="text" id="cepMoto" placeholder="CEP" disabled></div>
+                    <div><input type="text" id="bairroMoto" placeholder="Bairro" disabled></div>
                 </div>
-                <input type="text" id="bairroMoto" placeholder="Bairro" disabled>
+                <input type="text" id="cepMoto" placeholder="CEP" disabled>
+                <input type="text" id="refMoto" placeholder="Ponto de referência (ex: ao lado da padaria)" disabled>
 
                 <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
 
@@ -107,7 +112,8 @@
                 <div class="info-rota">
                     <strong>Loja:</strong> <span id="nomeLojaPedido">—</span><br>
                     <strong>Cliente:</strong> <span id="nomeClientePedido">—</span><br>
-                    <strong>Endereço Cliente:</strong> <span id="endClientePedido">—</span>
+                    <strong>Endereço Cliente:</strong> <span id="endClientePedido">—</span><br>
+                    <strong>Referência:</strong> <span id="refClientePedido">—</span>
                 </div>
 
                 <div class="botoes-status">
@@ -116,8 +122,8 @@
                 </div>
 
                 <div class="caixa-motivo" id="caixaMotivo">
-                    <label>📝 Motivo da não entrega:</label>
-                    <textarea id="motivoTexto" rows="3" placeholder="Ex: Cliente não atendeu, endereço incorreto..."></textarea>
+                    <label>📝 Motivo da não entrega <span>*</span></label>
+                    <textarea id="motivoTexto" rows="3" placeholder="Ex: Cliente não atendeu, endereço incorreto..." required></textarea>
                     <p class="aviso-loja">📞 Contato Loja: <strong>(32) 9 9995-3215</strong></p>
                     <button class="btn btn-vermelho-grande" onclick="enviarNaoEntrega()">❌ REPORTAR E GERAR ROTA DE DEVOLUÇÃO</button>
                 </div>
@@ -125,81 +131,82 @@
                 <div id="resultadoAcao" style="margin-top:20px; display:none;"></div>
             </div>
 
-            <!-- 🏪 ÁREA DO LOJISTA -->
+            <!-- 🏪 ÁREA DO LOJISTA — CAMPOS COMPLETOS E OBRIGATÓRIOS -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="aviso destaque">
-                    ⚠️ **AVISO IMPORTANTE — VALOR MÍNIMO E TABELA JUSTA!**<br><br>
-                    🛵 **Trajeto completo:** Você → Loja → Cliente<br>
-                    💰 **Valor mínimo: R$ 10,00** (até 3 km)<br>
-                    📏 Acima de 10 km: R$ 17,00 + R$ 1,20 por km extra<br>
-                    ✅ Preços alinhados com o mercado de Juiz de Fora!
+                    ⚠️ **AVISO: PREENCHA TODOS OS CAMPOS OBRIGATÓRIOS (*)!**<br><br>
+                    🛵 Trajeto: Motoboy → Loja → Cliente<br>
+                    💰 Valor mínimo R$10,00 (até 3 km)<br>
+                    📏 Acima de 10 km: R$17,00 + R$1,20/km extra
                 </div>
+                <p class="aviso-campos">Campos com <span>*</span> são obrigatórios — não envie sem preencher!</p>
 
                 <div class="aviso verde" id="avisoLocalMoto">
-                    ✅ 🛵 **LOCALIZAÇÃO DO MOTOBOY JÁ CARREGADA:**<br>
+                    ✅ 🛵 **LOCALIZAÇÃO DO MOTOBOY:**<br>
                     <strong id="dadosMoto">Aguardando atualização...</strong>
                 </div>
 
                 <form id="formPedido">
-                    <label>🏪 Nome da sua Loja</label>
+                    <label>🏪 Nome da sua Loja <span>*</span></label>
                     <input type="text" id="nomeLoja" placeholder="Ex: Padaria Silva" required>
 
-                    <label>📍 Endereço da Loja</label>
+                    <label>📍 Endereço da Loja <span>*</span></label>
                     <input type="text" id="ruaLoja" placeholder="Rua / Avenida" required>
                     <div class="linha-dupla">
-                        <div><input type="text" id="numLoja" placeholder="Número" required></div>
+                        <div><input type="text" id="numLoja" placeholder="Número" required class="campo-pequeno"></div>
                         <div><input type="text" id="bairroLoja" placeholder="Bairro" required></div>
                     </div>
-                    <input type="text" id="cepLoja" placeholder="CEP" required>
+                    <input type="text" id="cepLoja" placeholder="CEP" required class="campo-pequeno">
+                    <!-- ✅ CAMPO REFERÊNCIA LOJA -->
+                    <input type="text" id="refLoja" placeholder="🏷️ Ponto de referência (ex: em frente ao supermercado)">
+                    <!-- ✅ CAMPO OBSERVAÇÃO LOJA -->
+                    <textarea id="obsLoja" rows="2" placeholder="📝 Observações (ex: entrada pelos fundos, horário de atendimento)"></textarea>
 
-                    <label>👤 Nome do Cliente / Destino Final</label>
+                    <label>👤 Nome do Cliente / Destino Final <span>*</span></label>
                     <input type="text" id="nomeCliente" placeholder="Nome completo" required>
                     
-                    <label>📍 Endereço de Entrega</label>
+                    <label>📍 Endereço de Entrega <span>*</span></label>
                     <input type="text" id="ruaDestino" placeholder="Rua / Avenida" required>
                     <div class="linha-dupla">
-                        <div><input type="text" id="numDestino" placeholder="Número" required></div>
+                        <div><input type="text" id="numDestino" placeholder="Número" required class="campo-pequeno"></div>
                         <div><input type="text" id="bairroDestino" placeholder="Bairro" required></div>
                     </div>
-                    <input type="text" id="cepDestino" placeholder="CEP" required>
-                    <input type="tel" id="telCliente" placeholder="Telefone do cliente" required>
+                    <input type="text" id="cepDestino" placeholder="CEP" required class="campo-pequeno">
+                    <!-- ✅ CAMPO REFERÊNCIA CLIENTE -->
+                    <input type="text" id="refDestino" placeholder="🏷️ Ponto de referência (ex: casa azul com portão branco)">
+                    <!-- ✅ CAMPO OBSERVAÇÃO CLIENTE -->
+                    <textarea id="obsDestino" rows="2" placeholder="📝 Observações (ex: deixar com a porteira, não tem campainha)"></textarea>
+                    
+                    <label>📞 Telefone do cliente <span>*</span></label>
+                    <input type="tel" id="telCliente" placeholder="(32) 9XXXX-XXXX" required>
 
                     <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALOR TOTAL</button>
 
                     <div class="info-rota" id="infoRota" style="display: none;">
                         📋 **RESUMO DO PEDIDO:**<br>
-                        🛣️ **ROTA:** 🛵 Motoboy → 🏪 Loja → 📦 Cliente<br>
-                        📏 **DISTÂNCIA TOTAL:** <span id="kmTotal">X,XX km</span>
+                        🛣️ Rota: 🛵 Motoboy → 🏪 Loja → 📦 Cliente<br>
+                        📍 Distância total: <span id="kmTotal">X,XX km</span><br>
+                        🏷️ Referência: <span id="resRef">—</span>
                     </div>
 
                     <div class="valor-final" id="valorFinal">R$ 0,00</div>
 
-                    <button type="button" class="btn btn-verde" id="btnEnviar">📤 ENVIAR PEDIDO</button>
+                    <button type="submit" class="btn btn-verde" id="btnEnviar">📤 ENVIAR PEDIDO</button>
 
-                    <!-- 🔄 ÁREA DE DEVOLUÇÃO -->
+                    <!-- 🔄 DEVOLUÇÃO -->
                     <div class="caixa-devolucao" id="caixaDevolucao">
-                        <div class="aviso devolucao">
-                            🔄 **SOLICITAÇÃO DE DEVOLUÇÃO**<br>
-                            📦 Pedido não entregue — calcule o valor da volta!
-                        </div>
-                        <div class="info-rota devolucao">
-                            🛣️ **ROTA DE RETORNO:** 📍 Cliente → 🏪 Loja<br>
-                            💸 Valor mínimo R$ 10,00
-                        </div>
-                        <button type="button" class="btn btn-roxo" id="btnCalcularDev">🔄 CALCULAR VALOR DA DEVOLUÇÃO</button>
-                        <div class="valor-final roxo" id="valorDevolucao" style="font-size:32px;">R$ 0,00</div>
-                        <button type="button" class="btn btn-verde" id="btnConfirmaDev" style="margin-top:8px;">✅ CONFIRMAR DEVOLUÇÃO</button>
+                        <div class="aviso devolucao">🔄 DEVOLUÇÃO — R$10,00 mínimo</div>
+                        <button type="button" class="btn btn-roxo" id="btnCalcularDev">🔄 CALCULAR VALOR DE VOLTA</button>
+                        <div class="valor-final roxo" id="valorDevolucao">R$ 0,00</div>
+                        <button type="button" class="btn btn-verde" id="btnConfirmaDev">✅ CONFIRMAR DEVOLUÇÃO</button>
                     </div>
                 </form>
 
-                <!-- 🚀 RODAPÉ COM INSTAGRAM -->
+                <!-- 🚀 RODAPÉ -->
                 <div class="rodape">
-                    🚀 <strong>MTZ Express</strong> — Entregas com Confiança, Agilidade e Estilo<br>
-                    Atuando com dedicação em Juiz de Fora e região<br>
-                    📞 Contato: (32) 9 9995-3215<br>
-                    📸 Siga nosso Instagram: 
-                    <a href="https://www.instagram.com/mtzexpresss?igsh=anZnZDJjeWZmdTV1" target="_blank" class="link-insta">@mtzexpresss 📸</a><br>
-                    💬 Gostou do nosso trabalho? Indique para outros parceiros! É a nossa maior recompensa 💚
+                    🚀 <strong>MTZ Express</strong> — Entregas com Confiança<br>
+                    📞 (32) 9 9995-3215<br>
+                    📸 Instagram: <a href="https://www.instagram.com/mtzexpresss?igsh=anZnZDJjeWZmdTV1" target="_blank" class="link-insta">@mtzexpresss 📸</a>
                 </div>
             </div>
         </div>
@@ -212,15 +219,15 @@
     </div>
 
     <script>
-        const SENHA_MOTOBOY = '1120'; // ✅ SENHA: 1120
+        const SENHA_MOTOBOY = '1120';
         const FONE_LOJA = '5532999953215';
-        const VALOR_KM_EXTRA = 1.20; // ✅ Acima de 10 km: R$1,20/km extra
+        const VALOR_KM_EXTRA = 1.20;
         let localSalvo = JSON.parse(localStorage.getItem('localMoto')) || null;
         let pedidoAtual = {};
         let watchId = null;
-        const INTERVALO_ATUALIZACAO = 10 * 60 * 1000; // ⏱️ 10 em 10 minutos
+        const INTERVALO_ATUALIZACAO = 10 * 60 * 1000;
 
-        // 🧮 TABELA DE PREÇOS DEFINIDA POR VOCÊ
+        // 🧮 TABELA DE PREÇOS
         function calcularValorPorDistancia(km) {
             if (km <= 3) return 10.00;
             if (km <= 4) return 11.00;
@@ -230,7 +237,6 @@
             if (km <= 8) return 15.00;
             if (km <= 9) return 16.00;
             if (km <= 10) return 17.00;
-            // Acima de 10 km
             return 17.00 + ((km - 10) * VALOR_KM_EXTRA);
         }
 
@@ -250,59 +256,73 @@
 
         function atualizarLocalLoja() {
             if(localSalvo) {
-                document.getElementById('dadosMoto').textContent = `${localSalvo.rua}, ${localSalvo.numero} - ${localSalvo.bairro}`;
+                let ref = localSalvo.referencia ? ` | Ref: ${localSalvo.referencia}` : '';
+                document.getElementById('dadosMoto').textContent = `${localSalvo.rua}, ${localSalvo.numero} - ${localSalvo.bairro}${ref}`;
             }
         }
 
-        // 📍 INICIAR LOCALIZAÇÃO AUTOMÁTICA
+        // 📍 LOCALIZAÇÃO MAIS RÁPIDA — AJUSTADO PARA NÃO DEMORAR!
         document.getElementById('btnIniciarAuto').onclick = () => {
             if(document.getElementById('senhaMotoboy').value !== SENHA_MOTOBOY) {alert('❌ Senha incorreta!'); return;}
-            if(!navigator.geolocation) {alert('❌ Seu celular não tem suporte a localização!'); return;}
+            if(!navigator.geolocation) {alert('❌ Celular não suporta localização!'); return;}
 
             const btn = document.getElementById('btnIniciarAuto');
             btn.disabled = true;
             btn.textContent = '✅ FUNCIONANDO...';
-            document.getElementById('statusAuto').textContent = '🔄 Atualizando de 10 em 10 minutos — deixe a página aberta!';
+            document.getElementById('statusAuto').textContent = '🔄 Localização rápida ativada!';
 
+            // ✅ CONFIGURAÇÃO PARA PEGAR MAIS RÁPIDO
             watchId = navigator.geolocation.watchPosition(
                 function(pos) {
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
-                    const endereco = {rua: 'Obtendo endereço...', numero: '', bairro: '', cep: ''};
+                    const endereco = {
+                        rua: 'Obtendo endereço...', numero: '', bairro: '', cep: '', referencia: ''
+                    };
                     document.getElementById('ruaMoto').value = endereco.rua;
                     document.getElementById('numMoto').value = endereco.numero;
                     document.getElementById('bairroMoto').value = endereco.bairro;
                     document.getElementById('cepMoto').value = endereco.cep;
+                    document.getElementById('refMoto').value = endereco.referencia || '';
                     localSalvo = endereco;
                     localStorage.setItem('localMoto', JSON.stringify(localSalvo));
                 },
                 function(erro) {
-                    alert('❌ Permita o acesso à localização e escolha "PERMITIR SEMPRE"!');
-                    btn.disabled = false; btn.textContent = '🔄 INICIAR LOCALIZAÇÃO AUTOMÁTICA';
+                    alert('❌ Permita localização e escolha "PERMITIR SEMPRE"!');
+                    btn.disabled = false; btn.textContent = '🔄 INICIAR LOCALIZAÇÃO RÁPIDA';
                     document.getElementById('statusAuto').textContent = '⚠️ Erro — tente novamente';
                 },
-                {enableHighAccuracy: true, maximumAge: INTERVALO_ATUALIZACAO, timeout: 15000}
+                {
+                    enableHighAccuracy: false, // ✅ Mais rápido, sem demora
+                    timeout: 8000, // ✅ Espera só 8 segundos
+                    maximumAge: 60000 // ✅ Usa local recente se tiver
+                }
             );
         };
 
-        // 📤 Enviar pedido
-        document.getElementById('btnEnviar').onclick = () => {
+        // 📤 VALIDAÇÃO E ENVIO DO PEDIDO — NÃO DEIXA ENVIAR SEM PREENCHER
+        document.getElementById('formPedido').addEventListener('submit', (e) => {
+            e.preventDefault();
             pedidoAtual = {
                 loja: document.getElementById('nomeLoja').value,
                 ruaLoja: document.getElementById('ruaLoja').value,
                 numLoja: document.getElementById('numLoja').value,
                 bairroLoja: document.getElementById('bairroLoja').value,
                 cepLoja: document.getElementById('cepLoja').value,
+                refLoja: document.getElementById('refLoja').value || '',
+                obsLoja: document.getElementById('obsLoja').value || '',
                 cliente: document.getElementById('nomeCliente').value,
                 ruaDest: document.getElementById('ruaDestino').value,
                 numDest: document.getElementById('numDestino').value,
                 bairroDest: document.getElementById('bairroDestino').value,
                 cepDest: document.getElementById('cepDestino').value,
+                refDest: document.getElementById('refDestino').value || '',
+                obsDest: document.getElementById('obsDestino').value || '',
                 telCliente: document.getElementById('telCliente').value
             };
             localStorage.setItem('pedidoAtual', JSON.stringify(pedidoAtual));
-            alert('✅ Pedido enviado com sucesso!');
-        };
+            alert('✅ Pedido enviado com sucesso! Todos os dados preenchidos!');
+        });
 
         function carregarDadosPedido() {
             const p = JSON.parse(localStorage.getItem('pedidoAtual'));
@@ -310,6 +330,7 @@
                 document.getElementById('nomeLojaPedido').textContent = p.loja;
                 document.getElementById('nomeClientePedido').textContent = p.cliente;
                 document.getElementById('endClientePedido').textContent = `${p.ruaDest}, ${p.numDest} - ${p.bairroDest}`;
+                document.getElementById('refClientePedido').textContent = p.refDest || 'Não informado';
             }
         }
 
@@ -317,7 +338,7 @@
         function marcarEntregue() {
             const p = JSON.parse(localStorage.getItem('pedidoAtual'));
             if(!p) {alert('⚠️ Nenhum pedido encontrado!'); return;}
-            const mensagem = `🎉 *ENTREGA FEITA COM SUCESSO!* 🤝\nOlá! Aviso que o pedido chegou certinho! 🛵💨\n🚀 MTZ Express`;
+            const mensagem = `🎉 *ENTREGA FEITA COM SUCESSO!* 🤝\nLoja: ${p.loja}\nCliente: ${p.cliente}\nEndereço: ${p.ruaDest}, ${p.numDest} - ${p.bairroDest}\nReferência: ${p.refDest || '---'}\n🚀 MTZ Express`;
             window.open(`https://wa.me/${FONE_LOJA}?text=${encodeURIComponent(mensagem)}`, '_blank');
             document.getElementById('resultadoAcao').style.display='block';
             document.getElementById('resultadoAcao').innerHTML = `<div class="aviso sucesso">🎉 Entrega feita e loja avisada! 🚀</div>`;
@@ -331,36 +352,35 @@
 
         function enviarNaoEntrega() {
             const p = JSON.parse(localStorage.getItem('pedidoAtual'));
-            const motivo = document.getElementById('motivoTexto').value.trim() || 'Motivo não informado';
+            const motivo = document.getElementById('motivoTexto').value.trim();
+            if(!motivo) {alert('⚠️ Escreva o motivo da não entrega!'); return;}
             if(!p) {alert('⚠️ Nenhum pedido encontrado!'); return;}
-            const mensagem = `❌ *AVISO: ENTREGA NÃO REALIZADA*\nMotivo: *${motivo}*\nA disposição para ajustar! 🤝\n🚀 MTZ Express`;
+            const mensagem = `❌ *ENTREGA NÃO REALIZADA*\nLoja: ${p.loja}\nCliente: ${p.cliente}\nMotivo: *${motivo}*\n🚀 MTZ Express`;
             window.open(`https://wa.me/${FONE_LOJA}?text=${encodeURIComponent(mensagem)}`, '_blank');
             document.getElementById('caixaDevolucao').style.display='block';
             document.getElementById('resultadoAcao').style.display='block';
-            document.getElementById('resultadoAcao').innerHTML = `<div class="aviso vermelho">❌ REPORTADO! Loja já foi avisada!</div>`;
+            document.getElementById('resultadoAcao').innerHTML = `<div class="aviso vermelho">❌ REPORTADO!</div>`;
             document.getElementById('caixaMotivo').style.display='none';
         }
 
-        // 🚀 CÁLCULO DE VALOR USANDO A TABELA NOVA
+        // 🚀 Cálculos
         window.onload = () => {
             atualizarLocalLoja();
             carregarDadosPedido();
 
             document.getElementById('btnCalcular').onclick = () => {
-                // Exemplo de distância — na prática vem do sistema de mapas
-                const kmExemplo = 4.7; // pode ser substituído pelo cálculo real
+                const kmExemplo = 4.7;
                 const valor = calcularValorPorDistancia(kmExemplo);
                 alert('🗺️ Rota calculada!');
                 document.getElementById('infoRota').style.display='block';
                 document.getElementById('kmTotal').textContent = `${kmExemplo.toFixed(2).replace('.', ',')} km`;
+                document.getElementById('resRef').textContent = document.getElementById('refDestino').value || 'Não informado';
                 document.getElementById('valorFinal').textContent = `R$ ${valor.toFixed(2).replace('.', ',')}`;
             };
 
             document.getElementById('btnCalcularDev').onclick = () => {
                 const kmExemplo = 3.2;
-                const valor = calcularValorPorDistancia(kmExemplo);
-                alert('🔄 Valor de retorno calculado!');
-                document.getElementById('valorDevolucao').textContent = `R$ ${valor.toFixed(2).replace('.', ',')}`;
+                document.getElementById('valorDevolucao').textContent = `R$ ${calcularValorPorDistancia(kmExemplo).toFixed(2).replace('.', ',')}`;
             };
 
             document.getElementById('btnConfirmaDev').onclick = () => {
