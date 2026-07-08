@@ -32,10 +32,10 @@
         
         label {display: block; margin: 16px 0 6px; font-weight: 700; font-size: 15px;}
         label span {color: #FF6B6B; margin-left: 3px;}
-        .campo-completo {position: relative;}
+        .campo-completo {position: relative; z-index: 10;}
         input, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         textarea {resize: none; height: 80px;}
-        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 220px; overflow-y: auto; z-index: 9999; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.3);}
+        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 220px; overflow-y: auto; z-index: 9999; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.5);}
         .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.15s;}
         .item-sugestao:hover {background: rgba(0,180,140,0.15);}
         .item-sugestao .detalhe {font-size: 13px; color: #80CBC4; margin-top: 2px;}
@@ -65,8 +65,8 @@
         .btn-pequeno {width: auto; padding: 10px 15px; font-size: 14px;}
         .btn-limpar {width: auto; padding: 10px 20px; margin-top: 0;}
         
-        .conteudo-aba {display: none;}
-        .conteudo-aba.visivel {display: block;}
+        .conteudo-aba {display: none !important;}
+        .conteudo-aba.visivel {display: block !important;}
         .bloco-entrega {border: 1px solid rgba(0,180,140,0.2); border-radius: 16px; padding: 18px; margin: 20px 0; background: rgba(0,180,140,0.03);}
         .titulo-entrega {font-size: 18px; font-weight: 700; color: #00E0A8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         
@@ -268,7 +268,7 @@
                 </form>
             </div>
 
-            <!-- 🛵 ÁREA MOTOBOY → ABRINDO NORMAL AGORA -->
+            <!-- 🛵 ÁREA MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso verde">🔒 Área exclusiva do Motoboy Parceiro</div>
                 <button class="btn btn-amarelo" id="btnLocalizar">📍 ATIVAR MINHA LOCALIZAÇÃO</button>
@@ -331,7 +331,6 @@
         let valorBase = 0, valorGorjeta = 0, valorDesconto = 0;
         let dadosPedido = {};
 
-        // 📂 SALVA E CARREGA DADOS DA LOJA
         window.addEventListener('load', () => {
             const nomeSalvo = localStorage.getItem('mtz_nomeLoja');
             const wppSalvo = localStorage.getItem('mtz_wppLoja');
@@ -345,7 +344,6 @@
             document.getElementById('wppLoja').addEventListener('input', () => localStorage.setItem('mtz_wppLoja', document.getElementById('wppLoja').value.replace(/\D/g,'')));
         });
 
-        // 🎭 MÁSCARAS
         function aplicarMascara(campo, tipo) {
             let valor = campo.value.replace(/\D/g, '');
             if(tipo === 'telefone') {
@@ -360,7 +358,6 @@
             }
         }
 
-        // 🗑️ LIMPAR TUDO
         function limparTudo() {
             if(confirm('⚠️ Tem certeza que quer apagar todos os dados?')) {
                 document.getElementById('formPedido').reset();
@@ -402,12 +399,17 @@
             }
         }
 
-        // 🤑 GORJETA
         function mostrarCampoGorjeta() {
             const sim = document.getElementById('opSim').checked;
             document.getElementById('areaValorGorjeta').classList.toggle('escondido', !sim);
-            if(sim) { document.getElementById('valorGorjeta').disabled = false; if(!document.getElementById('valorGorjeta').value) selecionarValor(1); }
-            else { document.getElementById('valorGorjeta').disabled = true; document.getElementById('valorGorjeta').value = ''; valorGorjeta = 0; }
+            if(sim) { 
+                document.getElementById('valorGorjeta').disabled = false; 
+                if(!document.getElementById('valorGorjeta').value) selecionarValor(1); 
+            } else { 
+                document.getElementById('valorGorjeta').disabled = true; 
+                document.getElementById('valorGorjeta').value = ''; 
+                valorGorjeta = 0; 
+            }
             atualizarTotal();
         }
         function selecionarValor(v) {
@@ -417,19 +419,24 @@
             atualizarTotal();
         }
 
-        // 📉 DESCONTO
         function mostrarCampoDesconto() {
             const sim = document.getElementById('opDescSim').checked;
             document.getElementById('areaValorDesconto').classList.toggle('escondido', !sim);
-            if(!sim) { valorDesconto = 0; document.getElementById('valorDesconto').value = ''; }
+            if(!sim) { 
+                valorDesconto = 0; 
+                document.getElementById('valorDesconto').value = ''; 
+            }
             atualizarTotal();
         }
 
-        // 🔄 ATUALIZA TUDO
         function atualizarTotal() {
             const simGor = document.getElementById('opSim').checked;
             valorGorjeta = simGor ? (parseFloat(document.getElementById('valorGorjeta').value.replace(',','.')) || 0) : 0;
-            if(valorGorjeta > 0 && valorGorjeta < 1) { alert('⚠️ Mínimo R$1,00!'); selecionarValor(1); return; }
+            if(valorGorjeta > 0 && valorGorjeta < 1) { 
+                alert('⚠️ Valor mínimo da gorjeta é R$1,00!'); 
+                selecionarValor(1); 
+                return; 
+            }
             
             const simDesc = document.getElementById('opDescSim').checked;
             valorDesconto = simDesc ? Math.max(0, parseFloat(document.getElementById('valorDesconto').value.replace(',','.')) || 0) : 0;
@@ -445,46 +452,56 @@
             document.getElementById('mT').textContent = total.toFixed(2).replace('.', ',');
         }
 
-        // 🎭 TROCA DE ABAS → FUNCIONANDO 100%
-        function mostrarAba(nome) {
-            document.querySelectorAll('.conteudo-aba').forEach(a => a.classList.remove('visivel'));
-            document.querySelectorAll('.aba').forEach(b => {b.classList.remove('ativa'); b.classList.add('inativa');});
-            const aba = document.getElementById(`aba${nome.charAt(0).toUpperCase() + nome.slice(1)}`);
-            aba.classList.add('visivel');
-            event.target.classList.add('ativa');
-            event.target.classList.remove('inativa');
+        function mostrarAba(nomeAba) {
+            document.querySelectorAll('.conteudo-aba').forEach(aba => {
+                aba.classList.remove('visivel');
+            });
+            document.querySelectorAll('.aba').forEach(botao => {
+                botao.classList.remove('ativa');
+                botao.classList.add('inativa');
+            });
+            const idAba = `aba${nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)}`;
+            const abaAtiva = document.getElementById(idAba);
+            if(abaAtiva) abaAtiva.classList.add('visivel');
+            event.currentTarget.classList.remove('inativa');
+            event.currentTarget.classList.add('ativa');
         }
 
-        // 📍 SUGESTÕES DE ENDEREÇO → APARECENDO AGORA!
         async function buscarSugestoes(campo, tipo) {
             const texto = campo.value.trim();
-            const listaSugestoes = campo.nextElementSibling;
-            if(texto.length < 3) { listaSugestoes.style.display = 'none'; return; }
+            const lista = campo.nextElementSibling;
+
+            if(texto.length < 3) {
+                lista.style.display = 'none';
+                return;
+            }
 
             try {
                 const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}, Juiz de Fora, MG&addressdetails=1&format=json&limit=5`;
                 const res = await fetch(url);
-                const enderecos = await res.json();
-                
-                listaSugestoes.innerHTML = '';
-                let ok = false;
+                const dados = await res.json();
 
-                if(enderecos.length > 0) {
-                    enderecos.forEach(end => {
+                lista.innerHTML = '';
+                let temEnderecoValido = false;
+
+                if(dados.length > 0) {
+                    dados.forEach(end => {
                         const cidade = (end.address?.city || end.address?.town || '').toLowerCase();
                         if(cidade !== CIDADE_ALVO) return;
-                        ok = true;
-                        const rua = end.address?.road || end.name;
-                        const bairro = end.address?.suburb || 'Sem bairro';
+                        temEnderecoValido = true;
+
+                        const rua = end.address?.road || end.address?.street || end.name;
+                        const bairro = end.address?.suburb || end.address?.neighbourhood || 'Sem bairro';
                         const cep = end.address?.postcode || 'Sem CEP';
                         if(!rua) return;
 
                         const item = document.createElement('div');
                         item.className = 'item-sugestao';
                         item.innerHTML = `<strong>${rua}</strong><div class="detalhe">${bairro} • ${cep}</div>`;
+                        
                         item.onclick = () => {
                             campo.value = rua;
-                            listaSugestoes.style.display = 'none';
+                            lista.style.display = 'none';
                             if(tipo === 'loja') {
                                 document.getElementById('bairroLoja').value = bairro !== 'Sem bairro' ? bairro : '';
                                 document.getElementById('cepLoja').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
@@ -494,12 +511,20 @@
                                 bloco.querySelector('.cepDest').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
                             }
                         };
-                        listaSugestoes.appendChild(item);
+                        lista.appendChild(item);
                     });
-                    if(!ok) listaSugestoes.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos só Juiz de Fora-MG</div>`;
-                    listaSugestoes.style.display = 'block';
-                } else listaSugestoes.style.display = 'none';
-            } catch(e) { listaSugestoes.style.display = 'none'; }
+
+                    if(!temEnderecoValido) {
+                        lista.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos somente Juiz de Fora-MG</div>`;
+                    }
+                    lista.style.display = 'block';
+                } else {
+                    lista.style.display = 'none';
+                }
+            } catch (erro) {
+                console.log('Erro busca endereço:', erro);
+                lista.style.display = 'none';
+            }
         }
 
         async function buscarCoordenadas(end) {
@@ -541,5 +566,29 @@
             } catch {return null;}
         }
 
-        function valorKm(km) {
-            const precos = [[0,1,10],[1.1,2,11],[2.1,3,12],[3.1,4,13],[4.1,5,14],[5.1,6,15],[6.1,7,16],[7.1,8,17],[8.1,9,18],[9.1,10,19],[10.1,11,20],[11.1,12,21],[12.1,13,22],[13.1,14,23],[14.1,15,24],[15.1,16,25.5],[16.1,17,27],[17.1,18,28.5],[18.1,19,
+        function valorPorKm(km) {
+            if(km <= 1) return 10;
+            if(km <= 2) return 11;
+            if(km <= 3) return 12;
+            if(km <= 4) return 13;
+            if(km <= 5) return 14;
+            if(km <= 6) return 15;
+            if(km <= 7) return 16;
+            if(km <= 8) return 17;
+            if(km <= 9) return 18;
+            if(km <= 10) return 19;
+            if(km <= 11) return 20;
+            if(km <= 12) return 21;
+            if(km <= 13) return 22;
+            if(km <= 14) return 23;
+            if(km <= 15) return 24;
+            if(km <= 16) return 25.50;
+            if(km <= 17) return 27;
+            if(km <= 18) return 28.50;
+            if(km <= 19) return 30;
+            if(km <= 20) return 31.50;
+            return 31.50 + ((Math.ceil(km) - 20) * 1.50);
+        }
+
+        document.getElementById('btnCalcular').addEventListener('click', async () => {
+            const nomeLoja
