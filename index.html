@@ -33,8 +33,9 @@
         label span {color: #FF6B6B; margin-left: 3px;}
         .campo-completo {position: relative;}
         input {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
-        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 200px; overflow-y: auto; z-index: 100; display: none;}
-        .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        /* ✅ LISTA DE SUGESTÕES APARECE SEMPRE - NÃO ESCONDE POR ERRO */
+        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 220px; overflow-y: auto; z-index: 9999; display: none;}
+        .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.15s;}
         .item-sugestao:hover {background: rgba(0,180,140,0.15);}
         .linha-tripla {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;}
         .campo-pequeno {max-width: 120px;}
@@ -130,12 +131,12 @@
                     
                     <label>📍 Endereço da Loja <span>*</span> — Digite a rua e escolha uma opção</label>
                     <div class="campo-completo">
-                        <input type="text" id="ruaLoja" required placeholder="Nome da rua, avenida..." oninput="buscarSugestoes(this, 'sugestoesLoja', 'loja')">
+                        <input type="text" id="ruaLoja" required placeholder="Nome da rua, avenida..." oninput="buscarSugestoes(this, 'loja')">
                         <div class="lista-sugestoes" id="sugestoesLoja"></div>
                     </div>
                     <div class="linha-tripla">
                         <input type="text" id="numLoja" placeholder="Número" required class="campo-pequeno">
-                        <!-- ✅ AGORA PODE EDITAR LIVREMENTE, NÃO TRAVA MAIS -->
+                        <!-- ✅ DESBLOQUEADO PARA EDIÇÃO -->
                         <input type="text" id="bairroLoja" placeholder="Bairro" required>
                         <input type="text" id="cepLoja" placeholder="CEP" class="campo-pequeno">
                     </div>
@@ -148,12 +149,12 @@
                             
                             <label>📍 Endereço de Entrega <span>*</span> — Digite a rua e escolha uma opção</label>
                             <div class="campo-completo">
-                                <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, this.nextElementSibling.id, 'dest')">
+                                <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, 'dest')">
                                 <div class="lista-sugestoes"></div>
                             </div>
                             <div class="linha-tripla">
                                 <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
-                                <!-- ✅ TAMBÉM DESBLOQUEADO PARA EDIÇÃO -->
+                                <!-- ✅ DESBLOQUEADO PARA EDIÇÃO -->
                                 <input type="text" class="bairroDest" placeholder="Bairro" required>
                                 <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno">
                             </div>
@@ -359,31 +360,42 @@
             event.target.classList.remove('inativa');
         }
 
-        // 📍 PREENCHE AUTOMÁTICO MAS NÃO TRAVA NADA — PODE EDITAR!
-        async function buscarSugestoes(campo, idLista, tipo) {
-            const t = campo.value.trim();
-            const lista = document.getElementById(idLista) || campo.nextElementSibling;
-            if(t.length < 3) {lista.style.display = 'none'; return;}
+        // 📍 ✅ FUNÇÃO AJUSTADA: SUGESTÕES APARECEM SEMPRE + PREENCHE + DESBLOQUEADO
+        async function buscarSugestoes(campo, tipo) {
+            const texto = campo.value.trim();
+            const listaSugestoes = campo.nextElementSibling;
             
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(t)}, Juiz de Fora, MG&addressdetails=1&format=json&limit=5`;
-            const res = await fetch(url);
-            const dados = await res.json();
-            lista.innerHTML = '';
-            
-            if(dados.length) {
-                dados.forEach(l => {
-                    const rua = l.address?.road || l.address?.street || l.name;
-                    const bairro = l.address?.suburb || l.address?.neighbourhood || '';
-                    const cep = l.address?.postcode || '';
-                    if(!rua) return;
-                    
-                    const item = Object.assign(document.createElement('div'), {
-                        className: 'item-sugestao',
-                        innerHTML: `<strong>${rua}</strong> ${bairro?'• '+bairro:''}`,
-                        onclick: () => {
+            // Se digitar menos de 3 letras, esconde a lista
+            if(texto.length < 3) {
+                listaSugestoes.style.display = 'none';
+                return;
+            }
+
+            // Busca endereços no serviço
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}, Juiz de Fora, MG&addressdetails=1&format=json&limit=5`;
+                const resposta = await fetch(url);
+                const enderecos = await resposta.json();
+                
+                listaSugestoes.innerHTML = '';
+
+                if(enderecos.length > 0) {
+                    enderecos.forEach(end => {
+                        const rua = end.address?.road || end.address?.street || end.name;
+                        const bairro = end.address?.suburb || end.address?.neighbourhood || '';
+                        const cep = end.address?.postcode || '';
+                        
+                        if(!rua) return;
+
+                        const item = document.createElement('div');
+                        item.className = 'item-sugestao';
+                        item.innerHTML = `<strong>${rua}</strong> ${bairro ? '• ' + bairro : ''}`;
+                        
+                        item.onclick = () => {
                             campo.value = rua;
-                            lista.style.display = 'none';
-                            // ✅ PREENCHE, MAS NÃO TRAVA — VOCÊ PODE ALTERAR DEPOIS
+                            listaSugestoes.style.display = 'none';
+                            
+                            // ✅ PREENCHE AUTOMÁTICO, MAS NÃO TRAVA NENHUM CAMPO
                             if(tipo === 'loja') {
                                 document.getElementById('bairroLoja').value = bairro;
                                 document.getElementById('cepLoja').value = cep.replace('-', '');
@@ -392,11 +404,16 @@
                                 bloco.querySelector('.bairroDest').value = bairro;
                                 bloco.querySelector('.cepDest').value = cep.replace('-', '');
                             }
-                        }
+                        };
+                        listaSugestoes.appendChild(item);
                     });
-                    lista.appendChild(item);
-                });
-                lista.style.display = 'block';
+                    listaSugestoes.style.display = 'block';
+                } else {
+                    listaSugestoes.style.display = 'none';
+                }
+            } catch (erro) {
+                console.log('Erro ao buscar endereço:', erro);
+                listaSugestoes.style.display = 'none';
             }
         }
 
@@ -420,8 +437,8 @@
                 <input type="text" class="nomeCliente" required>
                 <label>📍 Endereço de Entrega <span>*</span> — Digite a rua e escolha uma opção</label>
                 <div class="campo-completo">
-                    <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, 's${n}', 'dest')">
-                    <div class="lista-sugestoes" id="s${n}"></div>
+                    <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, 'dest')">
+                    <div class="lista-sugestoes"></div>
                 </div>
                 <div class="linha-tripla">
                     <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
@@ -468,12 +485,11 @@
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const wppLoja = document.getElementById('wppLoja').value.trim();
             const endLoja = `${document.getElementById('ruaLoja').value}, ${document.getElementById('numLoja').value} - ${document.getElementById('bairroLoja').value}, CEP ${document.getElementById('cepLoja').value}, Juiz de Fora-MG`;
-            const cLoja = await buscarCoordenadas(endLoja);
+            let cLoja = await buscarCoordenadas(endLoja);
+            
             if(!cLoja) {
-                // ✅ MELHORIA: SE NÃO ENCONTRAR, AVISA MAS DEIXA CONTINUAR, POIS OS DADOS ESTÃO CERTOS
-                const continuar = confirm('⚠️ Não localizamos o endereço exato no mapa, mas os dados estão preenchidos. Deseja continuar mesmo assim?');
+                const continuar = confirm('⚠️ Não localizamos o endereço no mapa, mas os dados estão preenchidos. Deseja continuar?');
                 if(!continuar) {btn.disabled=false; aviso.classList.add('escondido'); return;}
-                // Usa localização aproximada se não encontrar
                 cLoja = {lat: LOCAL_PADRAO[0], lon: LOCAL_PADRAO[1]};
             }
 
@@ -491,7 +507,7 @@
                 const telCli = b.querySelector('.telCliente').value.trim();
                 let cCli = await buscarCoordenadas(endCli);
                 if(!cCli) {
-                    const continuarCli = confirm(`⚠️ Endereço da entrega ${i+1} não localizado no mapa. Deseja continuar?`);
+                    const continuarCli = confirm(`⚠️ Endereço da entrega ${i+1} não localizado. Deseja continuar?`);
                     if(!continuarCli) {btn.disabled=false; aviso.classList.add('escondido'); return;}
                     cCli = {lat: LOCAL_PADRAO[0], lon: LOCAL_PADRAO[1]};
                 }
@@ -602,12 +618,4 @@ ${textoGorjeta}
             if(document.getElementById('emailAdmin').value==='mtzexpresss@gmail.com' && document.getElementById('senhaAdmin').value==='1120') {
                 document.getElementById('telaLogin').classList.add('escondido');
                 document.getElementById('conteudoDash').classList.remove('escondido');
-            } else alert('❌ Dados incorretos!');
-        }
-        function sairDash() {
-            document.getElementById('telaLogin').classList.remove('escondido');
-            document.getElementById('conteudoDash').classList.add('escondido');
-        }
-        function confRetirada() {
-            document.getElementById('etLoja').classList.add('concluida');
-            document.getElementById('etLo
+            } else alert('
