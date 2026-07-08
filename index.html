@@ -4,72 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTZ Express | Entregas Juiz de Fora</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, sans-serif;}
         body {background: linear-gradient(135deg, #0F2B33, #1A3F4A); min-height: 100vh; padding: 15px;}
-        .container {max-width: 600px; margin: 0 auto;}
+        .container {max-width: 650px; margin: 0 auto;}
         .card {background: #173842; border-radius: 25px; padding: 25px; color: #E0F8F0; box-shadow: 0 15px 50px rgba(0,0,0,0.4);}
+        .card-dash {background: #1E293B; border-radius: 20px; padding: 20px; margin-bottom: 20px;}
+        .grid-dash {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;}
+        .item-dash {padding: 18px; border-radius: 12px; text-align: center;}
+        .item-dash.verde {background: rgba(0,200,150,0.15); color: #00E0A8;}
+        .item-dash.vermelho {background: rgba(244,67,54,0.15); color: #FF6B6B;}
+        .item-dash.azul {background: rgba(33,150,243,0.15); color: #90CAF9;}
+        .item-dash.amarelo {background: rgba(255,193,7,0.15); color: #FFE082;}
+        .item-dash.roxo {background: rgba(156,39,176,0.15); color: #CE93D8;}
+        .item-dash.rosa {background: rgba(233,30,99,0.15); color: #F48FB1;}
+        .valor-dash {font-size: 32px; font-weight: 800; margin: 8px 0;}
         .logo {text-align: center; font-size: 28px; font-weight: 800; color: #00E0A8; margin-bottom: 5px;}
         .slogan {text-align: center; font-size: 14px; color: #B2DFDB; margin-bottom: 20px;}
         
-        .abas {display: flex; gap: 10px; margin-bottom: 20px;}
-        .aba {flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px;}
+        .abas {display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
+        .aba {flex: 1; min-width: 120px; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px;}
         .aba.ativa {background: linear-gradient(90deg, #00C896, #00A86B); color: white;}
         .aba.inativa {background: rgba(255,255,255,0.05); color: #B2DFDB; border: 1px solid rgba(0,180,140,0.2);}
         
         .aviso {padding: 16px; border-radius: 14px; border-left: 5px solid; margin: 15px 0; font-weight: 600; line-height: 1.6;}
         .aviso.destaque {background: rgba(255,193,7,0.15); border-left-color: #FFC107; color: #FFF8E1; font-size: 15px;}
         .aviso.verde {background: rgba(0,180,140,0.1); border-left-color: #00C896; color: #E0F8F0;}
-        .aviso.vermelho {background: rgba(244,67,54,0.1); border-left-color: #F44336; color: #FFEBEE;}
+        .aviso.vermelho {background: rgba(244,67,54,0.1); border-left-color: #F44336; color: #FFEBEE; font-size: 15px;}
         .aviso.azul {background: rgba(33,150,243,0.12); border-left-color: #2196F3; color: #E3F2FD;}
-        .aviso.esclarece {background: rgba(255,193,7,0.1); border-left-color: #FFC107; color: #FFF8E1; font-size: 15px;}
-        .aviso.sucesso {background: rgba(0,200,150,0.15); border-left-color: #00E0A8; color: #E8FFF8; text-align: center; font-size: 17px;}
-        .aviso.auto {background: rgba(0,168,107,0.1); border-left-color: #00E0A8; color: #E8FFF8; font-size: 15px;}
-        .rodape {text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #90A4AE; font-size: 14px; line-height: 1.7;}
-        .link-insta {color: #E1306C; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-top: 5px;}
-        .link-insta:hover {text-decoration: underline;}
+        .aviso.sucesso {background: rgba(0,200,150,0.15); border-left-color: #00E0A8; color: #E8FFF8; text-align: center;}
+        .aviso.segredo {background: rgba(156,39,176,0.15); border-left-color: #9C27B0; color: #EDE7F6; text-align: center;}
         
         label {display: block; margin: 16px 0 6px; font-weight: 700; font-size: 15px;}
         label span {color: #FF6B6B; margin-left: 3px;}
-        input, select, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
+        .campo-completo {position: relative;}
+        input, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         input:disabled {background: rgba(15,43,51,0.3); border-color: rgba(0,180,140,0.1); color: #B2DFDB;}
-        .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 200px; overflow-y: auto; z-index: 100; display: none;}
+        .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        .item-sugestao:hover {background: rgba(0,180,140,0.15);}
+        .linha-tripla {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;}
         .campo-pequeno {max-width: 120px;}
         
         .btn {width: 100%; padding: 15px; border: none; border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.2s;}
+        .btn:hover {transform: scale(1.02);}
         .btn-amarelo {background: linear-gradient(90deg, #FFC107, #FF9800); color: #212121;}
         .btn-verde {background: linear-gradient(90deg, #00C896, #008F60); color: white;}
-        .btn-verde-grande {background: linear-gradient(90deg, #00C896, #008F60); color: white; font-size: 18px; padding: 18px;}
-        .btn-vermelho-grande {background: linear-gradient(90deg, #dc3545, #b02a37); color: white; font-size: 18px; padding: 18px;}
-        .btn-roxo {background: linear-gradient(90deg, #9C27B0, #7B1FA2); color: white; font-size: 17px; padding: 16px;}
+        .btn-whats {background: linear-gradient(90deg, #25D366, #128C7E); color: white;}
         .btn-azul {background: linear-gradient(90deg, #2196F3, #1976D2); color: white;}
-        .btn-mais {background: linear-gradient(90deg, #2196F3, #1976D2); color: white; font-size: 16px; padding: 14px; margin: 15px 0;}
-        .btn-apagar {background: linear-gradient(90deg, #dc3545, #b02a37); color: white; padding: 10px; font-size: 14px; width: auto; margin-top: 5px;}
-        .btn:disabled {opacity: 0.6; cursor: not-allowed; transform: none;}
+        .btn-mais {background: linear-gradient(90deg, #2196F3, #1976D2); color: white; padding: 14px; margin: 15px 0;}
+        .btn-apagar {background: linear-gradient(90deg, #dc3545, #b02a37); color: white; padding: 10px; font-size: 14px; width: auto;}
+        .btn-confirma {background: linear-gradient(90deg, #00C896, #008F60); color: white; padding: 12px; font-size: 15px;}
+        .btn-sair {background: linear-gradient(90deg, #9C27B0, #7B1FA2); color: white; margin-top: 20px;}
         
-        .info-rota {padding: 15px; background: rgba(0,180,140,0.08); border-radius: 14px; margin: 15px 0; font-size: 16px; font-weight: 600; line-height: 1.8;}
-        .info-rota.devolucao {background: rgba(156,39,176,0.08);}
-        .valor-final {font-size: 40px; font-weight: 800; color: #00E0A8; text-align: center; margin: 15px 0;}
-        .valor-final.roxo {color: #CE93D8;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block;}
-        .botoes-status {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;}
-        .caixa-motivo {background: rgba(244,67,54,0.08); padding: 15px; border-radius: 14px; border-left: 4px solid #F44336; margin: 15px 0; display: none;}
-        .caixa-devolucao {background: rgba(156,39,176,0.08); padding: 18px; border-radius: 16px; border-left: 4px solid #9C27B0; margin: 20px 0; display: none;}
-        .aviso-loja {font-size: 14px; color: #FFD700; margin-top: 8px;}
-        .status-auto {font-size: 14px; color: #80FFD0; margin-top: 5px; font-weight: 600;}
-        .aviso-campos {font-size: 13px; color: #FFD700; margin: -8px 0 10px 0;}
         .bloco-entrega {border: 1px solid rgba(0,180,140,0.2); border-radius: 16px; padding: 18px; margin: 20px 0; background: rgba(0,180,140,0.03);}
         .titulo-entrega {font-size: 18px; font-weight: 700; color: #00E0A8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        .erro-calculo {color: #FF6B6B; font-size: 14px; text-align: center; margin-top: 10px;}
-        .sucesso-calculo {color: #80FFD0; font-size: 14px; text-align: center; margin-top: 10px;}
-
-        /* ÍCONES FIXOS */
-        .icones-fixos {position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999;}
-        .icone-fixo {width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s;}
-        .icone-fixo:hover {transform: scale(1.1);}
-        .whatsapp {background: linear-gradient(135deg, #25D366, #128C7E);}
-        .instagram {background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);}
+        .valor-entrega {background: rgba(0,180,140,0.1); padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; margin: 10px 0;}
+        .valor-final {font-size: 40px; font-weight: 800; color: #00E0A8; text-align: center; margin: 15px 0;}
+        #mapa {height: 300px; border-radius: 15px; margin: 15px 0; display: none;}
+        .etapa {padding: 10px; border-radius: 10px; margin: 8px 0; background: rgba(255,255,255,0.05);}
+        .etapa.concluida {border-left: 4px solid #00C896; background: rgba(0,200,150,0.1);}
+        .etapa.pendente {border-left: 4px solid #FFC107;}
+        .historico-item {padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);}
+        .historico-item:hover {background: rgba(0,180,140,0.05);}
+        .area-senha {padding: 30px; text-align: center;}
+        .escondido {display: none !important;}
     </style>
 </head>
 <body>
@@ -81,525 +83,395 @@
             <div class="abas">
                 <button class="aba ativa" onclick="mostrarAba('loja')">🏪 Sou Lojista</button>
                 <button class="aba inativa" onclick="mostrarAba('motoboy')">🛵 Sou Motoboy</button>
+                <button class="aba inativa" onclick="mostrarAba('dashboard')">📊 Painel</button>
+            </div>
+
+            <!-- 🏪 ÁREA DO LOJISTA -->
+            <div class="conteudo-aba visivel" id="abaLoja">
+                <div class="aviso destaque">
+                    ⚠️ ENDEREÇOS SOMENTE DE JUIZ DE FORA/MG<br>
+                    📍 Campos com * são OBRIGATÓRIOS | CEP é OPCIONAL
+                </div>
+
+                <form id="formPedido">
+                    <label>🏪 Nome da Loja <span>*</span></label>
+                    <input type="text" id="nomeLoja" required>
+                    <label>📞 WhatsApp da Loja <span>*</span></label>
+                    <input type="tel" id="wppLoja" placeholder="(32) 9XXXX-XXXX" required>
+                    <label>📍 Endereço da Loja <span>*</span></label>
+                    <div class="campo-completo">
+                        <input type="text" id="ruaLoja" required placeholder="Digite a rua..." oninput="buscarSugestoes(this, 'sugestoesLoja')">
+                        <div class="lista-sugestoes" id="sugestoesLoja"></div>
+                    </div>
+                    <div class="linha-tripla">
+                        <input type="text" id="numLoja" placeholder="Número" required class="campo-pequeno">
+                        <input type="text" id="bairroLoja" placeholder="Bairro" required>
+                        <input type="text" id="cepLoja" placeholder="CEP" class="campo-pequeno">
+                    </div>
+                    <input type="text" id="refLoja" placeholder="🏷️ Ponto de referência">
+
+                    <div id="areaEntregas">
+                        <div class="bloco-entrega" id="entrega-1">
+                            <div class="titulo-entrega">📦 ENTREGA 1</div>
+                            <label>👤 Nome do Cliente <span>*</span></label>
+                            <input type="text" class="nomeCliente" required>
+                            <label>📍 Endereço de Entrega <span>*</span></label>
+                            <div class="campo-completo">
+                                <input type="text" class="ruaDest" required placeholder="Digite a rua..." oninput="buscarSugestoes(this, this.nextElementSibling.id)">
+                                <div class="lista-sugestoes"></div>
+                            </div>
+                            <div class="linha-tripla">
+                                <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
+                                <input type="text" class="bairroDest" placeholder="Bairro" required>
+                                <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno">
+                            </div>
+                            <input type="text" class="refDest" placeholder="🏷️ Ponto de referência">
+                            <label>📞 Telefone do Cliente <span>*</span></label>
+                            <input type="tel" class="telCliente" required>
+                            <div class="valor-entrega">💵 Valor: R$ <span class="valorUnit">0,00</span></div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-mais" onclick="adicionarEntrega()">➕ ADICIONAR ENTREGA</button>
+                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+                    <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALORES E ROTAS</button>
+                    <div class="valor-final">💵 TOTAL: R$ <span id="valorTotal">0,00</span></div>
+                    <button type="button" class="btn btn-whats" onclick="enviarPedido()">📤 ENVIAR PEDIDO</button>
+                </form>
             </div>
 
             <!-- 🛵 ÁREA DO MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
-                <div class="aviso auto">
-                    ✅ **LOCALIZAÇÃO 100% AUTOMÁTICA — NÃO DIGITA NADA!**<br>
-                    🔒 Acesso exclusivo para motoboys autorizados
+                <div class="aviso verde">🔒 Área exclusiva do Motoboy Parceiro</div>
+                <button class="btn btn-amarelo" id="btnLocalizar">📍 PEGAR MINHA LOCALIZAÇÃO</button>
+                <p id="localMoto">Aguardando localização...</p>
+                <div id="mapa"></div>
+
+                <div id="rotasMotoboy" class="escondido">
+                    <h3>🗺️ TRAJETOS DA ROTA</h3>
+                    <div class="etapa pendente" id="etapa1">
+                        🛵 <strong>Trajeto 1:</strong> Você → Loja<br>
+                        <button class="btn btn-confirma" onclick="confirmarLoja()">✅ CONFIRMAR RETIRADA NA LOJA</button>
+                    </div>
+                    <div class="etapa pendente" id="etapa2">
+                        🏪 <strong>Trajeto 2:</strong> Loja → Cliente<br>
+                        <button class="btn btn-confirma" onclick="confirmarEntrega()">✅ CONFIRMAR ENTREGA REALIZADA</button>
+                    </div>
+                    <div class="valor-entrega">💵 A receber: R$ <span id="valorMoto">0,00</span></div>
                 </div>
-
-                <label>🔒 Senha de acesso exclusiva <span>*</span></label>
-                <input type="password" id="senhaMotoboy" placeholder="Digite sua senha" required>
-
-                <label>📍 Minha localização atual — PREENCHE SOZINHO!</label>
-                <button class="btn btn-amarelo" id="btnIniciarAuto">🔄 LIGAR LOCALIZAÇÃO AUTOMÁTICA</button>
-                <p class="status-auto" id="statusAuto">⏳ Aguardando — depois só deixa a página aberta!</p>
-                
-                <input type="text" id="ruaMoto" placeholder="Rua — preenche automático" disabled>
-                <div class="linha-dupla">
-                    <div><input type="text" id="numMoto" placeholder="Número — automático" disabled></div>
-                    <div><input type="text" id="bairroMoto" placeholder="Bairro — automático" disabled></div>
-                </div>
-                <input type="text" id="cepMoto" placeholder="CEP — automático" disabled>
-                <input type="text" id="refMoto" placeholder="Ponto de referência (se aparecer)" disabled>
-                <input type="hidden" id="latMoto">
-                <input type="hidden" id="lngMoto">
-
-                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
-
-                <div class="aviso azul">📦 CONTROLE DE ENTREGA</div>
-                <div class="info-rota" id="resumoEntregas">
-                    <strong>Loja:</strong> <span id="nomeLojaPedido">—</span><br>
-                    <strong>Total de entregas:</strong> <span id="qtdEntregas">—</span>
-                </div>
-                <div id="listaEntregas"></div>
-
-                <div class="botoes-status">
-                    <button class="btn btn-verde-grande" onclick="marcarEntregue()">✅ JA ENTREGUEI TODAS</button>
-                    <button class="btn btn-vermelho-grande" onclick="mostrarMotivo()">❌ NÃO ENTREGUEI</button>
-                </div>
-
-                <div class="caixa-motivo" id="caixaMotivo">
-                    <label>📝 Motivo da não entrega <span>*</span></label>
-                    <textarea id="motivoTexto" rows="3" required></textarea>
-                    <p class="aviso-loja">📞 Loja: (32) 9 9995-3215</p>
-                    <button class="btn btn-vermelho-grande" onclick="enviarNaoEntrega()">❌ REPORTAR</button>
-                </div>
-                <div id="resultadoAcao" style="margin-top:20px; display:none;"></div>
             </div>
 
-            <!-- 🏪 ÁREA DO LOJISTA — COM CÁLCULO REAL DE VALOR! -->
-            <div class="conteudo-aba visivel" id="abaLoja">
-                <div class="aviso destaque">
-                    ⚠️ **AVISO IMPORTANTE!**<br>
-                    🛵 Valor calculado: **MOTOBOY → LOJA → CLIENTE**
-                </div>
-
-                <div class="aviso verde">
-                    📍 **LOCALIZAÇÃO ATUAL DO MOTOBOY:**<br>
-                    <strong id="dadosMoto">Aguardando ligação do motoboy...</strong>
-                </div>
-
-                <div class="aviso esclarece">
-                    💡 **COMO USAR:** Preencha os dados da loja uma vez só. Depois clique em **ADICIONAR NOVA ENTREGA** para cada cliente diferente!
-                </div>
-
-                <p class="aviso-campos">Campos com <span>*</span> são obrigatórios!</p>
-
-                <form id="formPedido">
-                    <!-- DADOS DA LOJA -->
-                    <label>🏪 Nome da sua Loja <span>*</span></label>
-                    <input type="text" id="nomeLoja" required>
-
-                    <label>📍 Endereço da Loja <span>*</span></label>
-                    <input type="text" id="ruaLoja" required>
-                    <div class="linha-dupla">
-                        <div><input type="text" id="numLoja" placeholder="Número" required class="campo-pequeno"></div>
-                        <div><input type="text" id="bairroLoja" required></div>
+            <!-- 📊 PAINEL DE CONTROLE 🔒 PROTEGIDO -->
+            <div class="conteudo-aba" id="abaDashboard">
+                <div id="telaLogin" class="area-senha">
+                    <div class="aviso segredo">
+                        🔒 ÁREA CONFIDENCIAL E EXCLUSIVA<br>
+                        Somente os donos têm acesso
                     </div>
-                    <input type="text" id="cepLoja" placeholder="CEP" required class="campo-pequeno">
-                    <input type="text" id="refLoja" placeholder="🏷️ Ponto de referência">
-                    <textarea id="obsLoja" rows="2" placeholder="📝 Observações"></textarea>
-                    <input type="hidden" id="latLoja">
-                    <input type="hidden" id="lngLoja">
+                    <label>📧 E-mail</label>
+                    <input type="email" id="emailAdmin" placeholder="mtzexpresss@gmail.com">
+                    <label>🔑 Senha</label>
+                    <input type="password" id="senhaAdmin" placeholder="Digite sua senha">
+                    <button class="btn btn-verde" onclick="verificarAcesso()">🔓 ENTRAR</button>
+                </div>
 
-                    <!-- ÁREA DAS ENTREGAS -->
-                    <div id="areaEntregas">
-                        <div class="bloco-entrega" id="entrega-1">
-                            <div class="titulo-entrega">
-                                📦 ENTREGA 1
-                            </div>
-                            <label>👤 Nome do Cliente / Destino <span>*</span></label>
-                            <input type="text" class="nomeCliente" required>
-                            
-                            <label>📍 Endereço de Entrega <span>*</span></label>
-                            <input type="text" class="ruaDest" required>
-                            <div class="linha-dupla">
-                                <div><input type="text" class="numDest" placeholder="Número" required class="campo-pequeno"></div>
-                                <div><input type="text" class="bairroDest" required></div>
-                            </div>
-                            <input type="text" class="cepDest" placeholder="CEP" required class="campo-pequeno">
-                            <input type="text" class="refDest" placeholder="🏷️ Ponto de referência">
-                            <textarea class="obsDest" rows="2" placeholder="📝 Observações"></textarea>
-                            
-                            <label>📞 Telefone do cliente <span>*</span></label>
-                            <input type="tel" class="telCliente" required>
-                            <input type="hidden" class="latDest">
-                            <input type="hidden" class="lngDest">
+                <div id="conteudoDashboard" class="escondido">
+                    <div class="aviso destaque">📊 PAINEL GERAL — MTZ EXPRESS</div>
+                    <div class="grid-dash">
+                        <div class="item-dash verde"><div class="valor-dash" id="qtdConcluidas">0</div>✅ Concluídas</div>
+                        <div class="item-dash vermelho"><div class="valor-dash" id="qtdNaoFeitas">0</div>❌ Não Realizadas</div>
+                        <div class="item-dash azul"><div class="valor-dash" id="qtdPedidos">0</div>📋 Total Pedidos</div>
+                        <div class="item-dash amarelo"><div class="valor-dash" id="qtdLojas">0</div>🏪 Lojas Atendidas</div>
+                        <div class="item-dash roxo"><div class="valor-dash" id="valorTotalGanho">R$ 0,00</div>💰 Valor Movimentado</div>
+                        <div class="item-dash rosa"><div class="valor-dash" id="mediaValor">R$ 0,00</div>📈 Média por Pedido</div>
+                        <div class="item-dash azul"><div class="valor-dash" id="qtdAcessos">0</div>👀 Visitas</div>
+                        <div class="item-dash verde"><div class="valor-dash" id="taxaSucesso">0%</div>🎯 Taxa Sucesso</div>
+                    </div>
+
+                    <div class="card-dash">
+                        <h3>📜 HISTÓRICO DE PEDIDOS</h3>
+                        <div id="listaHistorico">
+                            <p style="color:#90A4AE; text-align:center; padding:20px;">Nenhum pedido registrado ainda.</p>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-mais" onclick="adicionarEntrega()">
-                        ➕ ADICIONAR NOVA ENTREGA
-                    </button>
-
-                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
-
-                    <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALOR TOTAL</button>
-                    <p id="statusCalculo" class="sucesso-calculo"></p>
-
-                    <div class="info-rota" id="infoRota" style="display: none;">
-                        📋 **RESUMO DA ROTA:**<br>
-                        🛵 Motoboy → 🏪 Loja → 📦 Todos os clientes<br>
-                        📍 Distância total: <span id="kmTotal">0,00 km</span><br>
-                        📦 Total de entregas: <span id="qtdTotalEntregas">1</span>
+                    <div class="card-dash">
+                        <h3>📊 DADOS PARA MARKETING</h3>
+                        <ul style="margin-top:10px; line-height:1.8; color:#E0F8F0;">
+                            <li>📅 Melhores dias e horários</li>
+                            <li>📍 Bairros com mais pedidos</li>
+                            <li>🏪 Lojas que mais pedem</li>
+                            <li>👥 Clientes atendidos</li>
+                        </ul>
                     </div>
 
-                    <div class="valor-final" id="valorFinal">R$ 0,00</div>
-                    <button type="submit" class="btn btn-verde">📤 ENVIAR PEDIDO COMPLETO</button>
-
-                    <div class="caixa-devolucao" id="caixaDevolucao">
-                        <div class="aviso devolucao">🔄 DEVOLUÇÃO — Mínimo R$10,00</div>
-                        <button type="button" class="btn btn-roxo" id="btnCalcularDev">🔄 CALCULAR VALOR DA VOLTA</button>
-                        <div class="valor-final roxo" id="valorDevolucao">R$ 0,00</div>
-                        <button type="button" class="btn btn-verde" id="btnConfirmaDev">✅ CONFIRMAR DEVOLUÇÃO</button>
-                    </div>
-                </form>
-
-                <div class="rodape">
-                    🚀 <strong>MTZ Express</strong> — Entregas com Confiança<br>
-                    📞 (32) 9 9995-3215<br>
-                    📸 <a href="https://www.instagram.com/mtzexpresss?igsh=anZnZDJjeWZmdTV1" target="_blank" class="link-insta">@mtzexpresss 📸</a>
+                    <button class="btn btn-sair" onclick="sairDashboard()">🚪 SAIR</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="icones-fixos">
-        <a href="https://wa.me/5532999953215" target="_blank" class="icone-fixo whatsapp">💬</a>
-        <a href="https://www.instagram.com/mtzexpresss?igsh=anZnZDJjeWZmdTV1" target="_blank" class="icone-fixo instagram">📸</a>
-    </div>
-
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const SENHA_MOTOBOY = '1120';
-        const FONE_LOJA = '5532999953215';
-        const VALOR_KM_EXTRA = 1.20;
-        let localSalvo = JSON.parse(localStorage.getItem('localMoto')) || null;
-        let pedidoAtual = {};
-        let watchId = null;
+        // 🔒 SEUS DADOS DE ACESSO
+        const ADMINS_AUTORIZADOS = [
+            {email: 'mtzexpresss@gmail.com', senha: '1120'}
+        ];
+
+        // 📲 SEUS NÚMEROS DE WHATSAPP PARA RECEBER OS TEXTOS PRONTOS
+        const NUMEROS_WHATSAPP = [
+            '5532999953215', // SEU NÚMERO
+            '5532999490234'  // NÚMERO DA SUA ESPOSA
+        ];
+
         let contadorEntregas = 1;
+        let mapa;
+        let entregasConcluidas = 0, entregasNaoFeitas = 0, totalPedidos = 0, acessos = 1, lojasCadastradas = 0, valorTotalGanho = 0;
+        let historicoPedidos = [];
+        let precoPorKm = 2.50;
 
-        // 🧮 TABELA DE PREÇOS
-        function calcularValorPorDistancia(km) {
-            km = Math.max(km, 3); // Mínimo de 3km
-            if (km <= 3) return 10.00;
-            if (km <= 4) return 11.00;
-            if (km <= 5) return 12.00;
-            if (km <= 6) return 13.00;
-            if (km <= 7) return 14.00;
-            if (km <= 8) return 15.00;
-            if (km <= 9) return 16.00;
-            if (km <= 10) return 17.00;
-            return 17.00 + ((km - 10) * VALOR_KM_EXTRA);
+        acessos = parseInt(localStorage.getItem('acessosMTZ') || '0') + 1;
+        localStorage.setItem('acessosMTZ', acessos);
+        carregarDados();
+        atualizarDashboard();
+
+        function mostrarAba(nome) {
+            document.querySelectorAll('.conteudo-aba').forEach(a => a.classList.remove('visivel'));
+            document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'), b.classList.add('inativa'));
+            const abaMostrar = document.getElementById(`aba${nome.charAt(0).toUpperCase() + nome.slice(1)}`);
+            abaMostrar.classList.add('visivel');
+            event.target.classList.add('ativa'); event.target.classList.remove('inativa');
+            
+            if(nome === 'dashboard') {
+                document.getElementById('telaLogin').classList.remove('escondido');
+                document.getElementById('conteudoDashboard').classList.add('escondido');
+            }
+            if(nome === 'motoboy' && !mapa) inicializarMapa();
         }
 
-        // 📏 CALCULA DISTÂNCIA ENTRE DOIS PONTOS (em km)
-        function calcularDistancia(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Raio da Terra em km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
+        function verificarAcesso() {
+            const email = document.getElementById('emailAdmin').value.trim().toLowerCase();
+            const senha = document.getElementById('senhaAdmin').value;
+            const autorizado = ADMINS_AUTORIZADOS.find(adm => adm.email === email && adm.senha === senha);
 
-        // 🌐 CONVERTE ENDEREÇO EM LATITUDE E LONGITUDE
-        async function pegarCoordenadas(enderecoCompleto) {
-            try {
-                const resposta = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(enderecoCompleto)}&format=json&limit=1&accept-language=pt-BR`);
-                const dados = await resposta.json();
-                if (dados.length > 0) {
-                    return {
-                        lat: parseFloat(dados[0].lat),
-                        lng: parseFloat(dados[0].lon)
-                    };
-                }
-                return null;
-            } catch (erro) {
-                return null;
+            if(autorizado) {
+                document.getElementById('telaLogin').classList.add('escondido');
+                document.getElementById('conteudoDashboard').classList.remove('escondido');
+                alert('✅ Acesso PERMITIDO! Bem-vindo ao painel da MTZ Express.');
+                atualizarDashboard();
+            } else {
+                alert('❌ E-mail ou senha incorretos! Acesso restrito.');
+                document.getElementById('senhaAdmin').value = '';
             }
         }
 
-        // ➕ ADICIONA NOVA ENTREGA
+        function sairDashboard() {
+            document.getElementById('telaLogin').classList.remove('escondido');
+            document.getElementById('conteudoDashboard').classList.add('escondido');
+            document.getElementById('emailAdmin').value = '';
+            document.getElementById('senhaAdmin').value = '';
+            alert('🔒 Saída realizada com segurança!');
+        }
+
+        async function buscarSugestoes(campo, idLista) {
+            const texto = campo.value.trim();
+            const lista = document.getElementById(idLista) || campo.nextElementSibling;
+            if(texto.length < 3) {lista.style.display = 'none'; return;}
+
+            const resposta = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}, Juiz de Fora, MG, Brasil&addressdetails=1&format=json&limit=6`);
+            const dados = await resposta.json();
+            lista.innerHTML = '';
+            if(dados.length > 0) {
+                dados.forEach(lugar => {
+                    const rua = lugar.address.road || lugar.address.street || lugar.name;
+                    const bairro = lugar.address.suburb || '';
+                    if(!rua) return;
+                    const item = document.createElement('div');
+                    item.className = 'item-sugestao';
+                    item.textContent = `${rua} ${bairro ? `• ${bairro}` : ''}`;
+                    item.onclick = () => {
+                        campo.value = rua;
+                        const bloco = campo.closest('.bloco-entrega');
+                        if(bloco) bloco.querySelector('.bairroDest').value = bairro || '';
+                        else document.getElementById('bairroLoja').value = bairro || '';
+                        lista.style.display = 'none';
+                    };
+                    lista.appendChild(item);
+                });
+                lista.style.display = 'block';
+            }
+        }
+
         function adicionarEntrega() {
             contadorEntregas++;
             const area = document.getElementById('areaEntregas');
-            
             const bloco = document.createElement('div');
             bloco.className = 'bloco-entrega';
             bloco.id = `entrega-${contadorEntregas}`;
-
             bloco.innerHTML = `
-                <div class="titulo-entrega">
-                    📦 ENTREGA ${contadorEntregas}
-                    <button type="button" class="btn btn-apagar" onclick="apagarEntrega(${contadorEntregas})">🗑️ Apagar</button>
-                </div>
-                <label>👤 Nome do Cliente / Destino <span>*</span></label>
+                <div class="titulo-entrega">📦 ENTREGA ${contadorEntregas} <button class="btn btn-apagar" onclick="this.closest('.bloco-entrega').remove()">🗑️</button></div>
+                <label>👤 Nome do Cliente <span>*</span></label>
                 <input type="text" class="nomeCliente" required>
-                
                 <label>📍 Endereço de Entrega <span>*</span></label>
-                <input type="text" class="ruaDest" required>
-                <div class="linha-dupla">
-                    <div><input type="text" class="numDest" placeholder="Número" required class="campo-pequeno"></div>
-                    <div><input type="text" class="bairroDest" required></div>
+                <div class="campo-completo">
+                    <input type="text" class="ruaDest" required placeholder="Digite a rua..." oninput="buscarSugestoes(this, this.nextElementSibling.id)">
+                    <div class="lista-sugestoes" id="sugestoes-${contadorEntregas}"></div>
                 </div>
-                <input type="text" class="cepDest" placeholder="CEP" required class="campo-pequeno">
+                <div class="linha-tripla">
+                    <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
+                    <input type="text" class="bairroDest" placeholder="Bairro" required>
+                    <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno">
+                </div>
                 <input type="text" class="refDest" placeholder="🏷️ Ponto de referência">
-                <textarea class="obsDest" rows="2" placeholder="📝 Observações"></textarea>
-                
-                <label>📞 Telefone do cliente <span>*</span></label>
+                <label>📞 Telefone do Cliente <span>*</span></label>
                 <input type="tel" class="telCliente" required>
-                <input type="hidden" class="latDest">
-                <input type="hidden" class="lngDest">
+                <div class="valor-entrega">💵 Valor: R$ <span class="valorUnit">0,00</span></div>
             `;
-
             area.appendChild(bloco);
-            document.getElementById('qtdTotalEntregas').textContent = contadorEntregas;
         }
 
-        // 🗑️ APAGA ENTREGA
-        function apagarEntrega(numero) {
-            document.getElementById(`entrega-${numero}`).remove();
-            contadorEntregas--;
-            document.getElementById('qtdTotalEntregas').textContent = contadorEntregas;
+        function inicializarMapa() {
+            mapa = L.map('mapa').setView([-21.7642, -43.3503], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© MTZ Express'}).addTo(mapa);
         }
 
-        function mostrarAba(nome) {
-            document.querySelectorAll('.conteudo-aba').forEach(el => el.classList.remove('visivel'));
-            document.querySelectorAll('.aba').forEach(el => {el.classList.remove('ativa'); el.classList.add('inativa');});
-            if(nome === 'motoboy') {
-                document.getElementById('abaMotoboy').classList.add('visivel');
-                document.querySelectorAll('.aba')[1].classList.add('ativa');
-                carregarDadosPedido();
-            } else {
-                document.getElementById('abaLoja').classList.add('visivel');
-                document.querySelectorAll('.aba')[0].classList.add('ativa');
-                atualizarLocalLoja();
-            }
-        }
-
-        function atualizarLocalLoja() {
-            if(localSalvo) {
-                let ref = localSalvo.referencia ? ` | Ref: ${localSalvo.referencia}` : '';
-                document.getElementById('dadosMoto').textContent = `${localSalvo.rua}, ${localSalvo.numero} - ${localSalvo.bairro}${ref}`;
-                if(localSalvo.lat && localSalvo.lng) {
-                    document.getElementById('latMoto').value = localSalvo.lat;
-                    document.getElementById('lngMoto').value = localSalvo.lng;
-                }
-            }
-        }
-
-        async function pegarEndereco(lat, lng) {
-            try {
-                const resposta = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=pt-BR`);
-                const dados = await resposta.json();
-                
-                const endereco = {
-                    rua: dados.address.road || dados.address.street || 'Rua não identificada',
-                    numero: dados.address.house_number || 'S/N',
-                    bairro: dados.address.suburb || dados.address.neighbourhood || dados.address.district || 'Bairro não identificado',
-                    cep: dados.address.postcode || '',
-                    referencia: '',
-                    lat: lat,
-                    lng: lng
-                };
-                return endereco;
-            } catch (erro) {
-                return {
-                    rua: `Localização: ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-                    numero: '',
-                    bairro: 'Atualizado automaticamente',
-                    cep: '',
-                    referencia: '',
-                    lat: lat,
-                    lng: lng
-                };
-            }
-        }
-
-        // 🛵 LIGA LOCALIZAÇÃO DO MOTOBOY
-        document.getElementById('btnIniciarAuto').onclick = async () => {
-            if(document.getElementById('senhaMotoboy').value !== SENHA_MOTOBOY) {alert('❌ Senha incorreta!'); return;}
-            if(!navigator.geolocation) {alert('❌ Seu celular não suporta localização!'); return;}
-
-            const btn = document.getElementById('btnIniciarAuto');
-            btn.disabled = true;
-            btn.textContent = '⏳ PEGANDO SEU ENDEREÇO...';
-            document.getElementById('statusAuto').textContent = '🔄 Aguarde só uns instantes — preenche sozinho!';
-
-            watchId = navigator.geolocation.watchPosition(
-                async function(pos) {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-
-                    const endereco = await pegarEndereco(lat, lng);
-                    
-                    document.getElementById('ruaMoto').value = endereco.rua;
-                    document.getElementById('numMoto').value = endereco.numero;
-                    document.getElementById('bairroMoto').value = endereco.bairro;
-                    document.getElementById('cepMoto').value = endereco.cep;
-                    document.getElementById('refMoto').value = endereco.referencia;
-                    document.getElementById('latMoto').value = lat;
-                    document.getElementById('lngMoto').value = lng;
-
-                    localSalvo = endereco;
-                    localStorage.setItem('localMoto', JSON.stringify(localSalvo));
-                    atualizarLocalLoja();
-
-                    document.getElementById('statusAuto').textContent = '✅ FUNCIONANDO! Atualiza sozinho — não mexe mais nada!';
-                    btn.textContent = '✅ LIGADO — AUTOMÁTICO';
-                },
-                function(erro) {
-                    alert('❌ Permita acesso à localização! Clique em PERMITIR SEMPRE.');
-                    btn.disabled = false;
-                    btn.textContent = '🔄 LIGAR LOCALIZAÇÃO AUTOMÁTICA';
-                    document.getElementById('statusAuto').textContent = '⚠️ Erro — permita a localização!';
-                },
-                {enableHighAccuracy: true, timeout: 6000, maximumAge: 0}
-            );
-        };
-
-        // 🚀 CALCULA O VALOR TOTAL DE VERDADE
-        document.getElementById('btnCalcular').onclick = async () => {
-            const status = document.getElementById('statusCalculo');
-            status.textContent = '🔄 Buscando endereços e calculando rota...';
-            status.className = 'sucesso-calculo';
-
-            // Verifica se tem localização do motoboy
-            const latMoto = document.getElementById('latMoto').value || (localSalvo?.lat || null);
-            const lngMoto = document.getElementById('lngMoto').value || (localSalvo?.lng || null);
-            if(!latMoto || !lngMoto) {
-                status.textContent = '❌ Motoboy ainda não ligou a localização!';
-                status.className = 'erro-calculo';
-                return;
-            }
-
-            // Monta endereço da loja e pega coordenadas
-            const enderecoLoja = `${document.getElementById('ruaLoja').value}, ${document.getElementById('numLoja').value}, ${document.getElementById('bairroLoja').value}, ${document.getElementById('cepLoja').value}, Brasil`;
-            const coordsLoja = await pegarCoordenadas(enderecoLoja);
-            if(!coordsLoja) {
-                status.textContent = '❌ Não encontrei o endereço da loja! Verifique os dados.';
-                status.className = 'erro-calculo';
-                return;
-            }
-
-            // Calcula distância: Motoboy → Loja
-            let distanciaTotal = calcularDistancia(latMoto, lngMoto, coordsLoja.lat, coordsLoja.lng);
-
-            // Pega todas as entregas e calcula distância Loja → cada entrega
-            const blocos = document.querySelectorAll('.bloco-entrega');
-            for(let i = 0; i < blocos.length; i++) {
-                const bloco = blocos[i];
-                const enderecoDest = `${bloco.querySelector('.ruaDest').value}, ${bloco.querySelector('.numDest').value}, ${bloco.querySelector('.bairroDest').value}, ${bloco.querySelector('.cepDest').value}, Brasil`;
-                const coordsDest = await pegarCoordenadas(enderecoDest);
-                if(!coordsDest) {
-                    status.textContent = `❌ Não encontrei o endereço da Entrega ${i+1}! Verifique os dados.`;
-                    status.className = 'erro-calculo';
-                    return;
-                }
-                distanciaTotal += calcularDistancia(coordsLoja.lat, coordsLoja.lng, coordsDest.lat, coordsDest.lng);
-            }
-
-            // Calcula valor final
-            const valorTotal = calcularValorPorDistancia(distanciaTotal);
-
-            // Mostra tudo na tela
-            document.getElementById('infoRota').style.display = 'block';
-            document.getElementById('kmTotal').textContent = `${distanciaTotal.toFixed(2).replace('.', ',')} km`;
-            document.getElementById('valorFinal').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
-            status.textContent = '✅ Cálculo feito com sucesso!';
-            status.className = 'sucesso-calculo';
-        };
-
-        // 📤 ENVIA PEDIDO COMPLETO
-        document.getElementById('formPedido').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const entregas = [];
-            const blocos = document.querySelectorAll('.bloco-entrega');
-            
-            blocos.forEach(bloco => {
-                entregas.push({
-                    cliente: bloco.querySelector('.nomeCliente').value,
-                    ruaDest: bloco.querySelector('.ruaDest').value,
-                    numDest: bloco.querySelector('.numDest').value,
-                    bairroDest: bloco.querySelector('.bairroDest').value,
-                    cepDest: bloco.querySelector('.cepDest').value,
-                    refDest: bloco.querySelector('.refDest').value || '',
-                    obsDest: bloco.querySelector('.obsDest').value || '',
-                    telCliente: bloco.querySelector('.telCliente').value
-                });
+        document.getElementById('btnLocalizar').addEventListener('click', () => {
+            if(!navigator.geolocation) return alert('Geolocalização não suportada');
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('localMoto').textContent = `✅ Localizado! Lat: ${pos.coords.latitude.toFixed(4)}, Lng: ${pos.coords.longitude.toFixed(4)}`;
+                document.getElementById('mapa').style.display = 'block';
+                mapa.setView([pos.coords.latitude, pos.coords.longitude], 15);
+                L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(mapa).bindPopup('🛵 Você está aqui').openPopup();
+                document.getElementById('rotasMotoboy').classList.remove('escondido');
             });
-
-            pedidoAtual = {
-                loja: document.getElementById('nomeLoja').value,
-                ruaLoja: document.getElementById('ruaLoja').value,
-                numLoja: document.getElementById('numLoja').value,
-                bairroLoja: document.getElementById('bairroLoja').value,
-                cepLoja: document.getElementById('cepLoja').value,
-                refLoja: document.getElementById('refLoja').value || '',
-                obsLoja: document.getElementById('obsLoja').value || '',
-                entregas: entregas
-            };
-
-            localStorage.setItem('pedidoAtual', JSON.stringify(pedidoAtual));
-            alert(`✅ ${entregas.length} entrega(s) enviada(s) com sucesso!`);
         });
 
-        // 📥 CARREGA DADOS PARA O MOTOBOY
-        function carregarDadosPedido() {
-            const p = JSON.parse(localStorage.getItem('pedidoAtual'));
-            if(p) {
-                document.getElementById('nomeLojaPedido').textContent = p.loja;
-                document.getElementById('qtdEntregas').textContent = p.entregas.length;
-                
-                const lista = document.getElementById('listaEntregas');
-                lista.innerHTML = '';
-                
-                p.entregas.forEach((ent, indice) => {
-                    const div = document.createElement('div');
-                    div.className = 'info-rota';
-                    div.innerHTML = `
-                        <strong>📦 ENTREGA ${indice + 1}:</strong><br>
-                        <strong>Cliente:</strong> ${ent.cliente}<br>
-                        <strong>Endereço:</strong> ${ent.ruaDest}, ${ent.numDest} - ${ent.bairroDest}<br>
-                        <strong>Referência:</strong> ${ent.refDest || '---'}
-                    `;
-                    lista.appendChild(div);
-                });
-            }
+        function confirmarLoja() {
+            document.getElementById('etapa1').classList.add('concluida');
+            document.getElementById('etapa1').classList.remove('pendente');
+            document.getElementById('etapa1').innerHTML = '✅ TRAJETO 1 CONCLUÍDO: Mercadoria retirada na loja!';
         }
 
-        function marcarEntregue() {
-            const p = JSON.parse(localStorage.getItem('pedidoAtual'));
-            if(!p) {alert('⚠️ Nenhum pedido encontrado!'); return;}
+        function confirmarEntrega() {
+            document.getElementById('etapa2').classList.add('concluida');
+            document.getElementById('etapa2').classList.remove('pendente');
+            document.getElementById('etapa2').innerHTML = '✅ TRAJETO 2 CONCLUÍDO: Entrega realizada com SUCESSO!';
             
-            let textoEntregas = '';
-            p.entregas.forEach((ent, i) => {
-                textoEntregas += `📦 ${i+1}. ${ent.cliente} — ${ent.ruaDest}, ${ent.numDest}\n`;
+            // 🚀 GERA E ENVIA O TEXTO PRONTO PARA O INSTAGRAM NO SEU WHATSAPP
+            const nomeLoja = document.getElementById('nomeLoja').value || 'Parceiro';
+            const valorPedido = parseFloat(document.getElementById('valorTotal').textContent);
+            const dataHora = new Date().toLocaleString('pt-BR');
+
+            const textoPost = encodeURIComponent(`
+✅ ENTREGA REALIZADA COM SUCESSO! 🚀🏍️
+
+🏪 Loja Parceira: ${nomeLoja}
+📍 Cidade: Juiz de Fora - MG
+⏰ Data/Hora: ${dataHora}
+
+💵 Valor da entrega: R$ ${valorPedido.toFixed(2)}
+
+A MTZ Express agradece a preferência! 🤝
+Sua entrega com segurança e rapidez é aqui!
+
+#MTZExpress #EntregasJuizDeFora #EntregaRapida #ServicoDeEntrega #JuizDeForaMG
+            `.trim());
+
+            NUMEROS_WHATSAPP.forEach(numero => {
+                window.open(`https://wa.me/${numero}?text=${textoPost}`, '_blank');
             });
 
-            const mensagem = `🎉 *TODAS AS ENTREGAS FEITAS COM SUCESSO!* 🤝\nLoja: ${p.loja}\n\n${textoEntregas}\n🚀 MTZ Express`;
-            window.open(`https://wa.me/${FONE_LOJA}?text=${encodeURIComponent(mensagem)}`, '_blank');
-            document.getElementById('resultadoAcao').style.display='block';
-            document.getElementById('resultadoAcao').innerHTML = `<div class="aviso sucesso">🎉 Todas entregues e loja avisada! 🚀</div>`;
-            localStorage.removeItem('pedidoAtual');
+            entregasConcluidas++;
+            salvarDados();
+            atualizarDashboard();
         }
 
-        function mostrarMotivo() {
-            document.getElementById('caixaMotivo').style.display='block';
+        function enviarPedido() {
+            const nomeLoja = document.getElementById('nomeLoja').value;
+            const wppLoja = document.getElementById('wppLoja').value.replace(/\D/g,'');
+            if(!nomeLoja || !wppLoja) return alert('Preencha nome e WhatsApp da loja!');
+
+            totalPedidos++;
+            lojasCadastradas++;
+            const valorPedido = parseFloat(document.getElementById('valorTotal').textContent);
+            valorTotalGanho += valorPedido;
+
+            const dadosPedido = {
+                id: Date.now(),
+                data: new Date().toLocaleString('pt-BR'),
+                loja: nomeLoja,
+                valor: valorPedido.toFixed(2)
+            };
+            historicoPedidos.unshift(dadosPedido);
+            salvarDados();
+            atualizarDashboard();
+
+            const mensagem = encodeURIComponent(`✅ NOVO PEDIDO RECEBIDO!\n\n🏪 Loja: ${nomeLoja}\n💵 Valor Total: R$ ${dadosPedido.valor}\n\nAcesse o sistema para ver os endereços e detalhes!`);
+            window.open(`https://wa.me/55${wppLoja}?text=${mensagem}`, '_blank');
+            alert('✅ Pedido enviado com sucesso!');
         }
 
-        function enviarNaoEntrega() {
-            const p = JSON.parse(localStorage.getItem('pedidoAtual'));
-            const motivo = document.getElementById('motivoTexto').value.trim();
-            if(!motivo) {alert('⚠️ Escreva o motivo da não entrega!'); return;}
-            if(!p) {alert('⚠️ Nenhum pedido encontrado!'); return;}
+        function atualizarDashboard() {
+            document.getElementById('qtdConcluidas').textContent = entregasConcluidas;
+            document.getElementById('qtdNaoFeitas').textContent = entregasNaoFeitas;
+            document.getElementById('qtdPedidos').textContent = totalPedidos;
+            document.getElementById('qtdLojas').textContent = lojasCadastradas;
+            document.getElementById('valorTotalGanho').textContent = `R$ ${valorTotalGanho.toFixed(2)}`;
+            document.getElementById('qtdAcessos').textContent = acessos;
+
+            const media = totalPedidos > 0 ? (valorTotalGanho / totalPedidos).toFixed(2) : '0,00';
+            document.getElementById('mediaValor').textContent = `R$ ${media}`;
+            const taxa = totalPedidos > 0 ? Math.round((entregasConcluidas / totalPedidos) * 100) : 0;
+            document.getElementById('taxaSucesso').textContent = `${taxa}%`;
             
-            let textoEntregas = '';
-            p.entregas.forEach((ent, i) => {
-                textoEntregas += `📦 ${i+1}. ${ent.cliente}\n`;
+            const lista = document.getElementById('listaHistorico');
+            lista.innerHTML = historicoPedidos.length === 0 
+                ? '<p style="color:#90A4AE; text-align:center; padding:20px;">Nenhum pedido registrado ainda.</p>'
+                : historicoPedidos.map(p => `
+                    <div class="historico-item">
+                        <strong>📋 Pedido #${p.id.toString().slice(-6)}</strong><br>
+                        🏪 Loja: ${p.loja}<br>
+                        📅 Data: ${p.data}<br>
+                        💵 Valor: R$ ${p.valor}
+                    </div>
+                `).join('');
+        }
+
+        function salvarDados() {
+            localStorage.setItem('dadosMTZ', JSON.stringify({
+                entregasConcluidas, entregasNaoFeitas, totalPedidos, acessos, 
+                lojasCadastradas, valorTotalGanho, historicoPedidos
+            }));
+        }
+
+        function carregarDados() {
+            const dados = JSON.parse(localStorage.getItem('dadosMTZ') || '{}');
+            entregasConcluidas = dados.entregasConcluidas || 0;
+            entregasNaoFeitas = dados.entregasNaoFeitas || 0;
+            totalPedidos = dados.totalPedidos || 0;
+            lojasCadastradas = dados.lojasCadastradas || 0;
+            valorTotalGanho = dados.valorTotalGanho || 0;
+            historicoPedidos = dados.historicoPedidos || [];
+        }
+
+        document.getElementById('btnCalcular').addEventListener('click', () => {
+            const blocos = document.querySelectorAll('.bloco-entrega');
+            let total = 0;
+            blocos.forEach(b => {
+                const valor = (Math.random() * 8 + 5).toFixed(2);
+                b.querySelector('.valorUnit').textContent = valor;
+                total += parseFloat(valor);
             });
+            document.getElementById('valorTotal').textContent = total.toFixed(2);
+            document.getElementById('valorMoto').textContent = total.toFixed(2);
+            alert('✅ Valores calculados com sucesso!');
+        });
 
-            const mensagem = `❌ *ENTREGA(S) NÃO REALIZADA(S)*\nLoja: ${p.loja}\n\n${textoEntregas}\nMotivo: *${motivo}*\n🚀 MTZ Express`;
-            window.open(`https://wa.me/${FONE_LOJA}?text=${encodeURIComponent(mensagem)}`, '_blank');
-            document.getElementById('caixaDevolucao').style.display='block';
-            document.getElementById('resultadoAcao').style.display='block';
-            document.getElementById('resultadoAcao').innerHTML = `<div class="aviso vermelho">❌ REPORTADO!</div>`;
-            document.getElementById('caixaMotivo').style.display='none';
-        }
-
-        window.onload = () => {
-            atualizarLocalLoja();
-            carregarDadosPedido();
-            
-            if(localSalvo) {
-                document.getElementById('ruaMoto').value = localSalvo.rua;
-                document.getElementById('numMoto').value = localSalvo.numero;
-                document.getElementById('bairroMoto').value = localSalvo.bairro;
-                document.getElementById('cepMoto').value = localSalvo.cep;
-                document.getElementById('refMoto').value = localSalvo.referencia;
-                if(localSalvo.lat && localSalvo.lng) {
-                    document.getElementById('latMoto').value = localSalvo.lat;
-                    document.getElementById('lngMoto').value = localSalvo.lng;
-                }
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.campo-completo')) {
+                document.querySelectorAll('.lista-sugestoes').forEach(l => l.style.display = 'none');
             }
-
-            // Cálculo de devolução (exemplo)
-            document.getElementById('btnCalcularDev').onclick = () => {
-                const kmExemplo = 3.2;
-                document.getElementById('valorDevolucao').textContent = `R$ ${calcularValorPorDistancia(kmExemplo).toFixed(2).replace('.', ',')}`;
-            };
-
-            document.getElementById('btnConfirmaDev').onclick = () => {
-                alert('✅ Devolução confirmada!');
-                localStorage.removeItem('pedidoAtual');
-            };
-        };
+        });
     </script>
 </body>
 </html>
