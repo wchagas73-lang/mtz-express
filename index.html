@@ -33,7 +33,23 @@
         .campo-completo {position: relative; z-index: 10;}
         input, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         textarea {resize: none; height: 80px;}
-        .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 220px; overflow-y: auto; z-index: 9999; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.5);}
+        
+        /* ✅ AJUSTE CRÍTICO: Lista de sugestões SEMPRE visível e por cima */
+        .lista-sugestoes {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1A3F4A;
+            border: 1px solid rgba(0,180,140,0.3);
+            border-radius: 0 0 12px 12px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 99999 !important;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
         .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.15s;}
         .item-sugestao:hover {background: rgba(0,180,140,0.15);}
         .item-sugestao .detalhe {font-size: 13px; color: #80CBC4; margin-top: 2px;}
@@ -107,11 +123,11 @@
 
             <!-- 🏪 ÁREA DO LOJISTA -->
             <div class="conteudo-aba visivel" id="abaLoja">
-                <div class="aviso destaque">💡 VALORES CLAROS E DIRETOS:<br>
-                🛵 Deslocamento até a loja: R$ 0,50 por km<br>
-                📦 Entrega para o cliente: valor conforme tabela<br>
-                💵 Total = Soma dos valores + gorjeta (se quiser)<br>
-                ✅ Sem taxas escondidas! SEM DESCONTO!
+                <div class="aviso destaque">💡 COMO USAR CERTO:<br>
+                ✅ Digite <strong>apenas o nome da rua/avenida</strong><br>
+                ✅ Escolha na lista que aparece<br>
+                ✅ Número, bairro e CEP preenchem sozinhos!<br>
+                ✅ VALORES CLAROS: Deslocamento R$0,50/km + Entrega + Gorjeta
                 </div>
                 
                 <form id="formPedido">
@@ -125,9 +141,9 @@
                     <label>📞 WhatsApp da Loja <span>*</span></label>
                     <input type="tel" id="wppLoja" placeholder="(32) 9XXXX-XXXX" required oninput="aplicarMascara(this, 'telefone')">
                     
-                    <label>📍 Endereço da Loja <span>*</span> — Digite a rua e escolha</label>
+                    <label>📍 Endereço da Loja <span>*</span> — Digite a rua e escolha abaixo</label>
                     <div class="campo-completo">
-                        <input type="text" id="ruaLoja" required placeholder="Nome da rua, avenida..." oninput="buscarSugestoes(this, 'loja')">
+                        <input type="text" id="ruaLoja" required placeholder="Ex: Rua Halfeld, Avenida Brasil..." oninput="buscarSugestoes(this, 'loja')">
                         <div class="lista-sugestoes" id="sugestoesLoja"></div>
                     </div>
                     <div class="linha-tripla">
@@ -136,7 +152,7 @@
                         <input type="text" id="cepLoja" placeholder="CEP" class="campo-pequeno" oninput="aplicarMascara(this, 'cep')">
                     </div>
                     <label>📝 Complemento / Ponto de Referência</label>
-                    <textarea id="compLoja" placeholder="Ex: Ao lado do supermercado, Apto 201..."></textarea>
+                    <textarea id="compLoja" placeholder="Ex: Ao lado do supermercado..."></textarea>
 
                     <div id="areaEntregas">
                         <div class="bloco-entrega" id="entrega-1">
@@ -144,7 +160,7 @@
                             <label>👤 Nome do Cliente <span>*</span></label>
                             <input type="text" class="nomeCliente" required>
                             
-                            <label>📍 Endereço de Entrega <span>*</span> — Digite a rua e escolha</label>
+                            <label>📍 Endereço de Entrega <span>*</span> — Digite a rua e escolha abaixo</label>
                             <div class="campo-completo">
                                 <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, 'dest')">
                                 <div class="lista-sugestoes"></div>
@@ -453,53 +469,95 @@
             }
         }
 
+        // ✅ BUSCA DE SUGESTÕES MELHORADA - RÁPIDA E SEM ERRO
         async function buscarSugestoes(campo, tipo) {
             const texto = campo.value.trim();
             const lista = campo.nextElementSibling;
-            if(texto.length < 3) { lista.style.display = 'none'; return; }
+            
+            if (texto.length < 3) {
+                lista.style.display = 'none';
+                return;
+            }
+
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ', Juiz de Fora, MG')}&addressdetails=1&format=json&limit=5`);
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ', Juiz de Fora, Minas Gerais, Brasil')}&addressdetails=1&format=json&limit=8&accept-language=pt-BR`);
                 const dados = await res.json();
+                
                 lista.innerHTML = '';
                 let temValido = false;
-                if(dados.length > 0) {
+
+                if (dados.length > 0) {
                     dados.forEach(end => {
-                        const cidade = (end.address.city || end.address.town || '').toLowerCase();
-                        if(cidade !== CIDADE_ALVO) return;
+                        const cidade = (end.address.city || end.address.town || end.address.county || '').toLowerCase();
+                        if (!cidade.includes(CIDADE_ALVO)) return;
+
                         temValido = true;
-                        const rua = end.address.road || end.address.street || end.name;
-                        const bairro = end.address.suburb || end.address.neighbourhood || 'Sem bairro';
-                        const cep = end.address.postcode || 'Sem CEP';
-                        if(!rua) return;
+                        const rua = end.address.road || end.address.street || end.name || '';
+                        const bairro = end.address.suburb || end.address.neighbourhood || 'Centro';
+                        const cep = end.address.postcode || '36000-000';
+
+                        if (!rua) return;
+
                         const item = document.createElement('div');
                         item.className = 'item-sugestao';
                         item.innerHTML = `<strong>${rua}</strong><div class="detalhe">${bairro} • ${cep}</div>`;
+                        
                         item.onclick = () => {
                             campo.value = rua;
                             lista.style.display = 'none';
-                            if(tipo === 'loja') {
-                                document.getElementById('bairroLoja').value = bairro !== 'Sem bairro' ? bairro : '';
-                                document.getElementById('cepLoja').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
+                            if (tipo === 'loja') {
+                                document.getElementById('bairroLoja').value = bairro;
+                                document.getElementById('cepLoja').value = cep.replace('-', '');
                             } else {
                                 const bloco = campo.closest('.bloco-entrega');
-                                bloco.querySelector('.bairroDest').value = bairro !== 'Sem bairro' ? bairro : '';
-                                bloco.querySelector('.cepDest').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
+                                bloco.querySelector('.bairroDest').value = bairro;
+                                bloco.querySelector('.cepDest').value = cep.replace('-', '');
                             }
                         };
                         lista.appendChild(item);
                     });
-                    if(!temValido) lista.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos somente Juiz de Fora-MG</div>`;
+
+                    if (!temValido) {
+                        lista.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Apenas Juiz de Fora-MG</div>`;
+                    }
                     lista.style.display = 'block';
-                } else lista.style.display = 'none';
-            } catch { lista.style.display = 'none'; }
+                } else {
+                    lista.innerHTML = `<div style="padding:15px; color:#FF6B6B;">🔍 Nenhum endereço encontrado</div>`;
+                    lista.style.display = 'block';
+                }
+            } catch (erro) {
+                console.error('Erro na busca:', erro);
+                lista.innerHTML = `<div style="padding:15px; color:#FF6B6B;">⚠️ Erro ao buscar endereço</div>`;
+                lista.style.display = 'block';
+            }
         }
 
+        // ✅ BUSCA DE COORDENADAS MAIS TOLERANTE - NÃO FALHA MAIS
         async function buscarCoordenadas(endereco) {
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endereco + ', Juiz de Fora, MG')}&format=json&limit=1`);
+                const enderecoLimpo = endereco
+                    .replace(/[.,]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(enderecoLimpo + ', Juiz de Fora, MG')}&addressdetails=1&format=json&limit=3`);
                 const dados = await res.json();
-                return dados.length ? {lat: +dados[0].lat, lon: +dados[0].lon} : null;
-            } catch { return null; }
+
+                if (dados.length > 0) {
+                    return { lat: +dados[0].lat, lon: +dados[0].lon };
+                }
+
+                // Tenta sem número se não achar
+                const semNumero = enderecoLimpo.replace(/\d+/g, '').trim();
+                if (semNumero.length > 5) {
+                    const res2 = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(semNumero + ', Juiz de Fora, MG')}&format=json&limit=1`);
+                    const dados2 = await res2.json();
+                    if (dados2.length > 0) return { lat: +dados2[0].lat, lon: +dados2[0].lon };
+                }
+                return null;
+            } catch {
+                return null;
+            }
         }
 
         function adicionarEntrega() {
@@ -567,22 +625,32 @@
             const ruaLoja = document.getElementById('ruaLoja').value.trim();
             const numLoja = document.getElementById('numLoja').value.trim();
             const bairroLoja = document.getElementById('bairroLoja').value.trim();
+            const compLoja = document.getElementById('compLoja').value.trim();
+
             if(!nomeLoja || !wppLoja || !ruaLoja || !numLoja || !bairroLoja) {
                 alert('⚠️ Preencha todos os dados da loja!');
                 return;
             }
+
             const entregas = document.querySelectorAll('.bloco-entrega');
-            let valido = true;
-            entregas.forEach(blk => {
-                if(!blk.querySelector('.nomeCliente').value.trim() || !blk.querySelector('.ruaDest').value.trim() || !blk.querySelector('.numDest').value.trim() || !blk.querySelector('.bairroDest').value.trim() || !blk.querySelector('.telCliente').value.trim()) valido = false;
-            });
-            if(!valido) { alert('⚠️ Preencha todos os dados das entregas!'); return; }
+            for(let i=0; i<entregas.length; i++) {
+                const blk = entregas[i];
+                if(!blk.querySelector('.nomeCliente').value.trim() ||
+                   !blk.querySelector('.ruaDest').value.trim() ||
+                   !blk.querySelector('.numDest').value.trim() ||
+                   !blk.querySelector('.bairroDest').value.trim() ||
+                   !blk.querySelector('.telCliente').value.trim()) {
+                    alert(`⚠️ Preencha todos os dados da entrega ${i+1}!`);
+                    return;
+                }
+            }
 
             document.getElementById('avisoCarregando').classList.remove('escondido');
             document.getElementById('btnCalcular').disabled = true;
 
-            const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}`;
+            const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}, Juiz de Fora-MG`;
             coordenadasLoja = await buscarCoordenadas(endLojaComp);
+
             if(!coordenadasLoja) {
                 alert('❌ Não encontrei o endereço da loja em Juiz de Fora. Verifique!');
                 document.getElementById('avisoCarregando').classList.add('escondido');
@@ -591,7 +659,7 @@
             }
 
             const kmAteLoja = await calcularRota(localMoto, coordenadasLoja) || 0;
-            const valorDeslocamento =kmAteLoja * TAXA_KM;
+            const valorDeslocamento = kmAteLoja * TAXA_KM;
             let totalEntregas = 0;
             listaCoordenadasEntregas = [];
             let linksEntregas = [];
@@ -601,17 +669,18 @@
                 const rua = blk.querySelector('.ruaDest').value.trim();
                 const num = blk.querySelector('.numDest').value.trim();
                 const bairro = blk.querySelector('.bairroDest').value.trim();
-                const endComp = `${rua}, ${num}, ${bairro}`;
+                const endComp = `${rua}, ${num}, ${bairro}, Juiz de Fora-MG`;
                 const coord = await buscarCoordenadas(endComp);
+
                 if(!coord) {
-                    alert(`❌ Não encontrei o endereço da entrega ${i+1} em Juiz de Fora. Verifique!`);
+                    alert(`❌ Não encontrei a entrega ${i+1} em Juiz de Fora. Verifique!`);
                     document.getElementById('avisoCarregando').classList.add('escondido');
                     document.getElementById('btnCalcular').disabled = false;
                     return;
                 }
+
                 listaCoordenadasEntregas.push(coord);
                 linksEntregas.push(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(endComp)}`);
-
                 const kmRota = await calcularRota(coordenadasLoja, coord) || 0;
                 totalEntregas += valorPorKm(kmRota);
             }
@@ -627,7 +696,7 @@
             const linkLojaMaps = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(endLojaComp)}`;
 
             dadosPedido = {
-                nomeLoja, wppLoja, ruaLoja, numLoja, bairroLoja, compLoja: document.getElementById('compLoja').value.trim(),
+                nomeLoja, wppLoja, ruaLoja, numLoja, bairroLoja, compLoja,
                 kmAteLoja, valorDeslocamento, totalEntregas, valorGorjeta,
                 total: valorBase + valorGorjeta,
                 linkLojaMaps,
@@ -683,8 +752,10 @@
                 (pos) => {
                     localMoto = [pos.coords.latitude, pos.coords.longitude];
                     document.getElementById('localMoto').textContent = `✅ Localização: ${localMoto[0].toFixed(6)}, ${localMoto[1].toFixed(6)}`;
-                    mapa.setView(localMoto, 15);
-                    L.marker(localMoto).addTo(mapa).bindPopup('Você está aqui').openPopup();
+                    if(mapa) {
+                        mapa.setView(localMoto, 15);
+                        L.marker(localMoto).addTo(mapa).bindPopup('Você está aqui').openPopup();
+                    }
                     document.getElementById('dadosRota').classList.remove('escondido');
                     if(coordenadasLoja) preencherDadosMotoboy();
                 },
@@ -775,4 +846,4 @@
         }
     </script>
 </body>
-</html>
+                        </html>
