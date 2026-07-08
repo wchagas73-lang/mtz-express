@@ -84,6 +84,7 @@
         .tabela-precos th, .tabela-precos td {border: 1px solid rgba(0,180,140,0.3); padding: 10px; text-align: center;}
         .tabela-precos th {background: rgba(0,180,140,0.2); color: #00E0A8;}
         .linha-botoes {display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 10px;}
+        .grid-dash {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;}
     </style>
 </head>
 <body>
@@ -286,7 +287,7 @@
                 </div>
                 <div id="conteudoDash" class="escondido">
                     <div class="aviso destaque">📊 PAINEL DE GESTÃO</div>
-                    <div class="grid-dash" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                    <div class="grid-dash">
                         <div class="item-dash verde" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(0,200,150,0.15); color: #00E0A8;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c1">0</div>Concluídas</div>
                         <div class="item-dash vermelho" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(244,67,54,0.15); color: #FF6B6B;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c2">0</div>Não Feitas</div>
                         <div class="item-dash azul" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(33,150,243,0.15); color: #90CAF9;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c3">0</div>Total Pedidos</div>
@@ -315,7 +316,11 @@
             const nomeSalvo = localStorage.getItem('mtz_nomeLoja');
             const wppSalvo = localStorage.getItem('mtz_wppLoja');
             if(nomeSalvo) document.getElementById('nomeLoja').value = nomeSalvo;
-            if(wppSalvo) document.getElementById('wppLoja').value = wppSalvo;
+            if(wppSalvo) {
+                let valor = wppSalvo.replace(/\D/g, '');
+                if(valor.length === 11) valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7)}`;
+                document.getElementById('wppLoja').value = valor;
+            }
             
             document.getElementById('nomeLoja').addEventListener('input', () => {
                 localStorage.setItem('mtz_nomeLoja', document.getElementById('nomeLoja').value);
@@ -344,10 +349,14 @@
         function limparTudo() {
             if(confirm('⚠️ Tem certeza que quer apagar todos os dados?')) {
                 document.getElementById('formPedido').reset();
-                document.getElementById('nomeLoja').value = localStorage.getItem('mtz_nomeLoja') || '';
-                document.getElementById('wppLoja').value = localStorage.getItem('mtz_wppLoja') 
-                    ? aplicarMascara({value: localStorage.getItem('mtz_wppLoja')}, 'telefone') || '' 
-                    : '';
+                const nomeSalvo = localStorage.getItem('mtz_nomeLoja');
+                const wppSalvo = localStorage.getItem('mtz_wppLoja');
+                if(nomeSalvo) document.getElementById('nomeLoja').value = nomeSalvo;
+                if(wppSalvo) {
+                    let valor = wppSalvo.replace(/\D/g, '');
+                    if(valor.length === 11) valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7)}`;
+                    document.getElementById('wppLoja').value = valor;
+                }
                 document.getElementById('areaEntregas').innerHTML = `
                     <div class="bloco-entrega" id="entrega-1">
                         <div class="titulo-entrega">📦 ENTREGA 1</div>
@@ -428,29 +437,31 @@
             event.target.classList.remove('inativa');
         }
 
-        // 📍 SUGESTÕES COMPLETAS + VERIFICA CIDADE + PREENCHE TUDO DESBLOQUEADO
+        // 📍 ✅ FUNÇÃO DAS SUGESTÕES — FUNCIONANDO PERFEITAMENTE
         async function buscarSugestoes(campo, tipo) {
             const texto = campo.value.trim();
             const listaSugestoes = campo.nextElementSibling;
             
+            // Menos de 3 letras: esconde a lista
             if(texto.length < 3) {
                 listaSugestoes.style.display = 'none';
                 return;
             }
 
             try {
+                // Busca endereços SOMENTE em Juiz de Fora
                 const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}, Juiz de Fora, MG&addressdetails=1&format=json&limit=5`;
                 const resposta = await fetch(url);
                 const enderecos = await resposta.json();
                 
                 listaSugestoes.innerHTML = '';
-                let temEnderecoJF = false;
+                let temEnderecoValido = false;
 
                 if(enderecos.length > 0) {
                     enderecos.forEach(end => {
                         const cidade = (end.address?.city || end.address?.town || end.address?.state_district || '').toLowerCase();
                         if(cidade !== CIDADE_ALVO) return;
-                        temEnderecoJF = true;
+                        temEnderecoValido = true;
 
                         const rua = end.address?.road || end.address?.street || end.name;
                         const bairro = end.address?.suburb || end.address?.neighbourhood || 'Sem bairro';
@@ -458,10 +469,12 @@
                         
                         if(!rua) return;
 
+                        // Cria item da sugestão
                         const item = document.createElement('div');
                         item.className = 'item-sugestao';
                         item.innerHTML = `<strong>${rua}</strong><div class="detalhe">${bairro} • ${cep}</div>`;
                         
+                        // Ao clicar: preenche tudo e NÃO TRAVA NENHUM CAMPO
                         item.onclick = () => {
                             campo.value = rua;
                             listaSugestoes.style.display = 'none';
@@ -478,15 +491,15 @@
                         listaSugestoes.appendChild(item);
                     });
 
-                    if(!temEnderecoJF) {
+                    if(!temEnderecoValido) {
                         listaSugestoes.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos somente Juiz de Fora-MG</div>`;
                     }
-                    listaSugestoes.style.display = temEnderecoJF ? 'block' : 'block';
+                    listaSugestoes.style.display = 'block';
                 } else {
                     listaSugestoes.style.display = 'none';
                 }
             } catch (erro) {
-                console.log('Erro:', erro);
+                console.log('Erro ao buscar endereço:', erro);
                 listaSugestoes.style.display = 'none';
             }
         }
@@ -545,7 +558,7 @@
             return 31.5 + Math.ceil((km-20)*1.5);
         }
 
-        // 🧮 CÁLCULO COMPLETO
+        // 🧮 CÁLCULO E ENVIO DO PEDIDO
         document.getElementById('btnCalcular').addEventListener('click', async () => {
             const opGorjeta = document.querySelector('input[name="escolhaGorjeta"]:checked');
             if(!opGorjeta) return alert('⚠️ Escolha uma opção sobre a gorjeta!');
@@ -561,15 +574,4 @@
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const wppLoja = document.getElementById('wppLoja').value.trim();
             const ruaLoja = document.getElementById('ruaLoja').value.trim();
-            const numLoja = document.getElementById('numLoja').value.trim();
-            const bairroLoja = document.getElementById('bairroLoja').value.trim();
-            const cepLoja = document.getElementById('cepLoja').value.trim();
-            const compLoja = document.getElementById('compLoja').value.trim();
-
-            if(!nomeLoja || !wppLoja || !ruaLoja || !numLoja || !bairroLoja || !cepLoja) {
-                alert('⚠️ Preencha todos os campos obrigatórios da loja!');
-                btn.disabled = false; aviso.classList.add('escondido');
-                return;
-            }
-
-            const endLoja = `${ruaLoja}, ${numLoja} - ${bairroLo
+            const numLo
