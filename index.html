@@ -413,16 +413,22 @@
             document.getElementById('agradecimento').classList.toggle('escondido', valorGorjeta <= 0);
         }
 
+        // ✅ FUNÇÃO DAS ABAS 100% CORRIGIDA — TODAS ABEM!
         function mostrarAba(nomeAba) {
             document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.remove('visivel'));
             document.querySelectorAll('.aba').forEach(botao => {
                 botao.classList.remove('ativa');
                 botao.classList.add('inativa');
             });
+            const idAba = `aba${nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)}`;
+            const abaAtiva = document.getElementById(idAba);
+            if(abaAtiva) abaAtiva.classList.add('visivel');
             event.currentTarget.classList.remove('inativa');
             event.currentTarget.classList.add('ativa');
-            document.getElementById(`aba${nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)}`).classList.add('visivel');
-            if(nomeAba === 'motoboy') setTimeout(() => mapa.invalidateSize(), 100);
+            if(nomeAba === 'motoboy') {
+                setTimeout(() => mapa.invalidateSize(), 150);
+                document.getElementById('mapa').style.display = 'block';
+            }
         }
 
         async function buscarSugestoes(campo, tipo) {
@@ -555,3 +561,189 @@
 
             const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}`;
             coordenadasLoja = await buscarCoordenadas(endLojaComp);
+            if(!coordenadasLoja) {
+                alert('❌ Não encontrei o endereço da loja em Juiz de Fora. Verifique!');
+                document.getElementById('avisoCarregando').classList.add('escondido');
+                document.getElementById('btnCalcular').disabled = false;
+                return;
+            }
+
+            const kmAteLoja = await calcularRota(localMoto, coordenadasLoja) || 0;
+            const valorDeslocamento = kmAteLoja * TAXA_KM;
+            let totalEntregas = 0;
+            listaCoordenadasEntregas = [];
+
+            for(let i=0; i<entregas.length; i++) {
+                const blk = entregas[i];
+                const rua = blk.querySelector('.ruaDest').value.trim();
+                const num = blk.querySelector('.numDest').value.trim();
+                const bairro = blk.querySelector('.bairroDest').value.trim();
+                const endComp = `${rua}, ${num}, ${bairro}`;
+                const coord = await buscarCoordenadas(endComp);
+                if(!coord) {
+                    alert(`❌ Não encontrei o endereço da entrega ${i+1} em Juiz de Fora. Verifique!`);
+                    document.getElementById('avisoCarregando')
+document.getElementById('btnCalcular').disabled = false;
+                return;
+            }
+            listaCoordenadasEntregas.push(coord);
+
+            const kmRota = await calcularRota(coordenadasLoja, coord) || 0;
+            totalEntregas += valorPorKm(kmRota);
+        }
+
+        valorBase = valorDeslocamento + totalEntregas;
+        atualizarTotal();
+
+        document.getElementById('kmD').textContent = kmAteLoja.toFixed(2).replace('.', ',');
+        document.getElementById('vD').textContent = valorDeslocamento.toFixed(2).replace('.', ',');
+        document.getElementById('qE').textContent = entregas.length;
+        document.getElementById('vE').textContent = totalEntregas.toFixed(2).replace('.', ',');
+
+        dadosPedido = {
+            nomeLoja, wppLoja, ruaLoja, numLoja, bairroLoja, compLoja: document.getElementById('compLoja').value.trim(),
+            kmAteLoja, valorDeslocamento, totalEntregas, valorGorjeta,
+            total: valorBase + valorGorjeta,
+            entregas: Array.from(entregas).map(blk => ({
+                nome: blk.querySelector('.nomeCliente').value.trim(),
+                rua: blk.querySelector('.ruaDest').value.trim(),
+                num: blk.querySelector('.numDest').value.trim(),
+                bairro: blk.querySelector('.bairroDest').value.trim(),
+                comp: blk.querySelector('.compDest').value.trim(),
+                tel: blk.querySelector('.telCliente').value.trim()
+            }))
+        };
+
+        document.getElementById('resumoDados').classList.remove('escondido');
+        document.getElementById('btnEnviar').classList.remove('escondido');
+        document.getElementById('avisoCarregando').classList.add('escondido');
+        document.getElementById('btnCalcular').disabled = false;
+    }
+
+    function enviarPedido() {
+        const p = dadosPedido;
+        let msg = `📤 NOVO PEDIDO - MTZ EXPRESS 🚀\n\n`;
+        msg += `🏪 LOJA: ${p.nomeLoja}\n📞 WhatsApp: ${p.wppLoja}\n`;
+        msg += `📍 ENDEREÇO LOJA: ${p.ruaLoja}, ${p.numLoja} - ${p.bairroLoja}`;
+        if(p.compLoja) msg += ` (${p.compLoja})`;
+        msg += `\n\n`;
+
+        p.entregas.forEach((e, i) => {
+            msg += `📦 ENTREGA ${i+1}:\n👤 Cliente: ${e.nome}\n📞 Tel: ${e.tel}\n`;
+            msg += `📍 Endereço: ${e.rua}, ${e.num} - ${e.bairro}`;
+            if(e.comp) msg += ` (${e.comp})`;
+            msg += `\n\n`;
+        });
+
+        msg += `🛵 Deslocamento até loja: R$ ${p.valorDeslocamento.toFixed(2).replace('.', ',')}\n`;
+        msg += `📦 Valor entregas: R$ ${p.totalEntregas.toFixed(2).replace('.', ',')}\n`;
+        msg += `🤑 Gorjeta: R$ ${p.valorGorjeta.toFixed(2).replace('.', ',')}\n`;
+        msg += `💰 TOTAL: R$ ${(p.valorDeslocamento + p.totalEntregas + p.valorGorjeta).toFixed(2).replace('.', ',')}\n\n`;
+        msg += `✅ SEM TAXAS - DIRETO COM O MOTOBOY!`;
+
+        window.open(`https://wa.me/${SEU_NUMERO}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function pegarLocalizacao() {
+        if(!navigator.geolocation) {
+            alert('❌ Geolocalização não suportada!');
+            return;
+        }
+        document.getElementById('localMoto').textContent = '🔄 Buscando localização...';
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                localMoto = [pos.coords.latitude, pos.coords.longitude];
+                document.getElementById('localMoto').textContent = `✅ Localização: ${localMoto[0].toFixed(6)}, ${localMoto[1].toFixed(6)}`;
+                mapa.setView(localMoto, 15);
+                L.marker(localMoto).addTo(mapa).bindPopup('Você está aqui').openPopup();
+                document.getElementById('dadosRota').classList.remove('escondido');
+                if(coordenadasLoja) preencherDadosMotoboy();
+            },
+            () => {
+                document.getElementById('localMoto').textContent = '❌ Não foi possível pegar localização!';
+            }
+        );
+    }
+
+    function preencherDadosMotoboy() {
+        const kmD = calcularRota(localMoto, coordenadasLoja);
+        const vD = kmD * TAXA_KM;
+        let vE = 0;
+        listaCoordenadasEntregas.forEach(c => {
+            const km = calcularRota(coordenadasLoja, c);
+            vE += valorPorKm(km);
+        });
+        const vT = vD + vE + valorGorjeta;
+
+        document.getElementById('mD').textContent = vD.toFixed(2).replace('.', ',');
+        document.getElementById('mE').textContent = vE.toFixed(2).replace('.', ',');
+        document.getElementById('mG').textContent = valorGorjeta.toFixed(2).replace('.', ',');
+        document.getElementById('mT').textContent = vT.toFixed(2).replace('.', ',');
+
+        const endLoja = `${dadosPedido.ruaLoja}, ${dadosPedido.numLoja}, ${dadosPedido.bairroLoja}, Juiz de Fora-MG`;
+        document.getElementById('linkLoja').href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(endLoja)}`;
+
+        const etCli = document.getElementById('etapasCli');
+        etCli.innerHTML = '';
+        dadosPedido.entregas.forEach((e, i) => {
+            const endCli = `${e.rua}, ${e.num}, ${e.bairro}, Juiz de Fora-MG`;
+            etCli.innerHTML += `
+                <div class="etapa pendente" id="etCli${i}">
+                    📦 ENTREGA ${i+1}: ${e.nome}<br>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(endCli)}" target="_blank" class="btn btn-maps">🗺️ ABRIR NO MAPS → ENTREGA ${i+1}</a>
+                    <button class="btn btn-confirma" onclick="confEntrega(${i})">✅ CONFIRMAR ENTREGA ${i+1}</button>
+                </div>
+            `;
+        });
+    }
+
+    function confRetirada() {
+        document.getElementById('etLoja').classList.remove('pendente');
+        document.getElementById('etLoja').classList.add('concluida');
+        alert('✅ Retirada confirmada! Boa entrega!');
+    }
+
+    function confEntrega(n) {
+        document.getElementById(`etCli${n}`).classList.remove('pendente');
+        document.getElementById(`etCli${n}`).classList.add('concluida');
+        alert(`✅ Entrega ${n+1} confirmada!`);
+    }
+
+    function verificarAcesso() {
+        const senha = document.getElementById('senhaAdmin').value.trim();
+        if(senha === SENHA_CORRETA) {
+            document.getElementById('telaLogin').classList.add('escondido');
+            document.getElementById('conteudoDash').classList.remove('escondido');
+            carregarDadosDash();
+        } else {
+            alert('❌ Senha incorreta!');
+        }
+    }
+
+    function carregarDadosDash() {
+        const totalPedidos = parseInt(localStorage.getItem('mtz_totalPedidos') || '0') + 1;
+        const concluidas = parseInt(localStorage.getItem('mtz_concluidas') || '0');
+        const faturamento = parseFloat(localStorage.getItem('mtz_faturamento') || '0') + (valorBase + valorGorjeta);
+        const lojas = parseInt(localStorage.getItem('mtz_lojas') || '0') + 1;
+
+        localStorage.setItem('mtz_totalPedidos', totalPedidos);
+        localStorage.setItem('mtz_concluidas', concluidas + 1);
+        localStorage.setItem('mtz_faturamento', faturamento);
+        localStorage.setItem('mtz_lojas', lojas);
+
+        document.getElementById('c1').textContent = concluidas + 1;
+        document.getElementById('c2').textContent = totalPedidos - (concluidas + 1);
+        document.getElementById('c3').textContent = totalPedidos;
+        document.getElementById('c4').textContent = lojas;
+        document.getElementById('c5').textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
+        document.getElementById('c6').textContent = `R$ ${(faturamento / totalPedidos).toFixed(2).replace('.', ',')}`;
+    }
+
+    function sairDash() {
+        document.getElementById('conteudoDash').classList.add('escondido');
+        document.getElementById('telaLogin').classList.remove('escondido');
+        document.getElementById('senhaAdmin').value = '';
+    }
+    </script>
+</body>
+</html>
