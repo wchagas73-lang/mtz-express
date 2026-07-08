@@ -45,7 +45,6 @@
         .btn-azul {background: linear-gradient(90deg, #2196F3, #1976D2); color: white;}
         .btn-mais {background: linear-gradient(90deg, #2196F3, #1976D2); color: white; font-size: 16px; padding: 14px; margin: 15px 0;}
         .btn-apagar {background: linear-gradient(90deg, #dc3545, #b02a37); color: white; padding: 10px; font-size: 14px; width: auto; margin-top: 5px;}
-        .btn:hover {transform: scale(1.02);}
         .btn:disabled {opacity: 0.6; cursor: not-allowed; transform: none;}
         
         .info-rota {padding: 15px; background: rgba(0,180,140,0.08); border-radius: 14px; margin: 15px 0; font-size: 16px; font-weight: 600; line-height: 1.8;}
@@ -62,6 +61,8 @@
         .aviso-campos {font-size: 13px; color: #FFD700; margin: -8px 0 10px 0;}
         .bloco-entrega {border: 1px solid rgba(0,180,140,0.2); border-radius: 16px; padding: 18px; margin: 20px 0; background: rgba(0,180,140,0.03);}
         .titulo-entrega {font-size: 18px; font-weight: 700; color: #00E0A8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .erro-calculo {color: #FF6B6B; font-size: 14px; text-align: center; margin-top: 10px;}
+        .sucesso-calculo {color: #80FFD0; font-size: 14px; text-align: center; margin-top: 10px;}
 
         /* ÍCONES FIXOS */
         .icones-fixos {position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999;}
@@ -82,7 +83,7 @@
                 <button class="aba inativa" onclick="mostrarAba('motoboy')">🛵 Sou Motoboy</button>
             </div>
 
-            <!-- 🛵 ÁREA DO MOTOBOY — TUDO SEGURO E AUTOMÁTICO -->
+            <!-- 🛵 ÁREA DO MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso auto">
                     ✅ **LOCALIZAÇÃO 100% AUTOMÁTICA — NÃO DIGITA NADA!**<br>
@@ -103,6 +104,8 @@
                 </div>
                 <input type="text" id="cepMoto" placeholder="CEP — automático" disabled>
                 <input type="text" id="refMoto" placeholder="Ponto de referência (se aparecer)" disabled>
+                <input type="hidden" id="latMoto">
+                <input type="hidden" id="lngMoto">
 
                 <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
 
@@ -127,7 +130,7 @@
                 <div id="resultadoAcao" style="margin-top:20px; display:none;"></div>
             </div>
 
-            <!-- 🏪 ÁREA DO LOJISTA — AGORA COM VÁRIAS ENTREGAS! -->
+            <!-- 🏪 ÁREA DO LOJISTA — COM CÁLCULO REAL DE VALOR! -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="aviso destaque">
                     ⚠️ **AVISO IMPORTANTE!**<br>
@@ -140,13 +143,13 @@
                 </div>
 
                 <div class="aviso esclarece">
-                    💡 <strong>COMO USAR:</strong> Preencha os dados da loja uma vez só. Depois clique em **ADICIONAR NOVA ENTREGA** para cada cliente diferente!
+                    💡 **COMO USAR:** Preencha os dados da loja uma vez só. Depois clique em **ADICIONAR NOVA ENTREGA** para cada cliente diferente!
                 </div>
 
                 <p class="aviso-campos">Campos com <span>*</span> são obrigatórios!</p>
 
                 <form id="formPedido">
-                    <!-- DADOS DA LOJA — SÓ PREENCHE UMA VEZ -->
+                    <!-- DADOS DA LOJA -->
                     <label>🏪 Nome da sua Loja <span>*</span></label>
                     <input type="text" id="nomeLoja" required>
 
@@ -159,10 +162,11 @@
                     <input type="text" id="cepLoja" placeholder="CEP" required class="campo-pequeno">
                     <input type="text" id="refLoja" placeholder="🏷️ Ponto de referência">
                     <textarea id="obsLoja" rows="2" placeholder="📝 Observações"></textarea>
+                    <input type="hidden" id="latLoja">
+                    <input type="hidden" id="lngLoja">
 
-                    <!-- ÁREA DAS ENTREGAS — AQUI VAI ADICIONANDO MAIS -->
+                    <!-- ÁREA DAS ENTREGAS -->
                     <div id="areaEntregas">
-                        <!-- PRIMEIRA ENTREGA JÁ VAI APARECENDO -->
                         <div class="bloco-entrega" id="entrega-1">
                             <div class="titulo-entrega">
                                 📦 ENTREGA 1
@@ -182,10 +186,11 @@
                             
                             <label>📞 Telefone do cliente <span>*</span></label>
                             <input type="tel" class="telCliente" required>
+                            <input type="hidden" class="latDest">
+                            <input type="hidden" class="lngDest">
                         </div>
                     </div>
 
-                    <!-- BOTÃO PARA ADICIONAR MAIS ENTREGAS -->
                     <button type="button" class="btn btn-mais" onclick="adicionarEntrega()">
                         ➕ ADICIONAR NOVA ENTREGA
                     </button>
@@ -193,11 +198,13 @@
                     <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
 
                     <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALOR TOTAL</button>
+                    <p id="statusCalculo" class="sucesso-calculo"></p>
 
                     <div class="info-rota" id="infoRota" style="display: none;">
-                        📋 **RESUMO:**<br>
-                        🛣️ Rota: 🛵 Motoboy → 🏪 Loja → 📦 Todos os clientes<br>
-                        📍 Total de entregas: <span id="qtdTotalEntregas">1</span>
+                        📋 **RESUMO DA ROTA:**<br>
+                        🛵 Motoboy → 🏪 Loja → 📦 Todos os clientes<br>
+                        📍 Distância total: <span id="kmTotal">0,00 km</span><br>
+                        📦 Total de entregas: <span id="qtdTotalEntregas">1</span>
                     </div>
 
                     <div class="valor-final" id="valorFinal">R$ 0,00</div>
@@ -205,9 +212,9 @@
 
                     <div class="caixa-devolucao" id="caixaDevolucao">
                         <div class="aviso devolucao">🔄 DEVOLUÇÃO — Mínimo R$10,00</div>
-                        <button type="button" class="btn btn-roxo" id="btnCalcularDev">🔄 CALCULAR VOLTA</button>
+                        <button type="button" class="btn btn-roxo" id="btnCalcularDev">🔄 CALCULAR VALOR DA VOLTA</button>
                         <div class="valor-final roxo" id="valorDevolucao">R$ 0,00</div>
-                        <button type="button" class="btn btn-verde" id="btnConfirmaDev">✅ CONFIRMAR</button>
+                        <button type="button" class="btn btn-verde" id="btnConfirmaDev">✅ CONFIRMAR DEVOLUÇÃO</button>
                     </div>
                 </form>
 
@@ -234,7 +241,9 @@
         let watchId = null;
         let contadorEntregas = 1;
 
+        // 🧮 TABELA DE PREÇOS
         function calcularValorPorDistancia(km) {
+            km = Math.max(km, 3); // Mínimo de 3km
             if (km <= 3) return 10.00;
             if (km <= 4) return 11.00;
             if (km <= 5) return 12.00;
@@ -246,7 +255,36 @@
             return 17.00 + ((km - 10) * VALOR_KM_EXTRA);
         }
 
-        // ✅ FUNÇÃO PARA ADICIONAR NOVA ENTREGA
+        // 📏 CALCULA DISTÂNCIA ENTRE DOIS PONTOS (em km)
+        function calcularDistancia(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Raio da Terra em km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // 🌐 CONVERTE ENDEREÇO EM LATITUDE E LONGITUDE
+        async function pegarCoordenadas(enderecoCompleto) {
+            try {
+                const resposta = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(enderecoCompleto)}&format=json&limit=1&accept-language=pt-BR`);
+                const dados = await resposta.json();
+                if (dados.length > 0) {
+                    return {
+                        lat: parseFloat(dados[0].lat),
+                        lng: parseFloat(dados[0].lon)
+                    };
+                }
+                return null;
+            } catch (erro) {
+                return null;
+            }
+        }
+
+        // ➕ ADICIONA NOVA ENTREGA
         function adicionarEntrega() {
             contadorEntregas++;
             const area = document.getElementById('areaEntregas');
@@ -275,13 +313,15 @@
                 
                 <label>📞 Telefone do cliente <span>*</span></label>
                 <input type="tel" class="telCliente" required>
+                <input type="hidden" class="latDest">
+                <input type="hidden" class="lngDest">
             `;
 
             area.appendChild(bloco);
             document.getElementById('qtdTotalEntregas').textContent = contadorEntregas;
         }
 
-        // ✅ FUNÇÃO PARA APAGAR ENTREGA SE COLOCAU ERRADO
+        // 🗑️ APAGA ENTREGA
         function apagarEntrega(numero) {
             document.getElementById(`entrega-${numero}`).remove();
             contadorEntregas--;
@@ -306,6 +346,10 @@
             if(localSalvo) {
                 let ref = localSalvo.referencia ? ` | Ref: ${localSalvo.referencia}` : '';
                 document.getElementById('dadosMoto').textContent = `${localSalvo.rua}, ${localSalvo.numero} - ${localSalvo.bairro}${ref}`;
+                if(localSalvo.lat && localSalvo.lng) {
+                    document.getElementById('latMoto').value = localSalvo.lat;
+                    document.getElementById('lngMoto').value = localSalvo.lng;
+                }
             }
         }
 
@@ -319,7 +363,9 @@
                     numero: dados.address.house_number || 'S/N',
                     bairro: dados.address.suburb || dados.address.neighbourhood || dados.address.district || 'Bairro não identificado',
                     cep: dados.address.postcode || '',
-                    referencia: ''
+                    referencia: '',
+                    lat: lat,
+                    lng: lng
                 };
                 return endereco;
             } catch (erro) {
@@ -328,11 +374,14 @@
                     numero: '',
                     bairro: 'Atualizado automaticamente',
                     cep: '',
-                    referencia: ''
+                    referencia: '',
+                    lat: lat,
+                    lng: lng
                 };
             }
         }
 
+        // 🛵 LIGA LOCALIZAÇÃO DO MOTOBOY
         document.getElementById('btnIniciarAuto').onclick = async () => {
             if(document.getElementById('senhaMotoboy').value !== SENHA_MOTOBOY) {alert('❌ Senha incorreta!'); return;}
             if(!navigator.geolocation) {alert('❌ Seu celular não suporta localização!'); return;}
@@ -354,6 +403,8 @@
                     document.getElementById('bairroMoto').value = endereco.bairro;
                     document.getElementById('cepMoto').value = endereco.cep;
                     document.getElementById('refMoto').value = endereco.referencia;
+                    document.getElementById('latMoto').value = lat;
+                    document.getElementById('lngMoto').value = lng;
 
                     localSalvo = endereco;
                     localStorage.setItem('localMoto', JSON.stringify(localSalvo));
@@ -372,7 +423,59 @@
             );
         };
 
-        // 📤 ENVIA TODAS AS ENTREGAS JUNTAS
+        // 🚀 CALCULA O VALOR TOTAL DE VERDADE
+        document.getElementById('btnCalcular').onclick = async () => {
+            const status = document.getElementById('statusCalculo');
+            status.textContent = '🔄 Buscando endereços e calculando rota...';
+            status.className = 'sucesso-calculo';
+
+            // Verifica se tem localização do motoboy
+            const latMoto = document.getElementById('latMoto').value || (localSalvo?.lat || null);
+            const lngMoto = document.getElementById('lngMoto').value || (localSalvo?.lng || null);
+            if(!latMoto || !lngMoto) {
+                status.textContent = '❌ Motoboy ainda não ligou a localização!';
+                status.className = 'erro-calculo';
+                return;
+            }
+
+            // Monta endereço da loja e pega coordenadas
+            const enderecoLoja = `${document.getElementById('ruaLoja').value}, ${document.getElementById('numLoja').value}, ${document.getElementById('bairroLoja').value}, ${document.getElementById('cepLoja').value}, Brasil`;
+            const coordsLoja = await pegarCoordenadas(enderecoLoja);
+            if(!coordsLoja) {
+                status.textContent = '❌ Não encontrei o endereço da loja! Verifique os dados.';
+                status.className = 'erro-calculo';
+                return;
+            }
+
+            // Calcula distância: Motoboy → Loja
+            let distanciaTotal = calcularDistancia(latMoto, lngMoto, coordsLoja.lat, coordsLoja.lng);
+
+            // Pega todas as entregas e calcula distância Loja → cada entrega
+            const blocos = document.querySelectorAll('.bloco-entrega');
+            for(let i = 0; i < blocos.length; i++) {
+                const bloco = blocos[i];
+                const enderecoDest = `${bloco.querySelector('.ruaDest').value}, ${bloco.querySelector('.numDest').value}, ${bloco.querySelector('.bairroDest').value}, ${bloco.querySelector('.cepDest').value}, Brasil`;
+                const coordsDest = await pegarCoordenadas(enderecoDest);
+                if(!coordsDest) {
+                    status.textContent = `❌ Não encontrei o endereço da Entrega ${i+1}! Verifique os dados.`;
+                    status.className = 'erro-calculo';
+                    return;
+                }
+                distanciaTotal += calcularDistancia(coordsLoja.lat, coordsLoja.lng, coordsDest.lat, coordsDest.lng);
+            }
+
+            // Calcula valor final
+            const valorTotal = calcularValorPorDistancia(distanciaTotal);
+
+            // Mostra tudo na tela
+            document.getElementById('infoRota').style.display = 'block';
+            document.getElementById('kmTotal').textContent = `${distanciaTotal.toFixed(2).replace('.', ',')} km`;
+            document.getElementById('valorFinal').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+            status.textContent = '✅ Cálculo feito com sucesso!';
+            status.className = 'sucesso-calculo';
+        };
+
+        // 📤 ENVIA PEDIDO COMPLETO
         document.getElementById('formPedido').addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -407,7 +510,7 @@
             alert(`✅ ${entregas.length} entrega(s) enviada(s) com sucesso!`);
         });
 
-        // 📥 CARREGA TODAS AS ENTREGAS PARA O MOTOBOY VER
+        // 📥 CARREGA DADOS PARA O MOTOBOY
         function carregarDadosPedido() {
             const p = JSON.parse(localStorage.getItem('pedidoAtual'));
             if(p) {
@@ -480,17 +583,13 @@
                 document.getElementById('bairroMoto').value = localSalvo.bairro;
                 document.getElementById('cepMoto').value = localSalvo.cep;
                 document.getElementById('refMoto').value = localSalvo.referencia;
+                if(localSalvo.lat && localSalvo.lng) {
+                    document.getElementById('latMoto').value = localSalvo.lat;
+                    document.getElementById('lngMoto').value = localSalvo.lng;
+                }
             }
 
-            document.getElementById('btnCalcular').onclick = () => {
-                const kmExemplo = 4.7;
-                const valor = calcularValorPorDistancia(kmExemplo);
-                alert('🗺️ Rota calculada!');
-                document.getElementById('infoRota').style.display='block';
-                document.getElementById('kmTotal').textContent = `${kmExemplo.toFixed(2).replace('.', ',')} km`;
-                document.getElementById('valorFinal').textContent = `R$ ${valor.toFixed(2).replace('.', ',')}`;
-            };
-
+            // Cálculo de devolução (exemplo)
             document.getElementById('btnCalcularDev').onclick = () => {
                 const kmExemplo = 3.2;
                 document.getElementById('valorDevolucao').textContent = `R$ ${calcularValorPorDistancia(kmExemplo).toFixed(2).replace('.', ',')}`;
