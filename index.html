@@ -663,11 +663,10 @@
                 return;
             }
 
-            // ✅ Se já tem localização real do motoboy, já calcula a distância!
+            // ✅ Calcula distância real se já tiver localização
             if(localMoto[0] !== LOCAL_PADRAO[0] || localMoto[1] !== LOCAL_PADRAO[1]) {
                 await calcularDistanciaMotoAteLoja();
             } else {
-                // Se não tem localização, usa 0 temporariamente
                 dadosPedido.kmAteLoja = 0;
                 dadosPedido.valorDeslocamento = 0;
             }
@@ -713,6 +712,7 @@
             dadosPedido = {
                 ...dadosPedido,
                 nomeLoja, wppLoja, ruaLoja, numLoja, bairroLoja, compLoja,
+                valorGorjeta: valorGorjeta,
                 total: valorBase + valorGorjeta,
                 linkLojaMaps,
                 entregas: Array.from(entregas).map((blk, i) => ({
@@ -734,11 +734,17 @@
 
         function enviarPedido() {
             const p = dadosPedido;
+            if (!p.nomeLoja) {
+                alert('⚠️ Primeiro calcule o pedido antes de enviar!');
+                return;
+            }
+
             let msg = `📤 NOVO PEDIDO - MTZ EXPRESS 🚀\n\n`;
             msg += `🏪 LOJA: ${p.nomeLoja}\n📞 WhatsApp: ${p.wppLoja}\n`;
             msg += `📍 ENDEREÇO LOJA: ${p.ruaLoja}, ${p.numLoja} - ${p.bairroLoja}`;
             if(p.compLoja) msg += ` (${p.compLoja})`;
-            msg += `\n🛵 Distância até loja: ${p.kmAteLoja.toFixed(2).replace('.', ',')} km`;
+            msg += `\n🛵 Distância até loja: ${(p.kmAteLoja || 0).toFixed(2).replace('.', ',')} km`;
+            msg += `\n💸 Valor deslocamento: R$ ${(p.valorDeslocamento || 0).toFixed(2).replace('.', ',')}`;
             msg += `\n🗺️ IR ATÉ A LOJA: ${p.linkLojaMaps}`;
             msg += `\n\n`;
 
@@ -749,13 +755,14 @@
                 msg += `\n🗺️ IR ATÉ O CLIENTE: ${e.linkMaps}\n\n`;
             });
 
-            msg += `🛵 Deslocamento até loja: R$ ${p.valorDeslocamento.toFixed(2).replace('.', ',')}\n`;
-            msg += `📦 Valor entregas: R$ ${p.totalEntregas.toFixed(2).replace('.', ',')}\n`;
-            msg += `🤑 Gorjeta: R$ ${p.valorGorjeta.toFixed(2).replace('.', ',')}\n`;
-            msg += `💰 TOTAL: R$ ${(p.valorDeslocamento + p.totalEntregas + p.valorGorjeta).toFixed(2).replace('.', ',')}\n\n`;
+            msg += `🛵 Deslocamento até loja: R$ ${(p.valorDeslocamento || 0).toFixed(2).replace('.', ',')}\n`;
+            msg += `📦 Valor entregas: R$ ${(p.totalEntregas || 0).toFixed(2).replace('.', ',')}\n`;
+            msg += `🤑 Gorjeta: R$ ${(valorGorjeta || 0).toFixed(2).replace('.', ',')}\n`;
+            msg += `💰 TOTAL: R$ ${((p.valorDeslocamento || 0) + (p.totalEntregas || 0) + (valorGorjeta || 0)).toFixed(2).replace('.', ',')}\n\n`;
             msg += `✅ SEM TAXAS - DIRETO COM O MOTOBOY!`;
 
-            window.open(`https://wa.me/${SEU_NUMERO}?text=${encodeURIComponent(msg)}`, '_blank');
+            const urlWpp = `https://wa.me/${SEU_NUMERO}?text=${encodeURIComponent(msg)}`;
+            window.open(urlWpp, '_blank');
         }
 
         function pegarLocalizacao() {
@@ -774,7 +781,6 @@
                         L.marker(localMoto).addTo(mapa).bindPopup('Você está aqui').openPopup();
                     }
 
-                    // ✅ Quando ativar localização, já calcula e atualiza TUDO!
                     if(coordenadasLoja) {
                         await calcularDistanciaMotoAteLoja();
                         document.getElementById('dadosRota').classList.remove('escondido');
@@ -868,4 +874,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
