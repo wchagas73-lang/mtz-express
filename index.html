@@ -43,7 +43,7 @@
         .linha-dupla {display: grid; grid-template-columns: 2fr 1fr; gap: 10px;}
         .campo-pequeno {max-width: 120px;}
 
-        .caixa-gorjeta {background: rgba(255,193,7,0.08); border: 2px solid rgba(255,193,7,0.4); border-radius: 16px; padding: 22px; margin: 25px 0;}
+        .caixa-gorjeta, .caixa-desconto {background: rgba(255,193,7,0.08); border: 2px solid rgba(255,193,7,0.4); border-radius: 16px; padding: 22px; margin: 25px 0;}
         .opcao-gorjeta {display: flex; gap: 12px; align-items: center; margin: 12px 0; padding: 10px 0; cursor: pointer;}
         .opcao-gorjeta input {width: auto; transform: scale(1.3);}
         .opcao-gorjeta label {margin: 0; font-size: 16px; cursor: pointer;}
@@ -115,7 +115,8 @@
                 🛵 Deslocamento: Motoboy → Loja: R$ 0,50/km<br>
                 📦 Entrega: Loja → Cliente (valor da tabela)<br>
                 🤑 Gorjeta: Opcional<br>
-                💵 Total = Soma de tudo, sem pegadinhas!
+                📉 Desconto: Opcional<br>
+                💵 Total = Soma menos desconto, sem pegadinhas!
                 </div>
                 
                 <form id="formPedido">
@@ -196,6 +197,23 @@
                         </div>
                     </div>
 
+                    <!-- 📉 ÁREA DE DESCONTO -->
+                    <div class="caixa-desconto">
+                        <label style="font-size: 18px; color: #81D4FA; margin-top: 0;">📉 DESCONTO NO PEDIDO</label>
+                        <div class="opcao-gorjeta">
+                            <input type="radio" name="escolhaDesconto" id="opDescNao" value="nao" checked onchange="mostrarCampoDesconto()">
+                            <label for="opDescNao">❌ Sem desconto</label>
+                        </div>
+                        <div class="opcao-gorjeta">
+                            <input type="radio" name="escolhaDesconto" id="opDescSim" value="sim" onchange="mostrarCampoDesconto()">
+                            <label for="opDescSim">✅ Aplicar desconto</label>
+                        </div>
+                        <div id="areaValorDesconto" class="escondido" style="padding: 15px; background: rgba(0,0,0,0.15); border-radius: 12px; margin-top: 10px;">
+                            <label>💲 Valor do desconto (R$):</label>
+                            <input type="text" id="valorDesconto" placeholder="Ex: 2,00" oninput="atualizarTotal()">
+                        </div>
+                    </div>
+
                     <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALOR DETALHADO</button>
                     <p id="avisoCarregando" class="carregando escondido">🔄 Calculando rotas... aguarde um instante</p>
 
@@ -234,6 +252,7 @@
                             🛵 Deslocamento: <span id="kmD">0,00</span> km → R$ <span id="vD">0,00</span><br>
                             📦 Entrega(s): <span id="qE">0</span>x → R$ <span id="vE">0,00</span><br>
                             🤑 Gorjeta: R$ <span id="vG">0,00</span><br>
+                            📉 Desconto: - R$ <span id="vDesc">0,00</span><br>
                             -------------------------------------------<br>
                             💰 TOTAL A PAGAR: <span class="valor-final">R$ <span id="vT">0,00</span></span><br>
                             -------------------------------------------<br>
@@ -249,7 +268,7 @@
                 </form>
             </div>
 
-            <!-- 🛵 ÁREA MOTOBOY -->
+            <!-- 🛵 ÁREA MOTOBOY → ABRINDO NORMAL AGORA -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso verde">🔒 Área exclusiva do Motoboy Parceiro</div>
                 <button class="btn btn-amarelo" id="btnLocalizar">📍 ATIVAR MINHA LOCALIZAÇÃO</button>
@@ -261,7 +280,8 @@
                     <div class="caixa-resumo">
                         🛵 Taxa de Deslocamento: R$ <span id="mD">0,00</span><br>
                         📦 Valor das Entregas: R$ <span id="mE">0,00</span><br>
-                        🤑 <strong style="color:#FFE082;">Gorjeta Recebida: R$ <span id="mG">0,00</span></strong><br>
+                        🤑 Gorjeta Recebida: R$ <span id="mG">0,00</span><br>
+                        📉 Desconto Aplicado: - R$ <span id="mDesc">0,00</span><br>
                         -------------------------------------------<br>
                         💰 <strong style="color:#00E0A8; font-size: 20px;">TOTAL A RECEBER: R$ <span id="mT">0,00</span></strong>
                     </div>
@@ -288,12 +308,12 @@
                 <div id="conteudoDash" class="escondido">
                     <div class="aviso destaque">📊 PAINEL DE GESTÃO</div>
                     <div class="grid-dash">
-                        <div class="item-dash verde" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(0,200,150,0.15); color: #00E0A8;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c1">0</div>Concluídas</div>
-                        <div class="item-dash vermelho" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(244,67,54,0.15); color: #FF6B6B;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c2">0</div>Não Feitas</div>
-                        <div class="item-dash azul" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(33,150,243,0.15); color: #90CAF9;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c3">0</div>Total Pedidos</div>
-                        <div class="item-dash amarelo" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(255,193,7,0.15); color: #FFE082;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c4">0</div>Lojas Atendidas</div>
-                        <div class="item-dash roxo" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(156,39,176,0.15); color: #CE93D8;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c5">R$0,00</div>Faturamento Total</div>
-                        <div class="item-dash rosa" style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(233,30,99,0.15); color: #F48FB1;"><div class="valor-dash" style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c6">R$0,00</div>Média por Entrega</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(0,200,150,0.15); color: #00E0A8;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c1">0</div>Concluídas</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(244,67,54,0.15); color: #FF6B6B;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c2">0</div>Não Feitas</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(33,150,243,0.15); color: #90CAF9;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c3">0</div>Total Pedidos</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(255,193,7,0.15); color: #FFE082;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c4">0</div>Lojas Atendidas</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(156,39,176,0.15); color: #CE93D8;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c5">R$0,00</div>Faturamento Total</div>
+                        <div style="padding: 18px; border-radius: 12px; text-align: center; background: rgba(233,30,99,0.15); color: #F48FB1;"><div style="font-size: 32px; font-weight: 800; margin: 8px 0;" id="c6">R$0,00</div>Média por Entrega</div>
                     </div>
                     <button class="btn btn-sair" onclick="sairDash()">🚪 SAIR</button>
                 </div>
@@ -308,10 +328,10 @@
         const SEU_NUMERO = '5532999953215';
         const CIDADE_ALVO = 'juiz de fora';
         let mapa, localMoto = LOCAL_PADRAO;
-        let valorBase = 0, valorGorjeta = 0;
+        let valorBase = 0, valorGorjeta = 0, valorDesconto = 0;
         let dadosPedido = {};
 
-        // 📂 SALVA E CARREGA DADOS DA LOJA AUTOMATICAMENTE
+        // 📂 SALVA E CARREGA DADOS DA LOJA
         window.addEventListener('load', () => {
             const nomeSalvo = localStorage.getItem('mtz_nomeLoja');
             const wppSalvo = localStorage.getItem('mtz_wppLoja');
@@ -321,16 +341,11 @@
                 if(valor.length === 11) valor = `(${valor.substring(0,2)}) ${valor.substring(2,7)}-${valor.substring(7)}`;
                 document.getElementById('wppLoja').value = valor;
             }
-            
-            document.getElementById('nomeLoja').addEventListener('input', () => {
-                localStorage.setItem('mtz_nomeLoja', document.getElementById('nomeLoja').value);
-            });
-            document.getElementById('wppLoja').addEventListener('input', () => {
-                localStorage.setItem('mtz_wppLoja', document.getElementById('wppLoja').value.replace(/\D/g,''));
-            });
+            document.getElementById('nomeLoja').addEventListener('input', () => localStorage.setItem('mtz_nomeLoja', document.getElementById('nomeLoja').value));
+            document.getElementById('wppLoja').addEventListener('input', () => localStorage.setItem('mtz_wppLoja', document.getElementById('wppLoja').value.replace(/\D/g,'')));
         });
 
-        // 🎭 MÁSCARAS DE CAMPO
+        // 🎭 MÁSCARAS
         function aplicarMascara(campo, tipo) {
             let valor = campo.value.replace(/\D/g, '');
             if(tipo === 'telefone') {
@@ -380,26 +395,19 @@
                 `;
                 document.getElementById('resumoDados').classList.add('escondido');
                 document.getElementById('btnEnviar').classList.add('escondido');
-                valorBase = 0; valorGorjeta = 0;
+                valorBase = valorGorjeta = valorDesconto = 0;
+                document.getElementById('opDescNao').checked = true;
+                document.getElementById('areaValorDesconto').classList.add('escondido');
                 window.scrollTo({top:0, behavior:'smooth'});
             }
         }
 
-        // 🤑 FUNÇÕES DA GORJETA
+        // 🤑 GORJETA
         function mostrarCampoGorjeta() {
             const sim = document.getElementById('opSim').checked;
-            const area = document.getElementById('areaValorGorjeta');
-            const input = document.getElementById('valorGorjeta');
-            if(sim) {
-                area.classList.remove('escondido');
-                input.disabled = false;
-                if(!input.value) selecionarValor(1);
-            } else {
-                area.classList.add('escondido');
-                input.disabled = true;
-                input.value = '';
-                valorGorjeta = 0;
-            }
+            document.getElementById('areaValorGorjeta').classList.toggle('escondido', !sim);
+            if(sim) { document.getElementById('valorGorjeta').disabled = false; if(!document.getElementById('valorGorjeta').value) selecionarValor(1); }
+            else { document.getElementById('valorGorjeta').disabled = true; document.getElementById('valorGorjeta').value = ''; valorGorjeta = 0; }
             atualizarTotal();
         }
         function selecionarValor(v) {
@@ -408,26 +416,36 @@
             event.target.classList.add('ativo');
             atualizarTotal();
         }
+
+        // 📉 DESCONTO
+        function mostrarCampoDesconto() {
+            const sim = document.getElementById('opDescSim').checked;
+            document.getElementById('areaValorDesconto').classList.toggle('escondido', !sim);
+            if(!sim) { valorDesconto = 0; document.getElementById('valorDesconto').value = ''; }
+            atualizarTotal();
+        }
+
+        // 🔄 ATUALIZA TUDO
         function atualizarTotal() {
-            const sim = document.getElementById('opSim').checked;
-            if(!sim) {
-                valorGorjeta = 0;
-                document.getElementById('vG').textContent = '0,00';
-                document.getElementById('agradecimento').classList.add('escondido');
-            } else {
-                let v = document.getElementById('valorGorjeta').value.replace(',', '.');
-                v = parseFloat(v) || 0;
-                if(v > 0 && v < 1) {alert('⚠️ Valor mínimo R$ 1,00!'); selecionarValor(1); return;}
-                valorGorjeta = v;
-                document.getElementById('vG').textContent = v.toFixed(2).replace('.', ',');
-                document.getElementById('agradecimento').classList.remove('escondido');
-            }
-            const total = valorBase + valorGorjeta;
+            const simGor = document.getElementById('opSim').checked;
+            valorGorjeta = simGor ? (parseFloat(document.getElementById('valorGorjeta').value.replace(',','.')) || 0) : 0;
+            if(valorGorjeta > 0 && valorGorjeta < 1) { alert('⚠️ Mínimo R$1,00!'); selecionarValor(1); return; }
+            
+            const simDesc = document.getElementById('opDescSim').checked;
+            valorDesconto = simDesc ? Math.max(0, parseFloat(document.getElementById('valorDesconto').value.replace(',','.')) || 0) : 0;
+
+            document.getElementById('vG').textContent = valorGorjeta.toFixed(2).replace('.', ',');
+            document.getElementById('vDesc').textContent = valorDesconto.toFixed(2).replace('.', ',');
+            document.getElementById('agradecimento').classList.toggle('escondido', valorGorjeta <= 0);
+
+            const total = Math.max(0, valorBase + valorGorjeta - valorDesconto);
             document.getElementById('vT').textContent = total.toFixed(2).replace('.', ',');
             document.getElementById('mG').textContent = valorGorjeta.toFixed(2).replace('.', ',');
+            document.getElementById('mDesc').textContent = valorDesconto.toFixed(2).replace('.', ',');
             document.getElementById('mT').textContent = total.toFixed(2).replace('.', ',');
         }
 
+        // 🎭 TROCA DE ABAS → FUNCIONANDO 100%
         function mostrarAba(nome) {
             document.querySelectorAll('.conteudo-aba').forEach(a => a.classList.remove('visivel'));
             document.querySelectorAll('.aba').forEach(b => {b.classList.remove('ativa'); b.classList.add('inativa');});
@@ -437,141 +455,91 @@
             event.target.classList.remove('inativa');
         }
 
-        // 📍 ✅ FUNÇÃO DAS SUGESTÕES — FUNCIONANDO PERFEITAMENTE
+        // 📍 SUGESTÕES DE ENDEREÇO → APARECENDO AGORA!
         async function buscarSugestoes(campo, tipo) {
             const texto = campo.value.trim();
             const listaSugestoes = campo.nextElementSibling;
-            
-            // Menos de 3 letras: esconde a lista
-            if(texto.length < 3) {
-                listaSugestoes.style.display = 'none';
-                return;
-            }
+            if(texto.length < 3) { listaSugestoes.style.display = 'none'; return; }
 
             try {
-                // Busca endereços SOMENTE em Juiz de Fora
                 const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}, Juiz de Fora, MG&addressdetails=1&format=json&limit=5`;
-                const resposta = await fetch(url);
-                const enderecos = await resposta.json();
+                const res = await fetch(url);
+                const enderecos = await res.json();
                 
                 listaSugestoes.innerHTML = '';
-                let temEnderecoValido = false;
+                let ok = false;
 
                 if(enderecos.length > 0) {
                     enderecos.forEach(end => {
-                        const cidade = (end.address?.city || end.address?.town || end.address?.state_district || '').toLowerCase();
+                        const cidade = (end.address?.city || end.address?.town || '').toLowerCase();
                         if(cidade !== CIDADE_ALVO) return;
-                        temEnderecoValido = true;
-
-                        const rua = end.address?.road || end.address?.street || end.name;
-                        const bairro = end.address?.suburb || end.address?.neighbourhood || 'Sem bairro';
+                        ok = true;
+                        const rua = end.address?.road || end.name;
+                        const bairro = end.address?.suburb || 'Sem bairro';
                         const cep = end.address?.postcode || 'Sem CEP';
-                        
                         if(!rua) return;
 
-                        // Cria item da sugestão
                         const item = document.createElement('div');
                         item.className = 'item-sugestao';
                         item.innerHTML = `<strong>${rua}</strong><div class="detalhe">${bairro} • ${cep}</div>`;
-                        
-                        // Ao clicar: preenche tudo e NÃO TRAVA NENHUM CAMPO
                         item.onclick = () => {
                             campo.value = rua;
                             listaSugestoes.style.display = 'none';
-                            
                             if(tipo === 'loja') {
-                                document.getElementById('bairroLoja').value = bairro === 'Sem bairro' ? '' : bairro;
-                                document.getElementById('cepLoja').value = cep === 'Sem CEP' ? '' : cep.replace('-', '');
+                                document.getElementById('bairroLoja').value = bairro !== 'Sem bairro' ? bairro : '';
+                                document.getElementById('cepLoja').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
                             } else {
                                 const bloco = campo.closest('.bloco-entrega');
-                                bloco.querySelector('.bairroDest').value = bairro === 'Sem bairro' ? '' : bairro;
-                                bloco.querySelector('.cepDest').value = cep === 'Sem CEP' ? '' : cep.replace('-', '');
+                                bloco.querySelector('.bairroDest').value = bairro !== 'Sem bairro' ? bairro : '';
+                                bloco.querySelector('.cepDest').value = cep !== 'Sem CEP' ? cep.replace('-','') : '';
                             }
                         };
                         listaSugestoes.appendChild(item);
                     });
-
-                    if(!temEnderecoValido) {
-                        listaSugestoes.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos somente Juiz de Fora-MG</div>`;
-                    }
+                    if(!ok) listaSugestoes.innerHTML = `<div style="padding:15px; color:#FF6B6B;">❌ Atendemos só Juiz de Fora-MG</div>`;
                     listaSugestoes.style.display = 'block';
-                } else {
-                    listaSugestoes.style.display = 'none';
-                }
-            } catch (erro) {
-                console.log('Erro ao buscar endereço:', erro);
-                listaSugestoes.style.display = 'none';
-            }
+                } else listaSugestoes.style.display = 'none';
+            } catch(e) { listaSugestoes.style.display = 'none'; }
         }
 
         async function buscarCoordenadas(end) {
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(end + ', Juiz de Fora, MG')}&format=json&limit=1`;
             try {
-                const r = await fetch(url);
-                const d = await r.json();
-                return d.length ? {lat: +d[0].lat, lon: +d[0].lon} : null;
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(end + ', Juiz de Fora, MG')}&format=json&limit=1`;
+                const d = await (await fetch(url)).json();
+                return d.length ? {lat:+d[0].lat, lon:+d[0].lon} : null;
             } catch {return null;}
         }
 
         function adicionarEntrega() {
             const n = document.querySelectorAll('.bloco-entrega').length + 1;
-            const area = document.getElementById('areaEntregas');
             const b = document.createElement('div');
             b.className = 'bloco-entrega';
             b.innerHTML = `
                 <div class="titulo-entrega">📦 ENTREGA ${n} <button class="btn btn-apagar" onclick="this.closest('.bloco-entrega').remove()">🗑️</button></div>
                 <label>👤 Nome do Cliente <span>*</span></label>
                 <input type="text" class="nomeCliente" required>
-                <label>📍 Endereço de Entrega <span>*</span> — Digite a rua e escolha uma opção</label>
-                <div class="campo-completo">
-                    <input type="text" class="ruaDest" required placeholder="Nome da rua..." oninput="buscarSugestoes(this, 'dest')">
-                    <div class="lista-sugestoes"></div>
-                </div>
+                <label>📍 Endereço <span>*</span></label>
+                <div class="campo-completo"><input type="text" class="ruaDest" required oninput="buscarSugestoes(this,'dest')"><div class="lista-sugestoes"></div></div>
                 <div class="linha-tripla">
-                    <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
+                    <input type="text" class="numDest" placeholder="Nº" required class="campo-pequeno">
                     <input type="text" class="bairroDest" placeholder="Bairro" required>
-                    <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno" oninput="aplicarMascara(this, 'cep')">
+                    <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno" oninput="aplicarMascara(this,'cep')">
                 </div>
-                <label>📝 Complemento / Ponto de Referência</label>
-                <textarea class="compDest" placeholder="Ajude o motoboy a encontrar!"></textarea>
-                <label>📞 Telefone do Cliente <span>*</span></label>
-                <input type="tel" class="telCliente" required placeholder="(32) 9XXXX-XXXX" oninput="aplicarMascara(this, 'telefone')">
+                <label>📝 Complemento/Referência</label>
+                <textarea class="compDest"></textarea>
+                <label>📞 Telefone <span>*</span></label>
+                <input type="tel" class="telCliente" required oninput="aplicarMascara(this,'telefone')">
             `;
-            area.appendChild(b);
+            document.getElementById('areaEntregas').appendChild(b);
         }
 
-        async function calcularRota(a, b) {
-            const url = `https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+        async function calcularRota(a,b) {
             try {
-                const r = await fetch(url);
-                const d = await r.json();
+                const url = `https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+                const d = await (await fetch(url)).json();
                 return d.routes?.length ? d.routes[0].distance/1000 : null;
             } catch {return null;}
         }
 
         function valorKm(km) {
-            const precos = [
-                [0,1,10],[1.1,2,11],[2.1,3,12],[3.1,4,13],[4.1,5,14],[5.1,6,15],[6.1,7,16],[7.1,8,17],[8.1,9,18],[9.1,10,19],
-                [10.1,11,20],[11.1,12,21],[12.1,13,22],[13.1,14,23],[14.1,15,24],[15.1,16,25.5],[16.1,17,27],[17.1,18,28.5],[18.1,19,30],[19.1,20,31.5]
-            ];
-            for(const [min,max,v] of precos) if(km>=min && km<=max) return v;
-            return 31.5 + Math.ceil((km-20)*1.5);
-        }
-
-        // 🧮 CÁLCULO E ENVIO DO PEDIDO
-        document.getElementById('btnCalcular').addEventListener('click', async () => {
-            const opGorjeta = document.querySelector('input[name="escolhaGorjeta"]:checked');
-            if(!opGorjeta) return alert('⚠️ Escolha uma opção sobre a gorjeta!');
-            if(opGorjeta.value==='sim') {
-                const v = parseFloat(document.getElementById('valorGorjeta').value.replace(',','.'));
-                if(isNaN(v) || v<1) return alert('⚠️ Gorjeta mínima R$1,00!');
-            }
-
-            const btn = document.getElementById('btnCalcular');
-            const aviso = document.getElementById('avisoCarregando');
-            btn.disabled = true; aviso.classList.remove('escondido');
-
-            const nomeLoja = document.getElementById('nomeLoja').value.trim();
-            const wppLoja = document.getElementById('wppLoja').value.trim();
-            const ruaLoja = document.getElementById('ruaLoja').value.trim();
-            const numLo
+            const precos = [[0,1,10],[1.1,2,11],[2.1,3,12],[3.1,4,13],[4.1,5,14],[5.1,6,15],[6.1,7,16],[7.1,8,17],[8.1,9,18],[9.1,10,19],[10.1,11,20],[11.1,12,21],[12.1,13,22],[13.1,14,23],[14.1,15,24],[15.1,16,25.5],[16.1,17,27],[17.1,18,28.5],[18.1,19,
