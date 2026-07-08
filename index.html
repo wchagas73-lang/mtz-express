@@ -34,7 +34,6 @@
         input, textarea {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         textarea {resize: none; height: 80px;}
         
-        /* ✅ AJUSTE CRÍTICO: Lista de sugestões SEMPRE visível e por cima */
         .lista-sugestoes {
             position: absolute;
             top: 100%;
@@ -121,7 +120,6 @@
                 <button class="aba inativa" onclick="mostrarAba('dashboard')">📊 Painel de Gestão</button>
             </div>
 
-            <!-- 🏪 ÁREA DO LOJISTA -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="aviso destaque">💡 COMO USAR CERTO:<br>
                 ✅ Digite <strong>apenas o nome da rua/avenida</strong><br>
@@ -181,7 +179,6 @@
                     <button type="button" class="btn btn-azul" onclick="adicionarEntrega()">➕ ADICIONAR NOVA ENTREGA</button>
                     <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
 
-                    <!-- 🤑 ÁREA DE GORJETA -->
                     <div class="caixa-gorjeta">
                         <label style="font-size: 18px; color: #FFE082; margin-top: 0;">💵 GORJETA PARA O MOTOBOY <span>*</span></label>
                         
@@ -211,7 +208,6 @@
                     <button type="button" class="btn btn-azul" id="btnCalcular">🗺️ CALCULAR VALOR TOTAL</button>
                     <p id="avisoCarregando" class="carregando escondido">🔄 Calculando rotas... aguarde um instante</p>
 
-                    <!-- 📋 TABELA DE PREÇOS -->
                     <h3 style="margin-top:30px; color:#00E0A8;">📋 TABELA DE PREÇOS OFICIAIS (Loja → Cliente)</h3>
                     <table class="tabela-precos">
                         <tr><th>Distância</th><th>Valor (R$)</th></tr>
@@ -238,7 +234,6 @@
                         <tr><td>Acima de 20 km</td><td>+ R$ 1,50 por km rodado</td></tr>
                     </table>
 
-                    <!-- 📝 RESUMO DO PEDIDO -->
                     <div id="resumoDados" class="escondido">
                         <div class="caixa-resumo">
                             📋 <strong>RESUMO COMPLETO DO PEDIDO</strong><br>
@@ -256,12 +251,10 @@
                         </div>
                     </div>
 
-                    <!-- ✅ BOTÃO ENVIAR WHATSAPP -->
                     <button type="button" class="btn btn-whats escondido" id="btnEnviar" onclick="enviarPedido()">📤 ENVIAR PEDIDO NO WHATSAPP</button>
                 </form>
             </div>
 
-            <!-- 🛵 ÁREA DO MOTOBOY PARCEIRO -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <div class="aviso verde">🔒 Área exclusiva do Motoboy Parceiro</div>
                 <button class="btn btn-amarelo" id="btnLocalizar" onclick="pegarLocalizacao()">📍 ATIVAR MINHA LOCALIZAÇÃO</button>
@@ -287,7 +280,6 @@
                 </div>
             </div>
 
-            <!-- 📊 PAINEL DE GESTÃO -->
             <div class="conteudo-aba" id="abaDashboard">
                 <div id="telaLogin" class="area-senha">
                     <div class="aviso segredo">🔒 ÁREA CONFIDENCIAL</div>
@@ -469,7 +461,6 @@
             }
         }
 
-        // ✅ BUSCA DE SUGESTÕES MELHORADA - RÁPIDA E SEM ERRO
         async function buscarSugestoes(campo, tipo) {
             const texto = campo.value.trim();
             const lista = campo.nextElementSibling;
@@ -532,7 +523,6 @@
             }
         }
 
-        // ✅ BUSCA DE COORDENADAS MAIS TOLERANTE - NÃO FALHA MAIS
         async function buscarCoordenadas(endereco) {
             try {
                 const enderecoLimpo = endereco
@@ -547,7 +537,6 @@
                     return { lat: +dados[0].lat, lon: +dados[0].lon };
                 }
 
-                // Tenta sem número se não achar
                 const semNumero = enderecoLimpo.replace(/\d+/g, '').trim();
                 if (semNumero.length > 5) {
                     const res2 = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(semNumero + ', Juiz de Fora, MG')}&format=json&limit=1`);
@@ -619,6 +608,22 @@
             return 31.50 + ((Math.ceil(km) - 20) * 1.50);
         }
 
+        async function calcularDistanciaMotoAteLoja() {
+            if(!coordenadasLoja || !localMoto) return;
+
+            const kmAteLoja = await calcularRota({lat: localMoto[0], lon: localMoto[1]}, coordenadasLoja) || 0;
+            const valorDeslocamento = kmAteLoja * TAXA_KM;
+
+            document.getElementById('kmD').textContent = kmAteLoja.toFixed(2).replace('.', ',');
+            document.getElementById('vD').textContent = valorDeslocamento.toFixed(2).replace('.', ',');
+
+            dadosPedido.kmAteLoja = kmAteLoja;
+            dadosPedido.valorDeslocamento = valorDeslocamento;
+
+            valorBase = valorDeslocamento + (dadosPedido.totalEntregas || 0);
+            atualizarTotal();
+        }
+
         async function calcularValorTotal() {
             const nomeLoja = document.getElementById('nomeLoja').value.trim();
             const wppLoja = document.getElementById('wppLoja').value.trim();
@@ -658,8 +663,17 @@
                 return;
             }
 
-            const kmAteLoja = await calcularRota(localMoto, coordenadasLoja) || 0;
-            const valorDeslocamento = kmAteLoja * TAXA_KM;
+            // ✅ Se já tem localização real do motoboy, já calcula a distância!
+            if(localMoto[0] !== LOCAL_PADRAO[0] || localMoto[1] !== LOCAL_PADRAO[1]) {
+                await calcularDistanciaMotoAteLoja();
+            } else {
+                // Se não tem localização, usa 0 temporariamente
+                dadosPedido.kmAteLoja = 0;
+                dadosPedido.valorDeslocamento = 0;
+            }
+
+            const kmAteLoja = dadosPedido.kmAteLoja;
+            const valorDeslocamento = dadosPedido.valorDeslocamento;
             let totalEntregas = 0;
             listaCoordenadasEntregas = [];
             let linksEntregas = [];
@@ -685,6 +699,7 @@
                 totalEntregas += valorPorKm(kmRota);
             }
 
+            dadosPedido.totalEntregas = totalEntregas;
             valorBase = valorDeslocamento + totalEntregas;
             atualizarTotal();
 
@@ -696,8 +711,8 @@
             const linkLojaMaps = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(endLojaComp)}`;
 
             dadosPedido = {
+                ...dadosPedido,
                 nomeLoja, wppLoja, ruaLoja, numLoja, bairroLoja, compLoja,
-                kmAteLoja, valorDeslocamento, totalEntregas, valorGorjeta,
                 total: valorBase + valorGorjeta,
                 linkLojaMaps,
                 entregas: Array.from(entregas).map((blk, i) => ({
@@ -723,6 +738,7 @@
             msg += `🏪 LOJA: ${p.nomeLoja}\n📞 WhatsApp: ${p.wppLoja}\n`;
             msg += `📍 ENDEREÇO LOJA: ${p.ruaLoja}, ${p.numLoja} - ${p.bairroLoja}`;
             if(p.compLoja) msg += ` (${p.compLoja})`;
+            msg += `\n🛵 Distância até loja: ${p.kmAteLoja.toFixed(2).replace('.', ',')} km`;
             msg += `\n🗺️ IR ATÉ A LOJA: ${p.linkLojaMaps}`;
             msg += `\n\n`;
 
@@ -749,15 +765,21 @@
             }
             document.getElementById('localMoto').textContent = '🔄 Buscando localização...';
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
+                async (pos) => {
                     localMoto = [pos.coords.latitude, pos.coords.longitude];
                     document.getElementById('localMoto').textContent = `✅ Localização: ${localMoto[0].toFixed(6)}, ${localMoto[1].toFixed(6)}`;
+                    
                     if(mapa) {
                         mapa.setView(localMoto, 15);
                         L.marker(localMoto).addTo(mapa).bindPopup('Você está aqui').openPopup();
                     }
-                    document.getElementById('dadosRota').classList.remove('escondido');
-                    if(coordenadasLoja) preencherDadosMotoboy();
+
+                    // ✅ Quando ativar localização, já calcula e atualiza TUDO!
+                    if(coordenadasLoja) {
+                        await calcularDistanciaMotoAteLoja();
+                        document.getElementById('dadosRota').classList.remove('escondido');
+                        preencherDadosMotoboy();
+                    }
                 },
                 () => {
                     document.getElementById('localMoto').textContent = '❌ Não foi possível pegar localização!';
@@ -766,11 +788,11 @@
         }
 
         function preencherDadosMotoboy() {
-            const kmD = calcularRota(localMoto, coordenadasLoja);
-            const vD = kmD * TAXA_KM;
+            const kmD = dadosPedido.kmAteLoja || 0;
+            const vD = dadosPedido.valorDeslocamento || 0;
             let vE = 0;
-            listaCoordenadasEntregas.forEach(c => {
-                const km = calcularRota(coordenadasLoja, c);
+            listaCoordenadasEntregas.forEach(async (c) => {
+                const km = await calcularRota(coordenadasLoja, c);
                 vE += valorPorKm(km);
             });
             const vT = vD + vE + valorGorjeta;
@@ -846,4 +868,4 @@
         }
     </script>
 </body>
-                        </html>
+    </html>
