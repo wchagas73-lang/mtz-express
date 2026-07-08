@@ -33,7 +33,6 @@
         label span {color: #FF6B6B; margin-left: 3px;}
         .campo-completo {position: relative;}
         input {width: 100%; padding: 14px; border: 2px solid rgba(0,180,140,0.2); border-radius: 12px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
-        input:disabled {opacity: 0.5; cursor: not-allowed;}
         .lista-sugestoes {position: absolute; top: 100%; left: 0; right: 0; background: #1A3F4A; border: 1px solid rgba(0,180,140,0.3); border-radius: 0 0 12px 12px; max-height: 200px; overflow-y: auto; z-index: 100; display: none;}
         .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);}
         .item-sugestao:hover {background: rgba(0,180,140,0.15);}
@@ -136,8 +135,9 @@
                     </div>
                     <div class="linha-tripla">
                         <input type="text" id="numLoja" placeholder="Número" required class="campo-pequeno">
-                        <input type="text" id="bairroLoja" placeholder="Bairro" required readonly>
-                        <input type="text" id="cepLoja" placeholder="CEP" readonly class="campo-pequeno">
+                        <!-- ✅ AGORA PODE EDITAR LIVREMENTE, NÃO TRAVA MAIS -->
+                        <input type="text" id="bairroLoja" placeholder="Bairro" required>
+                        <input type="text" id="cepLoja" placeholder="CEP" class="campo-pequeno">
                     </div>
 
                     <div id="areaEntregas">
@@ -153,8 +153,9 @@
                             </div>
                             <div class="linha-tripla">
                                 <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
-                                <input type="text" class="bairroDest" placeholder="Bairro" required readonly>
-                                <input type="text" class="cepDest" placeholder="CEP" readonly class="campo-pequeno">
+                                <!-- ✅ TAMBÉM DESBLOQUEADO PARA EDIÇÃO -->
+                                <input type="text" class="bairroDest" placeholder="Bairro" required>
+                                <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno">
                             </div>
                             
                             <label>📞 Telefone do Cliente <span>*</span></label>
@@ -301,7 +302,6 @@
     <script>
         const LOCAL_PADRAO = [-21.7642, -43.3503];
         const TAXA_KM = 0.50;
-        // ✅ SEU NÚMERO CONFIRMADO: FORMATO INTERNACIONAL CORRETO
         const SEU_NUMERO = '5532999953215';
         let mapa, localMoto = LOCAL_PADRAO;
         let valorBase = 0, valorGorjeta = 0;
@@ -359,7 +359,7 @@
             event.target.classList.remove('inativa');
         }
 
-        // 📍 PREENCHE BAIRRO E CEP AUTOMÁTICO
+        // 📍 PREENCHE AUTOMÁTICO MAS NÃO TRAVA NADA — PODE EDITAR!
         async function buscarSugestoes(campo, idLista, tipo) {
             const t = campo.value.trim();
             const lista = document.getElementById(idLista) || campo.nextElementSibling;
@@ -383,6 +383,7 @@
                         onclick: () => {
                             campo.value = rua;
                             lista.style.display = 'none';
+                            // ✅ PREENCHE, MAS NÃO TRAVA — VOCÊ PODE ALTERAR DEPOIS
                             if(tipo === 'loja') {
                                 document.getElementById('bairroLoja').value = bairro;
                                 document.getElementById('cepLoja').value = cep.replace('-', '');
@@ -424,8 +425,8 @@
                 </div>
                 <div class="linha-tripla">
                     <input type="text" class="numDest" placeholder="Número" required class="campo-pequeno">
-                    <input type="text" class="bairroDest" placeholder="Bairro" required readonly>
-                    <input type="text" class="cepDest" placeholder="CEP" readonly class="campo-pequeno">
+                    <input type="text" class="bairroDest" placeholder="Bairro" required>
+                    <input type="text" class="cepDest" placeholder="CEP" class="campo-pequeno">
                 </div>
                 <label>📞 Telefone do Cliente <span>*</span></label>
                 <input type="tel" class="telCliente" required>
@@ -468,7 +469,13 @@
             const wppLoja = document.getElementById('wppLoja').value.trim();
             const endLoja = `${document.getElementById('ruaLoja').value}, ${document.getElementById('numLoja').value} - ${document.getElementById('bairroLoja').value}, CEP ${document.getElementById('cepLoja').value}, Juiz de Fora-MG`;
             const cLoja = await buscarCoordenadas(endLoja);
-            if(!cLoja) {alert('❌ Endereço da loja não encontrado!'); btn.disabled=false; aviso.classList.add('escondido'); return;}
+            if(!cLoja) {
+                // ✅ MELHORIA: SE NÃO ENCONTRAR, AVISA MAS DEIXA CONTINUAR, POIS OS DADOS ESTÃO CERTOS
+                const continuar = confirm('⚠️ Não localizamos o endereço exato no mapa, mas os dados estão preenchidos. Deseja continuar mesmo assim?');
+                if(!continuar) {btn.disabled=false; aviso.classList.add('escondido'); return;}
+                // Usa localização aproximada se não encontrar
+                cLoja = {lat: LOCAL_PADRAO[0], lon: LOCAL_PADRAO[1]};
+            }
 
             const cMoto = {lat: localMoto[0], lon: localMoto[1]};
             const kmDesloc = await calcularRota(cMoto, cLoja) || 2.5;
@@ -482,8 +489,12 @@
                 const nomeCli = b.querySelector('.nomeCliente').value.trim();
                 const endCli = `${b.querySelector('.ruaDest').value}, ${b.querySelector('.numDest').value} - ${b.querySelector('.bairroDest').value}, CEP ${b.querySelector('.cepDest').value}, Juiz de Fora-MG`;
                 const telCli = b.querySelector('.telCliente').value.trim();
-                const cCli = await buscarCoordenadas(endCli);
-                if(!cCli) {alert(`❌ Endereço da entrega ${i+1} não encontrado!`); btn.disabled=false; aviso.classList.add('escondido'); return;}
+                let cCli = await buscarCoordenadas(endCli);
+                if(!cCli) {
+                    const continuarCli = confirm(`⚠️ Endereço da entrega ${i+1} não localizado no mapa. Deseja continuar?`);
+                    if(!continuarCli) {btn.disabled=false; aviso.classList.add('escondido'); return;}
+                    cCli = {lat: LOCAL_PADRAO[0], lon: LOCAL_PADRAO[1]};
+                }
                 const kmEnt = await calcularRota(cLoja, cCli) || 2.5;
                 const vEstaEntrega = valorKm(kmEnt);
                 vEntrega += vEstaEntrega;
@@ -506,7 +517,6 @@
             document.getElementById('mE').textContent = dadosPedido.vE;
             document.getElementById('dadosRota').classList.remove('escondido');
             
-            // ✅ LINK DO MAPS 100% FUNCIONAL
             const linkLoja = `https://www.google.com/maps/dir/?api=1&origin=${localMoto[0]},${localMoto[1]}&destination=${encodeURIComponent(endLoja)}&travelmode=driving`;
             document.getElementById('linkLoja').href = linkLoja;
 
@@ -532,7 +542,7 @@
             alert('✅ Tudo certo! Agora é só enviar o pedido!');
         });
 
-        // 🚀 FUNÇÃO QUE ENVIA DIRETO PRO SEU WHATSAPP — PERFEITA
+        // 🚀 ENVIO WHATSAPP
         function enviarPedido() {
             const opGorjeta = document.querySelector('input[name="escolhaGorjeta"]:checked');
             const textoGorjeta = opGorjeta.value === 'sim' 
@@ -540,7 +550,6 @@
                 : '🤑 Gorjeta: Não adicionada';
             const totalFinal = (valorBase + valorGorjeta).toFixed(2).replace('.', ',');
 
-            // 📝 MENSAGEM COMPLETA E ORGANIZADA PARA VOCÊ RECEBER
             let mensagem = `🚀 NOVO PEDIDO RECEBIDO - MTZ EXPRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏪 DADOS DA LOJA:
@@ -570,7 +579,6 @@ ${textoGorjeta}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Pedido enviado automaticamente`;
 
-            // ✅ ABRE WHATSAPP DIRETO NO SEU NÚMERO
             const link = `https://wa.me/${SEU_NUMERO}?text=${encodeURIComponent(mensagem)}`;
             window.open(link, '_blank');
         }
@@ -602,15 +610,4 @@ ${textoGorjeta}
         }
         function confRetirada() {
             document.getElementById('etLoja').classList.add('concluida');
-            document.getElementById('etLoja').classList.remove('pendente');
-            alert('✅ Retirada confirmada!');
-        }
-        function confirmaEntrega(n) {
-            const etapa = document.getElementById(`etapaCli${n}`);
-            etapa.classList.add('concluida');
-            etapa.classList.remove('pendente');
-            alert(`✅ Entrega ${n} confirmada!`);
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('etLo
