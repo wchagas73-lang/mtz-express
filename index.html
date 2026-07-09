@@ -53,7 +53,6 @@
         .btn {width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s ease;}
         .btn:hover {transform: translateY(-3px);}
         .btn:active {transform: translateY(2px);}
-        .btn-whats {background: linear-gradient(90deg, #25D366, #128C7E); color: white; font-size: 20px; padding: 20px; margin: 24px 0;}
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, #FFC107, #FFA000); color: #212121;}
         .btn-pequeno {width: auto; padding: 12px 18px; font-size: 14px;}
@@ -279,7 +278,8 @@
                     <div class="valor-total">💰 TOTAL: R$ <span id="valTotal">0,00</span></div>
                 </div>
 
-                <button class="btn btn-whats escondido" id="btnEnviarWpp" onclick="enviarWhatsapp()">📤 ENVIAR PEDIDO NO WHATSAPP</button>
+                <!-- BOTÃO WHATSAPP OCULTO, NÃO PRECISA MAIS APARECER -->
+                <button class="btn btn-whats escondido" id="btnEnviarWpp" style="display:none;">📤 ENVIAR PEDIDO NO WHATSAPP</button>
                 <button class="btn btn-principal escondido" id="btnGerarPdf" onclick="gerarPdf()">📄 BAIXAR PDF DO PEDIDO</button>
             </div>
 
@@ -303,7 +303,7 @@
             <!-- ABA MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <h3 style="color:var(--primaria); margin:28px 0 14px;">🛵 Minha Localização</h3>
-                <div class="aviso destaque">⚠️ CLIQUE AQUI UMA VEZ ANTES DE COMEÇAR O DIA! SEM LOCALIZAÇÃO NÃO CALCULA VALOR!</div>
+                <div class="aviso destaque">⚠️ CLIQUE AQUI UMA VEZ ANTES DE COMEÇAR O DIA! SEM LOCALIZAÇÃO NÃO TEM OS LINKS DO MAPS!</div>
                 <button class="btn btn-azul" onclick="pegarLocalizacao()">📍 PEGAR MINHA LOCALIZAÇÃO</button>
                 <p class="status-local" id="statusLocal">❌ Nenhuma localização ativada</p>
 
@@ -395,7 +395,7 @@
         function mascaraCep(c) {c.value = c.value.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').slice(0,9);}
         function mascaraTelefone(c) {c.value = c.value.replace(/\D/g,'').replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2').slice(0,15);}
 
-        // ✅ BUSCA POR CEP — IGUAL PARA LOJA E CLIENTE
+        // BUSCA CEP
         async function buscarCep(cep, origem) {
             cep = cep.replace(/\D/g,'');
             if(cep.length!==8) return;
@@ -416,7 +416,7 @@
             } catch(e){}
         }
 
-        // ✅ BUSCA POR NOME DA RUA — IGUAL PARA LOJA E CLIENTE
+        // BUSCA POR NOME DA RUA
         async function buscarPorRua(valor, origem) {
             clearTimeout(timerBuscaRua);
             valor = valor.trim();
@@ -454,11 +454,9 @@
             }
         }
 
-        // ✅ SELECIONA E PREENCHE — FUNCIONA PERFEITO NOS DOIS
         function selecionarEndereco(rua, bairro, cep, elementoClicado) {
             cep = cep.replace(/(\d{5})(\d)/, '$1-$2');
             const caixaSugestao = elementoClicado.parentElement;
-
             if (caixaSugestao.id === 'sugestoesLoja') {
                 document.getElementById('ruaLoja').value = rua;
                 document.getElementById('bairroLoja').value = bairro;
@@ -469,7 +467,6 @@
                 bloco.querySelector('.bairroCliente').value = bairro;
                 bloco.querySelector('.cepCliente').value = cep;
             }
-
             caixaSugestao.innerHTML = '';
             caixaSugestao.classList.add('escondido');
         }
@@ -481,7 +478,6 @@
             document.getElementById('abaLoja').classList.add('visivel');
         }
 
-        // ✅ GUARDA PARA ONDE IR — NÃO CAI MAIS NO LUGAR ERRADO
         function verificarAbaMotoboy() {
             abaDestino = 'motoboy';
             document.getElementById('telaLogin').classList.add('visivel');
@@ -493,16 +489,13 @@
             document.querySelectorAll('.conteudo-aba:not(#telaLogin)').forEach(c => c.classList.remove('visivel'));
         }
 
-        // ✅ LOGIN QUE ABRE A ABA CERTA
         function validarLogin() {
             const l = document.getElementById('loginUsuario').value.trim();
             const s = document.getElementById('senhaUsuario').value.trim();
-
             if (l === LOGIN_PERMITIDO && s === SENHA_PERMITIDA) {
                 document.getElementById('telaLogin').classList.remove('visivel');
                 document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
                 document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
-
                 if (abaDestino === 'motoboy') {
                     document.querySelectorAll('.aba')[1].classList.add('ativa');
                     document.getElementById('abaMotoboy').classList.add('visivel');
@@ -513,11 +506,12 @@
                 }
                 document.getElementById('erroLogin').classList.add('escondido');
             } else {
+                document
                 document.getElementById('erroLogin').classList.remove('escondido');
             }
         }
 
-        // ✅ GEOLOCALIZAÇÃO MELHORADA E ATIVA
+        // GEOLOCALIZAÇÃO
         function pegarLocalizacao() {
             if(!navigator.geolocation) {
                 alert('❌ Seu navegador NÃO suporta localização!');
@@ -528,11 +522,10 @@
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     coordsMotoboy = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-                    document.getElementById('statusLocal').innerHTML = '✅ Localização ATIVADA! Sucesso!';
+                    document.getElementById('statusLocal').innerHTML = '✅ Localização ATIVADA! Pronto para usar!';
                     document.getElementById('statusLocal').style.color = '#00C896';
                 },
                 erro => {
-                    let mens
                     let mensagem = '❌ Erro ao pegar localização: ';
                     if(erro.code === 1) mensagem += 'Você NEGOU a permissão! Libere a localização no navegador.';
                     else if(erro.code === 2) mensagem += 'Localização INDISPONÍVEL no momento.';
@@ -621,7 +614,7 @@
             const retorno = document.querySelector('input[name="retorno"]:checked').value;
             const valRetorno = retorno === 'sim' ? valEntregas : 0;
 
-            const total = Math.round((valMotLoja + valEntregas + valRetorno + valGorjeta)*100)/100;
+            const total = Math.round((valMotLoja + valEntregas + valGorjeta + valRetorno)*100)/100;
 
             document.getElementById('distMotLoja').textContent = distMotLoja.toFixed(1);
             document.getElementById('valMotLoja').textContent = valMotLoja.toFixed(2);
@@ -631,16 +624,53 @@
             document.getElementById('valTotal').textContent = total.toFixed(2);
 
             document.getElementById('resumo').classList.remove('escondido');
-            document.getElementById('btnEnviarWpp').classList.remove('escondido');
             document.getElementById('btnGerarPdf').classList.remove('escondido');
 
             ultimoPedido = {distMotLoja, valMotLoja, distTotalEntrega, valEntregas, valGorjeta, total, retorno};
         }
 
         function gerarPedidoCompleto() {
-            const tipo = document.getElementById('tipoMercadoria').value;
-            if(!tipo) {alert('Selecione o tipo de mercadoria!'); return;}
-            calcularValor();
+            const nomeLoja = document.getElementById('nomeLoja').value.trim();
+            const wppLoja = document.getElementById('wppLoja').value.trim();
+            const cepLoja = document.getElementById('cepLoja').value.trim();
+            const ruaLoja = document.getElementById('ruaLoja').value.trim();
+            const numLoja = document.getElementById('numLoja').value.trim();
+            const bairroLoja = document.getElementById('bairroLoja').value.trim();
+            const tipoMerc = document.getElementById('tipoMercadoria').value;
+
+            if(!nomeLoja || !wppLoja || !cepLoja || !ruaLoja || !numLoja || !bairroLoja) {
+                alert('⚠️ PREENCHA TODOS OS DADOS DA LOJA PRIMEIRO!');
+                return;
+            }
+            if(!tipoMerc) {
+                alert('⚠️ SELECIONE O TIPO DE MERCADORIA!');
+                return;
+            }
+
+            const entregas = document.querySelectorAll('.bloco-entrega');
+            let entregasOk = true;
+            entregas.forEach((bloco, indice) => {
+                const nomeCli = bloco.querySelector('.nomeCliente').value.trim();
+                const cepCli = bloco.querySelector('.cepCliente').value.trim();
+                const ruaCli = bloco.querySelector('.ruaCliente').value.trim();
+                const numCli = bloco.querySelector('.numCliente').value.trim();
+                const bairroCli = bloco.querySelector('.bairroCliente').value.trim();
+                
+                if(!nomeCli || !cepCli || !ruaCli || !numCli || !bairroCli) {
+                    alert(`⚠️ PREENCHA TODOS OS DADOS DA ENTREGA ${indice + 1}!`);
+                    entregasOk = false;
+                    return;
+                }
+            });
+            if(!entregasOk) return;
+
+            if(!ultimoPedido) {
+                alert('✅ DADOS PREENCHIDOS!\n\n🔽 AGORA CLIQUE EM: 🧮 CALCULAR VALOR\n\nDepois clique em 📝 GERAR PEDIDO!');
+                return;
+            }
+
+            alert('✅ PEDIDO GERADO! ABRINDO WHATSAPP...');
+            enviarWhatsapp();
         }
 
         function enviarWhatsapp() {
@@ -651,30 +681,39 @@
             const numLoja = document.getElementById('numLoja').value;
             const bairroLoja = document.getElementById('bairroLoja').value;
             const cidadeLoja = document.getElementById('cidadeLoja').value;
-            const compLoja = document.getElementById('compLoja').value;
+            const enderecoLoja = `${ruaLoja}, ${numLoja} - ${bairroLoja}, ${cidadeLoja}`;
 
             const tipoMerc = document.querySelector('.btn-tipo-mercadoria.ativo').textContent.trim();
             const retorno = document.querySelector('input[name="retorno"]:checked').value === 'sim' ? 'SIM' : 'NÃO';
 
+            let linkMotoboyLoja = '';
+            if(coordsMotoboy) {
+                linkMotoboyLoja = `https://www.google.com/maps/dir/${coordsMotoboy.lat},${coordsMotoboy.lng}/${encodeURIComponent(enderecoLoja)}/`;
+            } else {
+                linkMotoboyLoja = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(enderecoLoja)}`;
+            }
+
             let msg = `🏍️ *PEDIDO MTZ EXPRESS*\n\n`;
             msg += `🏪 *LOJA:* ${loja}\n`;
             msg += `📲 *CONTATO:* ${wppLoja}\n`;
-            msg += `📍 *ENDEREÇO:* ${ruaLoja}, ${numLoja} - ${bairroLoja} / ${cidadeLoja}`;
-            if(compLoja) msg += ` (${compLoja})`;
-            msg += `\n\n📦 *ENTREGAS:*\n`;
+            msg += `📍 *ENDEREÇO:* ${enderecoLoja}\n`;
+            msg += `🗺️ *IR ATÉ A LOJA:* ${linkMotoboyLoja}\n\n`;
+            msg += `📦 *ENTREGAS:*\n`;
 
             document.querySelectorAll('.bloco-entrega').forEach((bloco, i) => {
                 const nome = bloco.querySelector('.nomeCliente').value;
                 const rua = bloco.querySelector('.ruaCliente').value;
                 const num = bloco.querySelector('.numCliente').value;
                 const bairro = bloco.querySelector('.bairroCliente').value;
-                const comp = bloco.querySelector('.compCliente').value;
-                msg += `${i+1}. ${nome}\n   📍 ${rua}, ${num} - ${bairro}`;
-                if(comp) msg += ` (${comp})`;
-                msg += `\n`;
+                const enderecoCli = `${rua}, ${num} - ${bairro}, Juiz de Fora`;
+                const linkLojaCliente = `https://www.google.com/maps/dir/${encodeURIComponent(enderecoLoja)}/${encodeURIComponent(enderecoCli)}/`;
+                
+                msg += `${i+1}. ${nome}\n`;
+                msg += `   📍 ${enderecoCli}\n`;
+                msg += `   🗺️ *IR ATÉ O CLIENTE:* ${linkLojaCliente}\n\n`;
             });
 
-            msg += `\n📋 *DETALHES:*\n`;
+            msg += `📋 *DETALHES:*\n`;
             msg += `📄 *MERCADORIA:* ${tipoMerc}\n`;
             msg += `🔄 *RETORNO:* ${retorno}\n\n`;
             msg += `💰 *VALORES:*\n`;
@@ -698,23 +737,52 @@
         }
 
         async function gerarPdf() {
-            if(!ultimoPedido) return;
+            if(!ultimoPedido) {alert('Gere o pedido primeiro!'); return;}
             const {jsPDF} = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(22);
             doc.setTextColor(0, 200, 150);
-            doc.text('MTZ EXPRESS', 105, 20, {align:'center'});
+            doc.text('MTZ EXPRESS', 105, 22, {align:'center'});
             doc.setFontSize(12);
             doc.setTextColor(0,0,0);
-            doc.text('PEDIDO DE ENTREGA', 105, 32, {align:'center'});
+            doc.text('PEDIDO DE ENTREGA', 105, 34, {align:'center'});
+            doc.setLineWidth(0.8);
             doc.line(20, 40, 190, 40);
 
             let y = 50;
-            doc.text(`Loja: ${document.getElementById('nomeLoja').value}`, 20, y); y += 8;
-            doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 20, y); y += 12;
-            doc.text(`Valor Total: R$ ${ultimoPedido.total.toFixed(2)}`, 20, y);
+            const loja = document.getElementById('nomeLoja').value;
+            const wppLoja = document.getElementById('wppLoja').value;
+            const ruaLoja = document.getElementById('ruaLoja').value;
+            const numLoja = document.getElementById('numLoja').value;
+            const bairroLoja = document.getElementById('bairroLoja').value;
 
-            doc.save('pedido-mtz-express.pdf');
+            doc.setFontSize(13);
+            doc.text(`Loja: ${loja}`, 20, y); y += 7;
+            doc.text(`Contato: ${wppLoja}`, 20, y); y += 7;
+            doc.text(`Endereço: ${ruaLoja}, ${numLoja} - ${bairroLoja}`, 20, y); y += 10;
+
+            doc.text('Entregas:', 20, y); y += 7;
+            document.querySelectorAll('.bloco-entrega').forEach((bloco, i) => {
+                const nome = bloco.querySelector('.nomeCliente').value;
+                const rua = bloco.querySelector('.ruaCliente').value;
+                const num = bloco.querySelector('.numCliente').value;
+                const bairro = bloco.querySelector('.bairroCliente').value;
+                doc.text(`${i+1}. ${nome}`, 23, y); y += 6;
+                doc.text(`   ${rua}, ${num} - ${bairro}`, 23, y); y += 7;
+            });
+
+            y += 5;
+            doc.setDrawColor(200,200,200);
+            doc.line(20, y, 190, y); y += 8;
+
+            doc.text(`Motoboy → Loja: R$ ${ultimoPedido.valMotLoja.toFixed(2)}`, 20, y); y += 7;
+            doc.text(`Entregas: R$ ${ultimoPedido.valEntregas.toFixed(2)}`, 20, y); y += 7;
+            doc.text(`Gorjeta: R$ ${ultimoPedido.valGorjeta.toFixed(2)}`, 20, y); y += 10;
+            doc.setFontSize(18);
+            doc.setTextColor(255, 193, 7);
+            doc.text(`TOTAL: R$ ${ultimoPedido.total.toFixed(2)}`, 20, y);
+
+            doc.save(`pedido-${loja.replace(/\W/g,'')}.pdf`);
         }
 
         function confirmarEntrega() {
@@ -871,4 +939,4 @@
         }
     </script>
 </body>
-                                                                                       </html>
+                                                 </html>
