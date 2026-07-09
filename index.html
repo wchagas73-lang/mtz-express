@@ -345,7 +345,7 @@
                 </div>
                 <div class="linha-quadrupla">
                     <div class="painel-card azul"><h4>💵 Média/Pedido</h4><div class="num" id="mediaValor">0,00</div></div>
-                    <div class="painel-card verde"><h4>📈 Taxa Sucesso</h4><div class="num" id="taxaSucesso">0%</div></div>
+                    <div class="painel-card azul"><h4>📈 Taxa Sucesso</h4><div class="num" id="taxaSucesso">0%</div></div>
                     <div class="painel-card amarelo"><h4>🏍️ Motoboys</h4><div class="num" id="qtdMotoboys">0</div></div>
                     <div class="painel-card azul"><h4>📅 Mês Atual</h4><div class="num" id="pedidosMes">0</div></div>
                 </div>
@@ -394,7 +394,7 @@
         function mascaraCep(c) {c.value = c.value.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').slice(0,9);}
         function mascaraTelefone(c) {c.value = c.value.replace(/\D/g,'').replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2').slice(0,15);}
 
-        // ✅ BUSCA POR CEP — PREENCHE RUA, BAIRRO, CIDADE
+        // ✅ BUSCA POR CEP — EXATAMENTE IGUAL PARA LOJA E CLIENTE
         async function buscarCep(cep, origem) {
             cep = cep.replace(/\D/g,'');
             if(cep.length!==8) return;
@@ -415,7 +415,7 @@
             } catch(e){}
         }
 
-        // ✅ BUSCA POR NOME DA RUA — PREENCHE CEP, BAIRRO, CIDADE — CORRIGIDO PARA CLIENTE!
+        // ✅ BUSCA POR NOME DA RUA — EXATAMENTE IGUAL PARA LOJA E CLIENTE
         async function buscarPorRua(valor, origem) {
             clearTimeout(timerBuscaRua);
             valor = valor.trim();
@@ -453,21 +453,28 @@
             }
         }
 
-        // ✅ FUNÇÃO DE SELECIONAR — CORRIGIDA E FUNCIONANDO PARA LOJA E CLIENTE!
-        function selecionarEndereco(rua, bairro, cep, elementoOrigem) {
-            cep = cep.replace(/(\d{5})(\d)/,'$1-$2');
-            if(elementoOrigem === 'loja') {
+        // ✅ FUNÇÃO DE SELEÇÃO — CORRIGIDA DEFINITIVAMENTE! CLIQUE FUNCIONA PERFEITO NOS DOIS!
+        function selecionarEndereco(rua, bairro, cep, elementoClicado) {
+            cep = cep.replace(/(\d{5})(\d)/, '$1-$2');
+            const caixaSugestao = elementoClicado.parentElement;
+
+            // 🟢 PREENCHE NA LOJA
+            if (caixaSugestao.id === 'sugestoesLoja') {
                 document.getElementById('ruaLoja').value = rua;
                 document.getElementById('bairroLoja').value = bairro;
                 document.getElementById('cepLoja').value = cep;
-                document.getElementById('sugestoesLoja').classList.add('escondido');
-            } else {
-                const bloco = elementoOrigem.closest('.bloco-entrega');
+            }
+            // 🔵 PREENCHE NO CLIENTE / ENTREGA
+            else {
+                const bloco = caixaSugestao.closest('.bloco-entrega');
                 bloco.querySelector('.ruaCliente').value = rua;
                 bloco.querySelector('.bairroCliente').value = bairro;
                 bloco.querySelector('.cepCliente').value = cep;
-                bloco.querySelector('.sugestoesCliente').classList.add('escondido');
             }
+
+            // LIMPA E FECHA A LISTA DE SUGESTÕES
+            caixaSugestao.innerHTML = '';
+            caixaSugestao.classList.add('escondido');
         }
 
         function mostrarAba(nome) {
@@ -527,7 +534,7 @@
                 <input type="text" class="nomeCliente" required>
                 <label>CEP de Entrega <span>*</span></label>
                 <input type="text" class="cepCliente" oninput="mascaraCep(this); if(this.value.replace(/\D/g,'').length===8) buscarCep(this.value, this)" required placeholder="Digite o CEP...">
-                <label>Endereço / Nome daRua <span>*</span></label>
+                <label>Endereço / Nome da Rua <span>*</span></label>
                 <input type="text" class="ruaCliente" oninput="buscarPorRua(this.value, this)" required placeholder="OU digite o nome da rua...">
                 <div class="sugestoesCliente sugestoes-endereco escondido"></div>
                 <div class="linha-tripla">
@@ -848,4 +855,4 @@
         }
     </script>
 </body>
-                            </html>
+                    </html>
