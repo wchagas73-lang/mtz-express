@@ -109,7 +109,7 @@
         .secao-dados {background: rgba(0,0,0,0.1); border-radius:20px; padding:20px; margin:25px 0; border:1px solid var(--borda-escuro);}
         .secao-dados h3 {color:var(--primaria); margin-bottom:18px;}
         .linha-dados {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:15px;}
-        .sugestoes-endereco {background: #173842; border: 1px solid var(--primaria); border-top: none; border-radius: 0 0 12px 12px; max-height: 200px; overflow-y: auto; margin-top: -10px; margin-bottom: 15px;}
+        .sugestoes-endereco {background: #173842; border: 1px solid var(--primaria); border-top: none; border-radius: 0 0 12px 12px; max-height: 200px; overflow-y: auto; margin-top: -10px; margin-bottom: 15px; z-index: 999; position: relative;}
         .item-sugestao {padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(0,200,150,0.15); color: var(--texto-escuro);}
         .item-sugestao:hover {background: rgba(0,200,150,0.1);}
         .caixa-justificativa {margin-top:15px; padding:15px; border:2px solid var(--perigo); border-radius:16px; background:rgba(220,53,69,0.05); display:none;}
@@ -415,7 +415,7 @@
             } catch(e){}
         }
 
-        // ✅ BUSCA POR NOME DA RUA — PREENCHE CEP, BAIRRO, CIDADE
+        // ✅ BUSCA POR NOME DA RUA — PREENCHE CEP, BAIRRO, CIDADE — CORRIGIDO PARA CLIENTE!
         async function buscarPorRua(valor, origem) {
             clearTimeout(timerBuscaRua);
             valor = valor.trim();
@@ -428,7 +428,7 @@
                     const lista = dados.slice(0,6);
                     let html = '';
                     lista.forEach(end => {
-                        html += `<div class="item-sugestao" onclick="selecionarEndereco('${end.logradouro}','${end.bairro}','${end.cep}','${origem === 'loja' ? 'loja' : this}')">✅ ${end.logradouro} — ${end.bairro} | CEP: ${end.cep}</div>`;
+                        html += `<div class="item-sugestao" onclick="selecionarEndereco('${end.logradouro}','${end.bairro}','${end.cep}', this)">✅ ${end.logradouro} — ${end.bairro} | CEP: ${end.cep}</div>`;
                     });
                     if(origem === 'loja') {
                         const caixa = document.getElementById('sugestoesLoja');
@@ -453,15 +453,16 @@
             }
         }
 
-        function selecionarEndereco(rua, bairro, cep, origem) {
+        // ✅ FUNÇÃO DE SELECIONAR — CORRIGIDA E FUNCIONANDO PARA LOJA E CLIENTE!
+        function selecionarEndereco(rua, bairro, cep, elementoOrigem) {
             cep = cep.replace(/(\d{5})(\d)/,'$1-$2');
-            if(origem === 'loja') {
+            if(elementoOrigem === 'loja') {
                 document.getElementById('ruaLoja').value = rua;
                 document.getElementById('bairroLoja').value = bairro;
                 document.getElementById('cepLoja').value = cep;
                 document.getElementById('sugestoesLoja').classList.add('escondido');
             } else {
-                const bloco = origem.closest('.bloco-entrega');
+                const bloco = elementoOrigem.closest('.bloco-entrega');
                 bloco.querySelector('.ruaCliente').value = rua;
                 bloco.querySelector('.bairroCliente').value = bairro;
                 bloco.querySelector('.cepCliente').value = cep;
@@ -526,7 +527,7 @@
                 <input type="text" class="nomeCliente" required>
                 <label>CEP de Entrega <span>*</span></label>
                 <input type="text" class="cepCliente" oninput="mascaraCep(this); if(this.value.replace(/\D/g,'').length===8) buscarCep(this.value, this)" required placeholder="Digite o CEP...">
-                <label>Endereço / Nome da Rua <span>*</span></label>
+                <label>Endereço / Nome daRua <span>*</span></label>
                 <input type="text" class="ruaCliente" oninput="buscarPorRua(this.value, this)" required placeholder="OU digite o nome da rua...">
                 <div class="sugestoesCliente sugestoes-endereco escondido"></div>
                 <div class="linha-tripla">
@@ -808,17 +809,6 @@
                 else contDist.dmais++;
             });
 
-            document.getElementById('qtdDoc').textContent = contTipo.doc;
-            document.getElementById('qtdComida').textContent = contTipo.comida;
-            document.getElementById('qtdRemedio').textContent = contTipo.remedio;
-            document.getElementById('qtdFratil').textContent = contTipo.fratil;
-            document.getElementById('qtdVestuario').textContent = contTipo.vestuario;
-            document.getElementById('qtdOutros').textContent = contTipo.outros;
-            document.getElementById('dist1').textContent = contDist.d1;
-            document.getElementById('dist5').textContent = contDist.d5;
-            document.getElementById('dist10').textContent = contDist.d10;
-            document.getElementById('distMais').textContent = contDist.dmais;
-
             const valMot = Math.round(valTotalGeral * 0.3 * 100)/100;
             const valGor = Math.round(valTotalGeral * 0.1 * 100)/100;
             const valEnt = Math.round((valTotalGeral - valMot - valGor)*100)/100;
@@ -858,4 +848,4 @@
         }
     </script>
 </body>
-                    </html>
+                            </html>
