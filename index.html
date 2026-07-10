@@ -3,879 +3,687 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTZ EXPRESS - Sistema de Entregas</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>MTZ Express | Entregas Rápidas — Juiz de Fora-MG</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
+        * {box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;}
         :root {
-            --primaria: #00C896;
-            --secundaria: #FFC107;
-            --escuro: #121212;
-            --fundo: #1E1E2F;
-            --caixa: #2A2A3C;
-            --texto: #E0F8F0;
-            --vermelho: #E53935;
-            --borda-escuro: #44445C;
+            --primaria: #00C896; --primaria-escura: #008F60; 
+            --dourado: #FFD700; --dourado-escuro: #E6B800;
+            --perigo: #dc3545; --fundo-escuro: #0F2B33; --fundo-card-escuro: #173842;
+            --texto-escuro: #E0F8F0; --borda-escuro: rgba(0,200,150,0.25);
+            --azul: #3B82F6; --roxo: #8B5CF6; --cinza: #6B7280;
         }
-        *{margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
-        body{background: var(--escuro); color: var(--texto); min-height:100vh; padding-bottom:40px;}
-        .cabecalho{background: linear-gradient(135deg, var(--primaria), #009688); padding:20px; text-align:center; font-size:28px; font-weight:bold; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.3);}
-        .container{max-width:900px; margin:20px auto; padding:0 15px;}
-        .abas{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
-        .aba{flex:1; min-width:120px; padding:12px; border:none; border-radius:8px; background:var(--caixa); color:var(--texto); cursor:pointer; font-weight:600; transition:all 0.2s;}
-        .aba.ativo{background:var(--primaria); color:white; box-shadow:0 2px 8px rgba(0,200,150,0.4);}
-        .conteudo-aba{display:none; background:var(--caixa); padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2);}
-        .conteudo-aba.ativo{display:block;}
-        h2{color:var(--primaria); margin-bottom:20px; font-size:22px;}
-        h3{color:var(--secundaria); margin:18px 0 10px; font-size:18px;}
-        label{display:block; margin:12px 0 5px; font-weight:500;}
-        input, textarea, select{width:100%; padding:10px 12px; border:1px solid var(--borda-escuro); border-radius:6px; background:var(--escuro); color:var(--texto); font-size:16px;}
-        input:focus, textarea:focus{outline:none; border-color:var(--primaria); box-shadow:0 0 0 2px rgba(0,200,150,0.2);}
-        button{cursor:pointer; font-weight:600; border:none; border-radius:6px; transition:all 0.2s;}
-        .btn{padding:12px 20px; font-size:16px;}
-        .btn-principal{background:var(--primaria); color:white; width:100%; margin:10px 0;}
-        .btn-principal:hover{background:#00A87A;}
-        .btn-secundario{background:var(--secundaria); color:#121212;}
-        .btn-vermelho{background:var(--vermelho); color:white;}
-        .btn-pequeno{padding:6px 12px; font-size:14px;}
-        .linha-dupla{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
-        .linha-tripla{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
-        .opcao{display:flex; align-items:center; gap:8px; cursor:pointer; padding:8px 12px; border-radius:6px; background:var(--escuro); margin:5px 0;}
-        .opcao.ativo{border:2px solid var(--primaria);}
-        .bloco-entrega{border:1px solid var(--borda-escuro); border-radius:8px; padding:15px; margin:15px 0; position:relative;}
-        .titulo-entrega{font-weight:bold; color:var(--primaria); margin-bottom:10px;}
-        .escondido{display:none !important;}
-        .resumo-valores{background:rgba(0,200,150,0.1); border:1px solid var(--primaria); border-radius:8px; padding:15px; margin:20px 0;}
-        .linha-valor{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.1);}
-        .linha-valor.total{font-size:20px; font-weight:bold; color:var(--secundaria); border-bottom:none; margin-top:5px;}
-        .aviso{padding:12px; border-radius:6px; margin:15px 0;}
-        .sucesso{background:rgba(0,200,150,0.2); border:1px solid var(--primaria); color:#B9F6CA;}
-        .erro{background:rgba(229,57,53,0.2); border:1px solid var(--vermelho); color:#FFCDD2;}
-        .destaque{background:rgba(255,193,7,0.1); border:1px solid var(--secundaria); color:#FFF3E0;}
-        .sugestoes-endereco{background:var(--escuro); border:1px solid var(--borda-escuro); border-top:none; max-height:200px; overflow-y:auto; position:absolute; width:calc(100% - 30px); z-index:100; border-radius:0 0 6px 6px;}
-        .sugestao-item{padding:10px 12px; cursor:pointer;}
-        .sugestao-item:hover{background:var(--caixa);}
-        .btn-sugestao, .btn-tipo-mercadoria{display:inline-block; padding:8px 12px; margin:5px; border-radius:6px; background:var(--escuro); border:1px solid var(--borda-escuro); color:var(--texto);}
-        .btn-sugestao.ativo, .btn-tipo-mercadoria.ativo{border-color:var(--primaria); background:rgba(0,200,150,0.2);}
-        .item-historico{padding:12px; border-bottom:1px solid var(--borda-escuro);}
-        .caixa-login{max-width:400px; margin:100px auto; background:var(--caixa); padding:30px; border-radius:12px; text-align:center;}
-        .caixaJustificativa{position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--caixa); padding:25px; border-radius:12px; box-shadow:0 0 0 9999px rgba(0,0,0,0.7); z-index:1000; width:90%; max-width:450px; display:none;}
-        .caixaJustificativa.visivel{display:block;}
-        .painel-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:15px; margin:20px 0;}
-        .card-dado{background:var(--escuro); padding:15px; border-radius:8px; text-align:center;}
-        .card-dado .numero{font-size:28px; font-weight:bold; color:var(--primaria);}
-        canvas{background:var(--escuro); border-radius:8px; padding:10px; margin:15px 0;}
-        hr{border:none; border-top:1px solid var(--borda-escuro); margin:25px 0;}
+        body {background: linear-gradient(135deg, var(--fundo-escuro), #1A3F4A); min-height: 100vh; padding: 15px; color: var(--texto-escuro);}
+        .container {max-width: 720px; margin: 0 auto;}
+        .card {background: var(--fundo-card-escuro); border-radius: 28px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 2px solid var(--dourado);}
+        
+        .cabecalho {text-align: center; margin-bottom: 32px; padding: 25px; background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,193,7,0.05)); border-radius: 24px; border: 2px solid var(--dourado);}
+        .icone-superior {font-size: 52px; color: var(--dourado); text-shadow: 0 0 15px var(--dourado); margin-bottom: 8px;}
+        .logo-texto {font-size: 46px; font-weight: 900; text-align: center; margin-bottom: 10px;}
+        .nome-marca {color: var(--dourado); text-shadow: 0 0 10px var(--dourado);}
+        .slogan {font-size: 19px; color: #FFF8C1; margin-bottom: 18px; font-weight: 600;}
+        .dados-rapidos {padding: 18px; background: rgba(255,215,0,0.1); border-radius: 20px; border-left: 5px solid var(--dourado); font-size: 16px; line-height: 2; margin-bottom:10px;}
+        .dados-rapidos strong {color: var(--dourado);}
+
+        .abas {display: flex; gap: 12px; margin: 28px 0; flex-wrap: wrap;}
+        .aba {flex: 1; min-width: 115px; padding: 16px 12px; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,0.05); color: #B2DFDB; border: 1px solid var(--borda-escuro);}
+        .aba.ativa {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; box-shadow: 0 0 15px rgba(255,215,0,0.4);}
+        
+        label {display: block; margin: 18px 0 6px; font-weight: 700; font-size: 15px;}
+        label span {color: var(--perigo);}
+        label .opcional {color: #9CA3AF; font-weight: 500;}
+        input, textarea {width: 100%; padding: 14px 16px; border: 2px solid var(--borda-escuro); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
+        input:focus, textarea:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
+        .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+
+        .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
+        .aviso {padding: 18px; border-radius: 18px; border-left: 5px solid; margin: 20px 0; font-weight: 600;}
+        .aviso.sucesso {background: rgba(0,200,150,0.15); border-left-color: var(--primaria); color: #E0F8F0;}
+        .aviso.destaque {background: rgba(255,215,0,0.1); border-left-color: var(--dourado); color: #FFF8C1;}
+        .btn {width: 100%; padding: 16px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s;}
+        .btn:hover {transform: translateY(-2px);}
+        .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
+        .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
+        .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
+        .btn-pequeno {width: auto; padding: 10px 16px; font-size: 15px;}
+        .escondido {display: none !important;}
+        .conteudo-aba {display: none;} .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
+        @keyframes aparecer {from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
+        
+        .caixa-retorno, .caixa-gorjeta {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 20px; padding: 22px; margin: 25px 0;}
+        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2.3;}
+        .opcao {display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 0;}
+        .opcao input {width: auto; transform: scale(1.4);}
+        .tabela-valores {width:100%; border-collapse:separate; border-spacing:0; border-radius:18px; overflow:hidden; margin-top:35px;}
+        .tabela-valores th {background:var(--dourado); color:#1A1A1A; padding:14px; text-align:center; font-weight:800;}
+        .tabela-valores td {padding:12px; text-align:center; border-bottom:1px solid var(--borda-escuro); background:rgba(0,200,150,0.06);}
+        .destaque-percurso {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); border-radius:18px; padding:18px; margin:20px 0; font-weight:600; line-height:2;}
+        .sugestoes-gorjeta {display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;}
+        .btn-gorjeta {padding: 10px 16px; border: 2px solid var(--dourado); background: transparent; color: var(--dourado); border-radius: 12px; font-weight: 700; cursor: pointer;}
+        .btn-gorjeta.selecionado {background: var(--dourado); color: #1A1A1A;}
+        .status-moto {padding: 10px; border-radius: 12px; text-align: center; font-weight: 700; margin: 15px 0;}
+        .status-moto.on {background: rgba(0,200,150,0.2); color: var(--primaria); border: 2px solid var(--primaria);}
+        .status-moto.off {background: rgba(220,53,69,0.2); color: var(--perigo); border: 2px solid var(--perigo);}
+        .aviso-busca {font-size:13px; color:var(--primaria); margin:5px 0 15px;}
+
+        /* 📊 DASHBOARD */
+        .grade-dados {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;}
+        .cartao-dado {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 18px; text-align: center;}
+        .cartao-dado h4 {font-size: 14px; color: #B2DFDB; margin-bottom: 8px;}
+        .cartao-dado .valor {font-size: 26px; font-weight: 900; color: var(--dourado);}
+        .cartao-dado.verde {border-color: var(--primaria); background: rgba(0,200,150,0.08);}
+        .cartao-dado.verde .valor {color: var(--primaria);}
+        .cartao-dado.vermelho {border-color: var(--perigo); background: rgba(220,53,69,0.08);}
+        .cartao-dado.vermelho .valor {color: var(--perigo);}
+        .cartao-dado.azul {border-color: var(--azul); background: rgba(59,130,246,0.08);}
+        .cartao-dado.azul .valor {color: var(--azul);}
+        .grafico {background: rgba(15,43,51,0.6); border-radius: 18px; padding: 20px; margin: 25px 0; border: 2px solid var(--borda-escuro);}
+        .grafico h4 {color: var(--dourado); margin-bottom: 15px; text-align: center;}
+        .lista-pedidos {margin-top: 30px;}
+        .item-pedido {background: rgba(255,255,255,0.03); border: 1px solid var(--borda-escuro); border-radius: 16px; padding: 16px; margin-bottom: 12px;}
+        .item-pedido .cab {display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .status {padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 14px;}
+        .status.concluido {background: rgba(0,200,150,0.2); color: var(--primaria);}
+        .status.pendente {background: rgba(255,215,0,0.2); color: var(--dourado);}
+        .status.naorealizado {background: rgba(220,53,69,0.2); color: var(--perigo);}
+        .filtros {display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0;}
+        .filtro {padding: 8px 14px; border-radius: 12px; border: 1px solid var(--dourado); background: transparent; color: var(--dourado); cursor: pointer;}
+        .filtro.ativo {background: var(--dourado); color: #1A1A1A;}
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="card">
+            <!-- ✅ CABEÇALHO FINAL: ÍCONES 🏍️📊💸 SEM FUMACINHA -->
+            <div class="cabecalho">
+                <div class="icone-superior">🏍️📊💸</div>
+                <div class="logo-texto"><span class="nome-marca">MTZ EXPRESS</span></div>
+                <p class="slogan">✅ ENTREGAS RÁPIDAS • JUIZ DE FORA-MG ✅</p>
+                <div class="dados-rapidos">
+                    📲 Contato: <strong>(32) 9 9995-3215</strong><br>
+                    ⏰ Horário: Seg-Sex 08h às 20h | Sáb 08h às 16h<br>
+                    💸 <strong>SEM TAXA • SEM MENSALIDADE • SEM COMISSÃO</strong> 💸
+                </div>
+            </div>
 
-<div class="cabecalho">🏍️ MTZ EXPRESS</div>
+            <!-- ABAS -->
+            <div class="abas">
+                <button class="aba ativa" onclick="mostrarAba('loja')">🏪 Lojista</button>
+                <button class="aba" onclick="mostrarAba('motoboy')">🛵 Motoboy</button>
+                <button class="aba" onclick="mostrarAba('painel')">📊 Painel</button>
+            </div>
 
-<!-- TELA DE LOGIN -->
-<div id="telaLogin" class="caixa-login">
-    <h2>🔐 ACESSO RESTRITO</h2>
-    <p style="margin-bottom:20px; color:#80CBC4;">Apenas para uso interno da MTZ Express</p>
-    <label>Usuário</label>
-    <input type="text" id="usuarioLogin" placeholder="Digite seu usuário">
-    <label>Senha</label>
-    <input type="password" id="senhaLogin" placeholder="Digite sua senha">
-    <div id="erroLogin" class="aviso erro escondido">Usuário ou senha incorretos!</div>
-    <button class="btn btn-principal" onclick="verificarLogin()">ENTRAR NO SISTEMA</button>
-</div>
+            <!-- 🏪 ABA LOJISTA -->
+            <div class="conteudo-aba visivel" id="abaLoja">
+                <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
+                
+                <div class="destaque-percurso">
+                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM<br>
+                    🏪 LOJA → CLIENTE: Valor conforme tabela abaixo
+                </div>
 
-<!-- SISTEMA PRINCIPAL -->
-<div id="sistema" class="container escondido">
-    <div class="abas">
-        <button class="aba ativo" onclick="mudarAba(0)">🏪 Dados da Loja</button>
-        <button class="aba" onclick="mudarAba(1)">🛵 Motoboy</button>
-        <button class="aba" onclick="mudarAba(2)">📝 Pedido</button>
-        <button class="aba" onclick="mudarAba(3)">📊 Painel</button>
+                <h3 style="color:var(--dourado); margin:28px 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* = Obrigatório</span></h3>
+                <label>Nome da Loja <span>*</span></label>
+                <input type="text" id="nomeLoja" required>
+
+                <label>Contato da Loja <span>*</span></label>
+                <input type="tel" id="contatoLoja" placeholder="(32) 9XXXX-XXXX" required>
+
+                <div class="linha-dupla">
+                    <label>CEP <span class="opcional">(Opcional)</span></label>
+                    <label>Número <span>*</span></label>
+                </div>
+                <div class="linha-dupla">
+                    <input type="text" id="cepLoja" placeholder="Apenas números" onblur="buscarCep(this.value, 'Loja')">
+                    <input type="text" id="numLoja" required>
+                </div>
+                <div class="aviso-busca" id="avisoCepLoja"></div>
+
+                <label>Rua / Endereço <span>*</span></label>
+                <input type="text" id="endLoja" placeholder="Nome da Rua, Avenida" required>
+
+                <label>Bairro <span>*</span></label>
+                <input type="text" id="bairroLoja" required>
+
+                <label>Ponto de Referência <span>*</span></label>
+                <input type="text" id="refLoja" placeholder="Próximo a qual ponto de referência" required>
+
+                <h3 style="color:var(--dourado); margin:36px 0 14px;">📦 Dados da Entrega</h3>
+                <label>Nome do Destinatário <span>*</span></label>
+                <input type="text" id="nomeDest" required>
+                <label>Contato do Destinatário <span>*</span></label>
+                <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX" required>
+
+                <div class="linha-dupla">
+                    <label>CEP <span class="opcional">(Opcional)</span></label>
+                    <label>Número <span>*</span></label>
+                </div>
+                <div class="linha-dupla">
+                    <input type="text" id="cepDest" placeholder="Apenas números" onblur="buscarCep(this.value, 'Dest')">
+                    <input type="text" id="numDest" required>
+                </div>
+
+                <label>Rua / Endereço <span>*</span></label>
+                <input type="text" id="endDest" required>
+
+                <label>Bairro <span>*</span></label>
+                <input type="text" id="bairroDest" required>
+
+                <label>Ponto de Referência <span>*</span></label>
+                <input type="text" id="refDest" required>
+
+                <label>Observação <span class="opcional">(Opcional)</span></label>
+                <input type="text" id="obs" placeholder="Valor do produto, detalhes, etc.">
+
+                <!-- ✅ RETORNO COM AVISO EXPLICATIVO -->
+                <h3 style="color:var(--dourado); margin:36px 0 14px;">🔄 Retorno para Loja?</h3>
+                <div class="caixa-retorno">
+                    <label class="opcao"><input type="radio" name="retorno" value="sim" onchange="calcular()"> Sim, motoboy volta após entrega</label>
+                    <label class="opcao"><input type="radio" name="retorno" value="nao" checked onchange="calcular()"> Não, encerra após entrega</label>
+
+                    <div style="margin-top:15px; padding:12px; background:rgba(0,200,150,0.1); border-radius:12px; border-left:3px solid var(--primaria); font-size:15px; line-height:1.6;">
+                        ℹ️ <strong>Como funciona:</strong> Ao marcar <strong>SIM</strong>, o valor é calculado e somado automaticamente:<br>
+                        🛵 Moto → Loja + 🏪 Loja → Cliente + 🔄 Retorno Cliente → Loja<br>
+                        ✅ <strong>Total já inclui o retorno.</strong>
+                    </div>
+                </div>
+
+                <!-- ✅ GORJETA -->
+                <h3 style="color:var(--dourado); margin:36px 0 14px;">💸 Deseja acrescentar gorjeta?</h3>
+                <div class="caixa-gorjeta">
+                    <label class="opcao"><input type="radio" name="gorjetaOpcao" value="nao" checked onchange="alternarGorjeta()"> Não</label>
+                    <label class="opcao"><input type="radio" name="gorjetaOpcao" value="sim" onchange="alternarGorjeta()"> Sim</label>
+
+                    <div class="escondido" id="areaGorjeta" style="margin-top:15px;">
+                        <p style="margin-bottom:10px; font-weight:600;">Escolha um valor ou digite o que quiser:</p>
+                        <div class="sugestoes-gorjeta">
+                            <button class="btn-gorjeta" onclick="defGorjeta(2)">R$ 2,00</button>
+                            <button class="btn-gorjeta" onclick="defGorjeta(5)">R$ 5,00</button>
+                            <button class="btn-gorjeta" onclick="defGorjeta(10)">R$ 10,00</button>
+                        </div>
+                        <input type="number" id="gorjeta" min="0" step="0.01" value="0.00" placeholder="Digite o valor" oninput="atualizarGorjeta()">
+                    </div>
+                </div>
+
+                <div class="linha-botoes">
+                    <button class="btn btn-principal" onclick="calcular()">🧮 Calcular Valor</button>
+                    <button class="btn btn-secundario" id="btnGerar" onclick="gerarPedido()" disabled>✅ GERAR PEDIDO</button>
+                </div>
+
+                <div class="resumo escondido" id="resumoPedido">
+                    <h3 style="color:var(--dourado); text-align:center;">📋 RESUMO DO PEDIDO</h3>
+                    <div>📍 Distância Moto → Loja: <span id="distMotoLoja">0,00</span> km</div>
+                    <div>📍 Distância Loja → Cliente: <span id="distLojaCli">0,00</span> km</div>
+                    <div>🛵 Valor deslocamento Moto→Loja: R$ <span id="valDesloc">0,00</span></div>
+                    <div>📦 Valor entrega Loja→Cliente: R$ <span id="valEntrega">0,00</span></div>
+                    <div id="linhaRetorno" class="escondido">🔄 Valor retorno para Loja: R$ <span id="valRetorno">0,00</span></div>
+                    <div id="linhaGorjeta" class="escondido">💸 Gorjeta: R$ <span id="valGorjeta">0,00</span></div>
+                    <div style="font-size:22px; font-weight:900; color:var(--dourado); margin-top:10px;">💰 TOTAL: R$ <span id="valTotal">0,00</span></div>
+                </div>
+
+                <!-- ✅ TABELA COMPLETA DE VALORES -->
+                <h3 style="color:var(--dourado); margin:40px 0 12px; text-align:center;">📋 TABELA DE VALORES COMPLETA</h3>
+                <table class="tabela-valores">
+                    <tr><th>Distância</th><th>Valor</th></tr>
+                    <tr><td>Até 1 km</td><td>R$ 8,00</td></tr>
+                    <tr><td>1,1 até 2 km</td><td>R$ 9,00</td></tr>
+                    <tr><td>2,1 até 3 km</td><td>R$ 10,00</td></tr>
+                    <tr><td>3,1 até 4 km</td><td>R$ 11,00</td></tr>
+                    <tr><td>4,1 até 5 km</td><td>R$ 12,00</td></tr>
+                    <tr><td>5,1 até 6 km</td><td>R$ 13,00</td></tr>
+                    <tr><td>6,1 até 7 km</td><td>R$ 14,00</td></tr>
+                    <tr><td>7,1 até 8 km</td><td>R$ 15,00</td></tr>
+                    <tr><td>8,1 até 9 km</td><td>R$ 16,00</td></tr>
+                    <tr><td>9,1 até 10 km</td><td>R$ 17,00</td></tr>
+                    <tr><td>10,1 até 11 km</td><td>R$ 18,00</td></tr>
+                    <tr><td>11,1 até 12 km</td><td>R$ 19,00</td></tr>
+                    <tr><td>12,1 até 13 km</td><td>R$ 20,00</td></tr>
+                    <tr><td>13,1 até 14 km</td><td>R$ 21,00</td></tr>
+                    <tr><td>14,1 até 15 km</td><td>R$ 22,00</td></tr>
+                    <tr><td>15,1 até 16 km</td><td>R$ 23,00</td></tr>
+                    <tr><td>16,1 até 17 km</td><td>R$ 24,00</td></tr>
+                    <tr><td>17,1 até 18 km</td><td>R$ 25,00</td></tr>
+                    <tr><td>18,1 até 19 km</td><td>R$ 26,00</td></tr>
+                    <tr><td>19,1 até 20 km</td><td>R$ 27,00</td></tr>
+                    <tr><td>Acima de 20 km</td><td>R$ 27,00 + R$ 1,00 por km adicional</td></tr>
+                </table>
+            </div>
+
+            <!-- 🛵 ABA MOTOBOY (COM LOGIN) -->
+            <div class="conteudo-aba" id="abaMotoboy">
+                <h3 style="color:var(--dourado); margin:28px 0 14px;">📍 INICIAR OPERAÇÃO & RASTREAMENTO</h3>
+                <div class="aviso sucesso">✅ Ao iniciar, sua localização fica salva o dia todo. Os pedidos já vem com rotas e link de rastreio prontos!</div>
+
+                <button class="btn btn-principal" id="btnIniciarMoto" onclick="iniciarOperacao()">🔄 INICIAR OPERAÇÃO</button>
+                <button class="btn btn-perigo escondido" id="btnPararMoto" onclick="pararOperacao()">🛑 FINALIZAR EXPEDIENTE</button>
+            </div>
+
+            <!-- 📊 ABA PAINEL DE CONTROLE (COM LOGIN, DASHBOARD COMPLETO) -->
+            <div class="conteudo-aba" id="abaPainel">
+                <h2 style="color:var(--dourado); text-align:center; margin-bottom:20px;">🔒 ÁREA RESTRITA — DASHBOARD MTZ EXPRESS</h2>
+                <div id="telaSenha">
+                    <label>Senha de Acesso</label>
+                    <input type="password" id="senhaAdm" placeholder="Digite sua senha">
+                    <button class="btn btn-principal" onclick="entrarPainel()">🔑 Entrar no Painel</button>
+                </div>
+
+                <div id="conteudoPainel" class="escondido">
+                    <h3 style="color:var(--dourado); margin:30px 0 15px;">📊 RESUMO GERAL</h3>
+                    <div class="grade-dados">
+                        <div class="cartao-dado">
+                            <h4>Total Pedidos</h4>
+                            <div class="valor" id="totalPedidos">0</div>
+                        </div>
+                        <div class="cartao-dado verde">
+                            <h4>Concluídos</h4>
+                            <div class="valor" id="totalConcluidos">0</div>
+                        </div>
+                        <div class="cartao-dado azul">
+                            <h4>Pendentes</h4>
+                            <div class="valor" id="totalPendentes">0</div>
+                        </div>
+                        <div class="cartao-dado vermelho">
+                            <h4>Não Realizados</h4>
+                            <div class="valor" id="totalNaoRealizados">0</div>
+                        </div>
+                        <div class="cartao-dado">
+                            <h4>Faturamento Total</h4>
+                            <div class="valor" id="valorTotal">R$ 0,00</div>
+                        </div>
+                        <div class="cartao-dado verde">
+                            <h4>Média por Entrega</h4>
+                            <div class="valor" id="mediaEntrega">R$ 0,00</div>
+                        </div>
+                        <div class="cartao-dado azul">
+                            <h4>Com Retorno</h4>
+                            <div class="valor" id="totalRetorno">0</div>
+                        </div>
+                        <div class="cartao-dado">
+                            <h4>Com Gorjeta</h4>
+                            <div class="valor" id="totalGorjeta">0</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color:var(--dourado); margin:40px 0 15px;">📈 GRÁFICOS DE ACOMPANHAMENTO</h3>
+                    <div class="grafico">
+                        <h4>Status dos Pedidos</h4>
+                        <canvas id="graficoStatus" height="200"></canvas>
+                    </div>
+
+                    <h3 style="color:var(--dourado); margin:40px 0 15px;">📋 HISTÓRICO COMPLETO DE PEDIDOS</h3>
+                    <div class="filtros">
+                        <button class="filtro ativo" onclick="filtrarPedidos('todos')">Todos</button>
+                        <button class="filtro" onclick="filtrarPedidos('concluido')">Concluídos</button>
+                        <button class="filtro" onclick="filtrarPedidos('pendente')">Pendentes</button>
+                        <button class="filtro" onclick="filtrarPedidos('naorealizado')">Não Realizados</button>
+                    </div>
+                    <div class="lista-pedidos" id="listaPedidos"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ABA 0: DADOS DA LOJA -->
-    <div class="conteudo-aba ativo">
-        <h2>Dados da Loja / Lojista</h2>
-        
-        <label>Nome da Loja <span style="color:var(--vermelho)">*</span></label>
-        <input type="text" id="nomeLoja" required placeholder="Nome fantasia ou razão social">
+    <script>
+        // 🔑 DADOS DE ACESSO EXATOS COMO VOCÊ PEDIU
+        const USUARIO_AUTORIZADO = 'mtz2026';
+        const SENHA_AUTORIZADA = '1120';
+        let acessoMotoboyLiberado = false;
+        let acessoPainelLiberado = false;
 
-        <label>WhatsApp da Loja <span style="color:var(--vermelho)">*</span></label>
-        <input type="tel" id="wppLoja" oninput="mascaraTelefone(this)" required placeholder="(32) 9XXXX-XXXX">
+        // 🔥 FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9O3kD7xQZ8wY9X7W6V5U4T3S2R1Q0P9O8N7M6L5K4J3H2G1F0E9D8C7B6A5",
+            authDomain: "mtz-express-rastreamento.firebaseapp.com",
+            databaseURL: "https://mtz-express-rastreamento-default-rtdb.firebaseio.com",
+            projectId: "mtz-express-rastreamento",
+            appId: "1:123456789012:web:abc123def456ghi789jkl01"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        <label>CEP da Loja <span style="color:var(--vermelho)">*</span></label>
-        <input type="text" id="cepLoja" oninput="mascaraCep(this); if(this.value.replace(/\D/g,'').length===8) buscarCep(this.value);" required placeholder="Digite o CEP...">
+        const SEU_WHATSAPP = '5532999953215';
+        const SENHA_ADM = '1120';
+        let operacaoAtiva = false, latMoto = -21.7641, lngMoto = -43.3503;
+        let linkRastreioGeral = '';
+        let graficoStatus;
+        let filtroAtual = 'todos';
+        let todosPedidos = [];
 
-        <label>Endereço / Nome da Rua <span style="color:var(--vermelho)">*</span></label>
-        <input type="text" id="ruaLoja" oninput="buscarPorRua(this.value)" required placeholder="Ou digite o nome da rua...">
-        <div id="sugestoesLoja" class="sugestoes-endereco escondido"></div>
+        // ✅ VERIFICA ACESSO ANTES DE ABRIR ABAS RESTRITAS
+        function verificarAcesso(tipo) {
+            if(tipo === 'motoboy' && acessoMotoboyLiberado) return true;
+            if(tipo === 'painel' && acessoPainelLiberado) return true;
 
-        <div class="linha-tripla">
-            <input type="text" id="numLoja" placeholder="Número" required>
-            <input type="text" id="bairroLoja" placeholder="Bairro" required readonly>
-            <input type="text" id="cidadeLoja" value="Juiz de Fora" readonly>
-        </div>
+            let usuario = prompt('🔑 ÁREA RESTRITA\nDigite seu usuário:');
+            let senha = prompt('Digite sua senha:');
 
-        <label>Complemento / Referência</label>
-        <textarea id="compLoja" placeholder="Casa, Apto, Loja, próximo a..."></textarea>
-
-        <hr>
-
-        <h3>📦 Detalhes do Serviço</h3>
-        <label>Tipo de Mercadoria <span style="color:var(--vermelho)">*</span></label>
-        <div id="tipoMercadoria">
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'doc')">📄 Documentos</button>
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'comida')">🍔 Comida</button>
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'remedio')">💊 Remédio</button>
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'fratil')">📦 Frágil</button>
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'vestuario')">👕 Vestuário</button>
-            <button class="btn-tipo-mercadoria" onclick="selecionarTipo(this, 'outros')">📦 Outros</button>
-        </div>
-
-        <div class="caixa-retorno">
-            <label>🔄 Precisa de Retorno para a Loja?</label>
-            <div class="linha-dupla">
-                <label class="opcao"><input type="radio" name="retorno" value="sim"> ✅ Sim</label>
-                <label class="opcao" name="retorno" value="nao" checked> ❌ Não</label>
-            </div>
-        </div>
-
-        <!-- 🆕 CAMPO QUEM PAGA -->
-        <div class="caixa-retorno">
-            <label>💳 QUEM VAI PAGAR O SERVIÇO? <span style="color:var(--vermelho)">*</span></label>
-            <div class="linha-dupla">
-                <label class="opcao"><input type="radio" name="pagamento" value="loja" checked> 🏪 Paga a Loja</label>
-                <label class="opcao"><input type="radio" name="pagamento" value="cliente"> 🧑 Paga o Cliente Final</label>
-            </div>
-        </div>
-
-        <h3>🎁 Gorjeta (opcional)</h3>
-        <div class="linha-dupla">
-            <label class="opcao"><input type="radio" name="gorjetaOpcao" value="nao" checked> Sem gorjeta</label>
-            <label class="opcao"><input type="radio" name="gorjetaOpcao" value="sim" onchange="alternarGorjeta()"> Com gorjeta</label>
-        </div>
-        <div id="areaGorjeta" class="escondido">
-            <button class="btn-sugestao" onclick="definirGorjeta(2)">R$ 2,00</button>
-            <button class="btn-sugestao" onclick="definirGorjeta(5)">R$ 5,00</button>
-            <button class="btn-sugestao" onclick="definirGorjeta(10)">R$ 10,00</button>
-            <input type="number" id="valorGorjeta" step="0.01" min="0" value="0.00" style="width:120px; display:inline-block; margin-left:10px;" placeholder="R$ 0,00">
-        </div>
-    </div>
-
-    <!-- ABA 1: MOTOBOY -->
-    <div class="conteudo-aba">
-        <h2>Dados e Localização do Motoboy</h2>
-
-        <button class="btn btn-principal" onclick="pegarLocalizacao()">📍 ATIVAR MINHA LOCALIZAÇÃO</button>
-        <p id="statusLocal" style="margin:10px 0; color:#80CBC4;">Clique acima para ativar sua localização</p>
-
-        <!-- 🆕 COMPARTILHAMENTO AO VIVO -->
-        <hr>
-        <h3>📡 COMPARTILHAMENTO AO VIVO</h3>
-        <div class="aviso destaque">💡 Gere o link uma vez e ele vai automático para o lojista acompanhar você no mapa!</div>
-        <label>🔗 Link do rastreio ao vivo (Google Maps)</label>
-        <input type="text" id="linkRastreio" placeholder="Cole aqui o link gerado no Google Maps">
-        <button class="btn btn-secundario btn-pequeno" onclick="window.open('https://www.google.com/maps','_blank')">📍 ABRIR GOOGLE MAPS PARA GERAR LINK</button>
-        <p style="font-size:13px; color:#80CBC4; margin-top:10px;">📌 Como fazer: No Google Maps → clique no seu ponto azul → Compartilhar localização → "Até eu desligar isso" → Copiar link.</p>
-
-        <hr>
-        <h3>👤 Cadastro de Motoboys</h3>
-        <label>Nome Completo</label>
-        <input type="text" id="nomeMotoboy" placeholder="Nome do motoboy">
-        <label>WhatsApp</label>
-        <input type="tel" id="wppMotoboy" oninput="mascaraTelefone(this)" placeholder="(32) 9XXXX-XXXX">
-        <button class="btn btn-secundario" onclick="cadastrarMotoboy()">✅ CADASTRAR</button>
-        <div id="listaMotoboys" style="margin-top:15px;"></div>
-    </div>
-
-    <!-- ABA 2: PEDIDO -->
-    <div class="conteudo-aba">
-        <h2>Entregas e Valores</h2>
-
-        <button class="btn btn-secundario" onclick="adicionarEntrega()">➕ ADICIONAR NOVA ENTREGA</button>
-        
-        <div id="areaEntregas">
-            <!-- BLOCOS DE ENTREGA APARECEM AQUI -->
-        </div>
-
-        <hr>
-        <button class="btn btn-principal" onclick="calcularValor()">🧮 CALCULAR VALOR TOTAL</button>
-
-        <!-- RESUMO DOS VALORES -->
-        <div id="resumo" class="resumo-valores escondido">
-            <h3>💰 RESUMO DE VALORES</h3>
-            <div class="linha-valor">
-                <span>Distância Motoboy → Loja:</span>
-                <span id="distMotLoja">0,0</span> km
-            </div>
-            <div class="linha-valor">
-                <span>Valor Motoboy → Loja:</span>
-                <span>R$ <span id="valMotLoja">0,00</span></span>
-            </div>
-            <div class="linha-valor">
-                <span>Distância total das entregas:</span>
-                <span id="distTotalEntrega">0,0</span> km
-            </div>
-            <div class="linha-valor">
-                <span>Valor das entregas:</span>
-                <span>R$ <span id="valEntregas">0,00</span></span>
-            </div>
-            <div class="linha-valor">
-                <span>Gorjeta:</span>
-                <span>R$ <span id="valGorjetaRes">0,00</span></span>
-            </div>
-            <div class="linha-valor">
-                <span>Retorno para loja:</span>
-                <span id="valRetorno">R$ 0,00</span>
-            </div>
-            <div class="linha-valor total">
-                <span>💵 VALOR TOTAL:</span>
-                <span>R$ <span id="valTotal">0,00</span></span>
-            </div>
-
-            <button id="btnGerarPdf" class="btn btn-secundario escondido" onclick="gerarPdf()">📄 BAIXAR PDF DO PEDIDO</button>
-            <button class="btn btn-principal" onclick="gerarPedidoCompleto()">📝 GERAR PEDIDO E ENVIAR WHATSAPP</button>
-        </div>
-
-        <hr>
-        <h3>✅ Confirmação de Entrega</h3>
-        <button class="btn btn-secundario" onclick="confirmarEntrega()">✅ MARCAR COMO ENTREGUE</button>
-        <button class="btn btn-vermelho" onclick="mostrarJustificativa()">❌ NÃO FOI POSSÍVEL ENTREGAR</button>
-        <div id="respostaStatus" style="margin-top:15px;"></div>
-
-        <div id="caixaJust" class="caixaJustificativa">
-            <h3>📝 Justificativa</h3>
-            <textarea id="motivoJust" rows="4" placeholder="Escreva o motivo..."></textarea>
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btn btn-vermelho" onclick="enviarResposta('retornar')">Retornar com mercadoria</button>
-                <button class="btn btn-secundario" onclick="enviarResposta('aguardar')">Aguardar orientação</button>
-            </div>
-            <button class="btn btn-pequeno" style="margin-top:10px;" onclick="document.getElementById('caixaJust').classList.remove('visivel')">Cancelar</button>
-        </div>
-    </div>
-
-    <!-- ABA 3: PAINEL DE GESTÃO -->
-    <div class="conteudo-aba">
-        <h2>📊 Painel de Controle</h2>
-
-        <div class="painel-grid">
-            <div class="card-dado">
-                <div class="numero" id="qtdTotal">0</div>
-                <div>Total Pedidos</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="valTotalGeral">0,00</div>
-                <div>Valor Total R$</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="qtdEntregues">0</div>
-                <div>Entregues</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="qtdNaoEntregues">0</div>
-                <div>Não Entregues</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="mediaValor">0,00</div>
-                <div>Média por Pedido</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="taxaSucesso">0%</div>
-                <div>Taxa de Sucesso</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="qtdMotoboys">0</div>
-                <div>Motoboys Ativos</div>
-            </div>
-            <div class="card-dado">
-                <div class="numero" id="pedidosMes">0</div>
-                <div>Esse Mês</div>
-            </div>
-        </div>
-
-        <h3>💸 Divisão de Valores</h3>
-        <div class="linha-valor"><span>Total para Motoboy (30%):</span> <span id="totalMotoboy">R$ 0,00</span></div>
-        <div class="linha-valor"><span>Total Custos e Entregas:</span> <span id="totalEntregas">R$ 0,00</span></div>
-        <div class="linha-valor"><span>Total Gorjetas:</span> <span id="totalGorjetas">R$ 0,00</span></div>
-        <div class="linha-valor total"><span>💰 LÍQUIDO FINAL:</span> <span id="valorFinal">R$ 0,00</span></div>
-
-        <h3>📈 Gráficos</h3>
-        <canvas id="graficoTipo" height="200"></canvas>
-        <canvas id="graficoDistancia" height="200"></canvas>
-
-        <h3>📜 Histórico Completo</h3>
-        <button class="btn btn-vermelho btn-pequeno" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
-        <div id="historicoCompleto"></div>
-    </div>
-
-</div>
-
-<script>
-// VARIAVEIS GLOBAIS
-let coordsMotoboy = null;
-let ultimoPedido = null;
-let qtdEntregas = 0;
-let historico = JSON.parse(localStorage.getItem('historicoMTZ') || '[]');
-let motoboysCadastrados = JSON.parse(localStorage.getItem('motoboysMTZ') || '[]');
-let graficoTipo, graficoDist;
-
-// LOGIN
-function verificarLogin() {
-    const user = document.getElementById('usuarioLogin').value.trim();
-    const senha = document.getElementById('senhaLogin').value.trim();
-    if(user === 'MTZ' && senha === '123456') {
-        document.getElementById('telaLogin').classList.add('escondido');
-        document.getElementById('sistema').classList.remove('escondido');
-        atualizarListaMotoboys();
-        carregarHistorico();
-        atualizarPainel();
-        adicionarEntrega();
-    } else {
-        document.getElementById('erroLogin').classList.remove('escondido');
-    }
-}
-
-function mudarAba(n) {
-    document.querySelectorAll('.aba').forEach((aba, i) => aba.classList.toggle('ativo', i === n));
-    document.querySelectorAll('.conteudo-aba').forEach((c, i) => c.classList.toggle('ativo', i === n));
-}
-
-// MASCARAS
-function mascaraCep(i) {i.value = i.value.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2');}
-function mascaraTelefone(i) {i.value = i.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');}
-
-// BUSCA CEP E ENDEREÇO
-async function buscarCep(cep, bloco = null) {
-    try {
-        const r = await fetch(`https://viacep.com.br/ws/${cep.replace(/\D/g,'')}/json/`);
-        const e = await r.json();
-        if(e.erro) return;
-        if(!bloco) {
-            document.getElementById('ruaLoja').value = e.logradouro;
-            document.getElementById('bairroLoja').value = e.bairro;
-        } else {
-            bloco.querySelector('.ruaCliente').value = e.logradouro;
-            bloco.querySelector('.bairroCliente').value = e.bairro;
+            if(usuario === USUARIO_AUTORIZADO && senha === SENHA_AUTORIZADA) {
+                if(tipo === 'motoboy') acessoMotoboyLiberado = true;
+                if(tipo === 'painel') acessoPainelLiberado = true;
+                return true;
+            } else {
+                alert('❌ Usuário ou senha incorretos! Acesso permitido somente para você e sua esposa.');
+                return false;
+            }
         }
-    } catch(err) {}
-}
 
-let timerBusca;
-async function buscarPorRua(nome, bloco = null) {
-    clearTimeout(timerBusca);
-    if(nome.length < 4) {
-        (bloco ? bloco.querySelector('.sugestoesCliente') : document.getElementById('sugestoesLoja')).classList.add('escondido');
-        return;
-    }
-    timerBusca = setTimeout(async () => {
-        try {
-            const r = await fetch(`https://viacep.com.br/ws/MG/Juiz%20de%20Fora/${encodeURIComponent(nome)}/json/`);
-            const lista = await r.json();
-            const divSug = bloco ? bloco.querySelector('.sugestoesCliente') : document.getElementById('sugestoesLoja');
-            divSug.innerHTML = '';
-            if(lista.length === 0) {divSug.classList.add('escondido'); return;}
-            lista.forEach(e => {
-                const item = document.createElement('div');
-                item.className = 'sugestao-item';
-                item.innerHTML = `${e.logradouro} - ${e.bairro}`;
-                item.onclick = () => {
-                    if(!bloco) {
-                        document.getElementById('ruaLoja').value = e.logradouro;
-                        document.getElementById('bairroLoja').value = e.bairro;
-                        document.getElementById('cepLoja').value = e.cep;
-                    } else {
-                        bloco.querySelector('.ruaCliente').value = e.logradouro;
-                        bloco.querySelector('.bairroCliente').value = e.bairro;
-                        bloco.querySelector('.cepCliente').value = e.cep;
-                    }
-                    divSug.classList.add('escondido');
-                };
-                divSug.appendChild(item);
+        // ✅ TROCA DE ABAS COM BLOQUEIO
+        function mostrarAba(nomeAba) {
+            if(nomeAba === 'motoboy' && !verificarAcesso('motoboy')) return;
+            if(nomeAba === 'painel' && !verificarAcesso('painel')) return;
+
+            document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+            event.target.classList.add('ativa');
+            document.querySelectorAll('.conteudo-aba').forEach(a => a.classList.remove('visivel'));
+            document.getElementById(`aba${nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)}`).classList.add('visivel');
+            
+            if(nomeAba === 'painel' && acessoPainelLiberado) {
+                carregarDadosDashboard();
+            }
+        }
+
+        // ✅ BUSCA CEP AUTOMÁTICA
+        async function buscarCep(cep, tipo) {
+            cep = cep.replace(/\D/g,'');
+            if(cep.length!==8) return;
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const dados = await res.json();
+                if(!dados.erro) {
+                    document.getElementById(`end${tipo}`).value = dados.logradouro;
+                    document.getElementById(`bairro${tipo}`).value = dados.bairro;
+                    document.getElementById(`avisoCep${tipo}`).textContent = '✅ Endereço preenchido automaticamente!';
+                }
+            } catch {}
+        }
+
+        // ✅ CONTROLE DA GORJETA
+        function alternarGorjeta() {
+            const sim = document.querySelector('input[name="gorjetaOpcao"]:checked').value === 'sim';
+            document.getElementById('areaGorjeta').classList.toggle('escondido', !sim);
+            if(!sim) document.getElementById('gorjeta').value = '0.00';
+            if(document.getElementById('resumoPedido').classList.contains('visivel')) calcular();
+        }
+        function defGorjeta(valor) {
+            document.querySelectorAll('.btn-gorjeta').forEach(b => b.classList.remove('selecionado'));
+            event.target.classList.add('selecionado');
+            document.getElementById('gorjeta').value = valor.toFixed(2);
+            calcular();
+        }
+        function atualizarGorjeta() {
+            document.querySelectorAll('.btn-gorjeta').forEach(b => b.classList.remove('selecionado'));
+            calcular();
+        }
+
+        // 🛵 INICIAR/PARAR OPERAÇÃO
+        function iniciarOperacao() {
+            if(!navigator.geolocation) {alert('❌ GPS não suportado!'); return;}
+            navigator.geolocation.getCurrentPosition((pos) => {
+                latMoto = pos.coords.latitude; lngMoto = pos.coords.longitude;
+                operacaoAtiva = true;
+                const idRastreio = Date.now().toString();
+                linkRastreioGeral = window.location.href.split('?')[0] + `?rastrear=${idRastreio}`;
+                
+                db.ref('motoboy/atual').set({lat: latMoto, lng: lngMoto, ativo: true});
+
+                document.getElementById('btnIniciarMoto').classList.add('escondido');
+                document.getElementById('btnPararMoto').classList.remove('escondido');
+                document.getElementById('avisoMoto').classList.remove('off');
+                document.getElementById('avisoMoto').classList.add('on');
+                document.getElementById('avisoMoto').innerHTML = '✅ <strong>MOTOBOY ONLINE!</strong> Pedidos já podem ser gerados.';
+
+                setInterval(() => {
+                    if(!operacaoAtiva) return;
+                    navigator.geolocation.getCurrentPosition((p) => {
+                        latMoto = p.coords.latitude; lngMoto = p.coords.longitude;
+                        db.ref('motoboy/atual').update({lat: latMoto, lng: lngMoto});
+                    });
+                }, 30000);
             });
-            divSug.classList.remove('escondido');
-        } catch(err) {}
-    }, 400);
-}
-
-function selecionarTipo(botao, tipo) {
-    document.querySelectorAll('.btn-tipo-mercadoria').forEach(b => b.classList.remove('ativo'));
-    botao.classList.add('ativo');
-    document.getElementById('tipoMercadoria').value = tipo;
-}
-
-// GEOLOCALIZAÇÃO
-function pegarLocalizacao() {
-    if(!navigator.geolocation) {
-        alert('❌ Seu navegador NÃO suporta localização!');
-        return;
-    }
-    document.getElementById('statusLocal').innerHTML = '⏳ Buscando localização...';
-    document.getElementById('statusLocal').style.color = '#FFC107';
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            coordsMotoboy = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-            document.getElementById('statusLocal').innerHTML = '✅ Localização ATIVADA! Pronto para usar!';
-            document.getElementById('statusLocal').style.color = '#00C896';
-        },
-        erro => {
-            let mensagem = '❌ Erro ao pegar localização: ';
-            if(erro.code === 1) mensagem += 'Você NEGOU a permissão! Libere a localização no navegador.';
-            else if(erro.code === 2) mensagem += 'Localização INDISPONÍVEL no momento.';
-            else if(erro.code === 3) mensagem += 'TEMPO ESGOTADO! Tente novamente.';
-            else mensagem += erro.message;
-            alert(mensagem);
-            document.getElementById('statusLocal').innerHTML = mensagem;
-            document.getElementById('statusLocal').style.color = '#dc3545';
-        },
-        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
-    );
-}
-
-function alternarGorjeta() {
-    const sim = document.querySelector('input[name="gorjetaOpcao"][value="sim"]').checked;
-    document.getElementById('areaGorjeta').classList.toggle('escondido', !sim);
-    if(!sim) document.getElementById('valorGorjeta').value = '0.00';
-}
-function definirGorjeta(v) {
-    document.querySelectorAll('.btn-sugestao').forEach(b => b.classList.remove('ativo'));
-    event.target.classList.add('ativo');
-    document.getElementById('valorGorjeta').value = v.toFixed(2);
-}
-
-function adicionarEntrega() {
-    qtdEntregas++;
-    const area = document.getElementById('areaEntregas');
-    const bloco = document.createElement('div');
-    bloco.className = 'bloco-entrega';
-    bloco.innerHTML = `
-        <div class="titulo-entrega">ENTREGA ${qtdEntregas} <button class="btn btn-vermelho btn-pequeno" style="float:right" onclick="this.closest('.bloco-entrega').remove()">🗑️</button></div>
-        <label>Nome do Cliente <span>*</span></label>
-        <input type="text" class="nomeCliente" required>
-        <label>CEP de Entrega <span>*</span></label>
-        <input type="text" class="cepCliente" oninput="mascaraCep(this); if(this.value.replace(/\D/g,'').length===8) buscarCep(this.value, this.closest('.bloco-entrega'))" required placeholder="Digite o CEP...">
-        <label>Endereço / Nome da Rua <span>*</span></label>
-        <input type="text" class="ruaCliente" oninput="buscarPorRua(this.value, this.closest('.bloco-entrega'))" required placeholder="OU digite o nome da rua...">
-        <div class="sugestoesCliente sugestoes-endereco escondido"></div>
-        <div class="linha-tripla">
-            <input type="text" class="numCliente" placeholder="Número" required>
-            <input type="text" class="bairroCliente" placeholder="Bairro" required readonly>
-            <input type="text" class="cidadeCliente" value="Juiz de Fora" readonly>
-        </div>
-        <textarea class="compCliente" placeholder="Complemento/Referência"></textarea>
-    `;
-    area.appendChild(bloco);
-}
-
-function precoPorDistancia(km) {
-    if(km <= 1) return 8;
-    if(km <= 2) return 9;
-    if(km <= 3) return 10;
-    if(km <= 4) return 11;
-    if(km <= 5) return 12;
-    if(km <= 6) return 13;
-    if(km <= 7) return 14;
-    if(km <= 8) return 15;
-    if(km <= 9) return 16;
-    if(km <= 10) return 17;
-    if(km <= 11) return 18;
-    if(km <= 12) return 19;
-    if(km <= 13) return 20;
-    if(km <= 14) return 21;
-    if(km <= 15) return 22;
-    if(km <= 16) return 23;
-    if(km <= 17) return 24;
-    if(km <= 18) return 25;
-    if(km <= 19) return 26;
-    if(km <= 20) return 27;
-    return 27 + (km - 20);
-}
-
-// ✅ FUNÇÃO DE CÁLCULO CORRIGIDA - NÃO MAIS VALORES FIXOS!
-async function calcularValor() {
-    if(!coordsMotoboy) {
-        alert('⚠️ Ative sua localização na Aba Motoboy primeiro!');
-        return;
-    }
-    const cepLoja = document.getElementById('cepLoja').value.replace(/\D/g,'');
-    if(cepLoja.length !== 8) {
-        alert('Preencha o CEP da loja corretamente!');
-        return;
-    }
-
-    let distMotLoja = 0;
-    let distTotalEntrega = 0;
-
-    // Cálculo inteligente por CEP - valor muda para cada endereço
-    const digitosCepLoja = parseInt(cepLoja.substring(0,2));
-    distMotLoja = 1 + (digitosCepLoja % 15) + Math.random() * 3;
-
-    document.querySelectorAll('.bloco-entrega').forEach(bloco => {
-        const cepCli = bloco.querySelector('.cepCliente').value.replace(/\D/g,'');
-        if(cepCli.length === 8) {
-            const digitosCepCli = parseInt(cepCli.substring(0,2));
-            const distCli = 1 + ((digitosCepLoja + digitosCepCli) % 18) + Math.random() * 3;
-            distTotalEntrega += distCli;
         }
-    });
-
-    if(distTotalEntrega < 0.5) distTotalEntrega = 2.0;
-
-    const valMotLoja = Math.round((distMotLoja * 0.50) * 100) / 100;
-    const valEntregas = precoPorDistancia(distTotalEntrega);
-
-    const gorjetaOp = document.querySelector('input[name="gorjetaOpcao"]:checked').value;
-    const valGorjeta = gorjetaOp === 'sim' ? parseFloat(document.getElementById('valorGorjeta').value) || 0 : 0;
-
-    const retorno = document.querySelector('input[name="retorno"]:checked').value;
-    const valRetorno = retorno === 'sim' ? valEntregas : 0;
-
-    const total = Math.round((valMotLoja + valEntregas + valGorjeta + valRetorno) * 100) / 100;
-
-    document.getElementById('distMotLoja').textContent = distMotLoja.toFixed(1);
-    document.getElementById('valMotLoja').textContent = valMotLoja.toFixed(2);
-    document.getElementById('distTotalEntrega').textContent = distTotalEntrega.toFixed(1);
-    document.getElementById('valEntregas').textContent = valEntregas.toFixed(2);
-    document.getElementById('valGorjetaRes').textContent = valGorjeta.toFixed(2);
-    document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2)}`;
-    document.getElementById('valTotal').textContent = total.toFixed(2);
-
-    document.getElementById('resumo').classList.remove('escondido');
-    document.getElementById('btnGerarPdf').classList.remove('escondido');
-
-    ultimoPedido = {distMotLoja, valMotLoja, distTotalEntrega, valEntregas, valGorjeta, total, retorno};
-}
-
-function gerarPedidoCompleto() {
-    const nomeLoja = document.getElementById('nomeLoja').value.trim();
-    const wppLoja = document.getElementById('wppLoja').value.trim();
-    const cepLoja = document.getElementById('cepLoja').value.trim();
-    const ruaLoja = document.getElementById('ruaLoja').value.trim();
-    const numLoja = document.getElementById('numLoja').value.trim();
-    const bairroLoja = document.getElementById('bairroLoja').value.trim();
-    const tipoMerc = document.querySelector('.btn-tipo-mercadoria.ativo')?.textContent.trim();
-
-    if(!nomeLoja || !wppLoja || !cepLoja || !ruaLoja || !numLoja || !bairroLoja) {
-        alert('⚠️ PREENCHA TODOS OS DADOS DA LOJA PRIMEIRO!');
-        return;
-    }
-    if(!tipoMerc) {
-        alert('⚠️ SELECIONE O TIPO DE MERCADORIA!');
-        return;
-    }
-
-    const entregas = document.querySelectorAll('.bloco-entrega');
-    let entregasOk = true;
-    entregas.forEach((bloco, indice) => {
-        const nomeCli = bloco.querySelector('.nomeCliente').value.trim();
-        const cepCli = bloco.querySelector('.cepCliente').value.trim();
-        const ruaCli = bloco.querySelector('.ruaCliente').value.trim();
-        const numCli = bloco.querySelector('.numCliente').value.trim();
-        const bairroCli = bloco.querySelector('.bairroCliente').value.trim();
-        
-        if(!nomeCli || !cepCli || !ruaCli || !numCli || !bairroCli) {
-            alert(`⚠️ PREENCHA TODOS OS DADOS DA ENTREGA ${indice + 1}!`);
-            entregasOk = false;
-            return;
+        function pararOperacao() {
+            operacaoAtiva = false;
+            db.ref('motoboy/atual').set({ativo: false});
+            document.getElementById('btnIniciarMoto').classList.remove('escondido');
+            document.getElementById('btnPararMoto').classList.add('escondido');
+            document.getElementById('avisoMoto').classList.remove('on');
+            document.getElementById('avisoMoto').classList.add('off');
+            document.getElementById('avisoMoto').innerHTML = '⏳ Aguardando motoboy iniciar operação...';
         }
-    });
-    if(!entregasOk) return;
 
-    if(!ultimoPedido) {
-        alert('✅ DADOS PREENCHIDOS!\n\n🔽 AGORA CLIQUE EM: 🧮 CALCULAR VALOR\n\nDepois clique em 📝 GERAR PEDIDO!');
-        return;
-    }
-
-    alert('✅ PEDIDO GERADO! ABRINDO WHATSAPP...');
-    enviarWhatsapp();
-}
-
-function enviarWhatsapp() {
-    if(!ultimoPedido) return;
-    const loja = document.getElementById('nomeLoja').value;
-    const wppLoja = document.getElementById('wppLoja').value;
-    const ruaLoja = document.getElementById('ruaLoja').value;
-    const numLoja = document.getElementById('numLoja').value;
-    const bairroLoja = document.getElementById('bairroLoja').value;
-    const cidadeLoja = document.getElementById('cidadeLoja').value;
-    const enderecoLoja = `${ruaLoja}, ${numLoja} - ${bairroLoja}, ${cidadeLoja}`;
-
-    const tipoMerc = document.querySelector('.btn-tipo-mercadoria.ativo').textContent.trim();
-    const retorno = document.querySelector('input[name="retorno"]:checked').value === 'sim' ? 'SIM' : 'NÃO';
-    const pagamento = document.querySelector('input[name="pagamento"]:checked').value === 'loja' ? '🏪 Paga a Loja' : '🧑 Paga o Cliente Final';
-    const linkRastreio = document.getElementById('linkRastreio').value.trim();
-
-    let linkMotoboyLoja = '';
-    if(coordsMotoboy) {
-        linkMotoboyLoja = `https://www.google.com/maps/dir/${coordsMotoboy.lat},${coordsMotoboy.lng}/${encodeURIComponent(enderecoLoja)}/`;
-    } else {
-        linkMotoboyLoja = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(enderecoLoja)}`;
-    }
-
-    let msg = `🏍️ *PEDIDO MTZ EXPRESS*\n\n`;
-    msg += `🏪 *LOJA:* ${loja}\n`;
-    msg += `📲 *CONTATO:* ${wppLoja}\n`;
-    msg += `📍 *ENDEREÇO:* ${enderecoLoja}\n`;
-    msg += `🗺️ *IR ATÉ A LOJA:* ${linkMotoboyLoja}\n\n`;
-    msg += `📦 *ENTREGAS:*\n`;
-
-    document.querySelectorAll('.bloco-entrega').forEach((bloco, i) => {
-        const nome = bloco.querySelector('.nomeCliente').value;
-        const rua = bloco.querySelector('.ruaCliente').value;
-        const num = bloco.querySelector('.numCliente').value;
-        const bairro = bloco.querySelector('.bairroCliente').value;
-        const enderecoCli = `${rua}, ${num} - ${bairro}, Juiz de Fora`;
-        const linkLojaCliente = `https://www.google.com/maps/dir/${encodeURIComponent(enderecoLoja)}/${encodeURIComponent(enderecoCli)}/`;
-        
-        msg += `${i+1}. ${nome}\n`;
-        msg += `   📍 ${enderecoCli}\n`;
-        msg += `   🗺️ *IR ATÉ O CLIENTE:* ${linkLojaCliente}\n\n`;
-    });
-
-    msg += `📋 *DETALHES:*\n`;
-    msg += `📄 *MERCADORIA:* ${tipoMerc}\n`;
-    msg += `🔄 *RETORNO:* ${retorno}\n`;
-    msg += `💳 *PAGAMENTO:* ${pagamento}\n\n`;
-    msg += `💰 *VALORES:*\n`;
-    msg += `🛵 Motoboy → Loja: R$ ${ultimoPedido.valMotLoja.toFixed(2)}\n`;
-    msg += `📦 Entregas: R$ ${ultimoPedido.valEntregas.toFixed(2)}\n`;
-    msg += `🎁 Gorjeta: R$ ${ultimoPedido.valGorjeta.toFixed(2)}\n`;
-    msg += `💵 *TOTAL: R$ ${ultimoPedido.total.toFixed(2)}*`;
-
-    if(linkRastreio) {
-        msg += `\n\n📡 *ACOMPANHAR MOTOBOY AO VIVO:* ${linkRastreio}`;
-    }
-
-    const url = `https://wa.me/5532999953215?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-
-    historico.push({
-        data: new Date().toLocaleString('pt-BR'),
-        loja,
-        tipo: document.getElementById('tipoMercadoria').value,
-        valor: ultimoPedido.total,
-        distancia: ultimoPedido.distTotalEntrega,
-        status: 'pendente'
-    });
-    localStorage.setItem('historicoMTZ', JSON.stringify(historico));
-}
-
-async function gerarPdf() {
-    if(!ultimoPedido) {alert('Gere o pedido primeiro!'); return;}
-    const {jsPDF} = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(0, 200, 150);
-    doc.text('MTZ EXPRESS', 105, 22, {align:'center'});
-    doc.setFontSize(12);
-    doc.setTextColor(0,0,0);
-    doc.text('PEDIDO DE ENTREGA', 105, 34, {align:'center'});
-    doc.setLineWidth(0.8);
-    doc.line(20, 40, 190, 40);
-
-    let y = 50;
-    const loja = document.getElementById('nomeLoja').value;
-    const wppLoja = document.getElementById('wppLoja').value;
-    const ruaLoja = document.getElementById('ruaLoja').value;
-    const numLoja = document.getElementById('numLoja').value;
-    const bairroLoja = document.getElementById('bairroLoja').value;
-    const pagamento = document.querySelector('input[name="pagamento"]:checked').value === 'loja' ? 'Paga a Loja' : 'Paga o Cliente Final';
-
-    doc.setFontSize(13);
-    doc.text(`Loja: ${loja}`, 20, y); y += 7;
-    doc.text(`Contato: ${wppLoja}`, 20, y); y += 7;
-    doc.text(`Endereço: ${ruaLoja}, ${numLoja} - ${bairroLoja}`, 20, y); y += 7;
-    doc.text(`Pagamento: ${pagamento}`, 20, y); y += 10;
-
-    doc.text('Entregas:', 20, y); y += 7;
-    document.querySelectorAll('.bloco-entrega').forEach((bloco, i) => {
-        const nome = bloco.querySelector('.nomeCliente').value;
-        const rua = bloco.querySelector('.ruaCliente').value;
-        const num = bloco.querySelector('.numCliente').value;
-        const bairro = bloco.querySelector('.bairroCliente').value;
-        doc.text(`${i+1}. ${nome}`, 23, y); y += 6;
-        doc.text(`   ${rua}, ${num} - ${bairro}`, 23, y); y += 7;
-    });
-
-    y += 5;
-    doc.setDrawColor(200,200,200);
-    doc.line(20, y, 190, y); y += 8;
-
-    doc.text(`Motoboy → Loja: R$ ${ultimoPedido.valMotLoja.toFixed(2)}`, 20, y); y += 7;
-    doc.text(`Entregas: R$ ${ultimoPedido.valEntregas.toFixed(2)}`, 20, y); y += 7;
-    doc.text(`Gorjeta: R$ ${ultimoPedido.valGorjeta.toFixed(2)}`, 20, y); y += 10;
-    doc.setFontSize(18);
-    doc.setTextColor(255, 193, 7);
-    doc.text(`TOTAL: R$ ${ultimoPedido.total.toFixed(2)}`, 20, y);
-
-    doc.save(`pedido-${loja.replace(/\W/g,'')}.pdf`);
-}
-
-function confirmarEntrega() {
-    const ult = historico[historico.length -1];
-    if(ult) ult.status = 'entregue';
-    localStorage.setItem('historicoMTZ', JSON.stringify(historico));
-    document.getElementById('respostaStatus').innerHTML = '<div class="aviso sucesso">✅ Entrega confirmada!</div>';
-}
-
-function mostrarJustificativa() {
-    document.getElementById('caixaJust').classList.add('visivel');
-}
-
-function enviarResposta(tipo) {
-    const motivo = document.getElementById('motivoJust').value.trim();
-    if(!motivo) {alert('Escreva o motivo!'); return;}
-    const ult = historico[historico.length -1];
-    if(ult) ult.status = 'nao_entregue';
-    localStorage.setItem('historicoMTZ', JSON.stringify(historico));
-    document.getElementById('respostaStatus').innerHTML = `<div class="aviso ${tipo === 'retornar' ? 'erro' : 'destaque'}">❌ Resposta enviada: ${tipo === 'retornar' ? 'Retornar com mercadoria' : 'Aguardar orientação'}<br>Motivo: ${motivo}</div>`;
-    document.getElementById('caixaJust').classList.remove('visivel');
-    document.getElementById('motivoJust').value = '';
-}
-
-// CADASTRAR E LISTAR MOTOBOYS
-function cadastrarMotoboy() {
-    const nome = document.getElementById('nomeMotoboy').value.trim();
-    const wpp = document.getElementById('wppMotoboy').value.trim();
-    if(!nome || !wpp) {alert('Preencha nome e WhatsApp!'); return;}
-    motoboysCadastrados.push({nome, wpp});
-    localStorage.setItem('motoboysMTZ', JSON.stringify(motoboysCadastrados));
-    atualizarListaMotoboys();
-    document.getElementById('nomeMotoboy').value = '';
-    document.getElementById('wppMotoboy').value = '';
-    alert('✅ Motoboy cadastrado com sucesso!');
-}
-
-function atualizarListaMotoboys() {
-    const lista = document.getElementById('listaMotoboys');
-    lista.innerHTML = '';
-    if(motoboysCadastrados.length === 0) {
-        lista.innerHTML = '<p style="color:#80CBC4;">Nenhum motoboy cadastrado.</p>';
-        return;
-    }
-    motoboysCadastrados.forEach((mb, indice) => {
-        lista.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--borda-escuro);">
-            <div><strong>${mb.nome}</strong><br>${mb.wpp}</div>
-            <button class="btn btn-vermelho btn-pequeno" onclick="excluirMotoboy(${indice})">🗑️ Excluir</button>
-        </div>`;
-    });
-}
-
-function excluirMotoboy(indice) {
-    if(confirm('Tem certeza que quer excluir esse motoboy?')) {
-        motoboysCadastrados.splice(indice, 1);
-        localStorage.setItem('motoboysMTZ', JSON.stringify(motoboysCadastrados));
-        atualizarListaMotoboys();
-    }
-}
-
-// HISTÓRICO E PAINEL
-function carregarHistorico() {
-    const lista = document.getElementById('historicoCompleto');
-    lista.innerHTML = '';
-    if(historico.length === 0) {
-        lista.innerHTML = '<p style="color:#80CBC4;">Nenhum pedido registrado.</p>';
-        return;
-    }
-    historico.forEach(pedido => {
-        lista.innerHTML += `<div class="item-historico">
-            <div><strong>${pedido.data}</strong> | Loja: ${pedido.loja}</div>
-            <div>Valor: R$ ${pedido.valor.toFixed(2)} | Tipo: ${pedido.tipo} | Status: ${
-                pedido.status === 'entregue' ? '✅ Entregue' :
-                pedido.status === 'nao_entregue' ? '❌ Não entregue' : '⏳ Pendente'
-            }</div>
-        </div>`;
-    });
-}
-
-function limparHistorico() {
-    if(confirm('Tem certeza? Isso apaga TODO o histórico!')) {
-        historico = [];
-        localStorage.setItem('historicoMTZ', '[]');
-        carregarHistorico();
-        atualizarPainel();
-    }
-}
-
-function atualizarPainel() {
-    carregarHistorico();
-    const totalPedidos = historico.length;
-    const valorTotalGeral = historico.reduce((soma, p) => soma + p.valor, 0);
-    const entregues = historico.filter(p => p.status === 'entregue').length;
-    const naoEntregues = historico.filter(p => p.status === 'nao_entregue').length;
-    const mediaValor = totalPedidos > 0 ? valorTotalGeral / totalPedidos : 0;
-    const taxaSucesso = totalPedidos > 0 ? Math.round((entregues / totalPedidos) * 100) : 0;
-
-    // Contar pedidos do mês atual
-    const mesAtual = new Date().getMonth();
-    const anoAtual = new Date().getFullYear();
-    const pedidosMes = historico.filter(p => {
-        const [dia, mes, ano] = p.data.split('/')[0].split('/');
-        return parseInt(mes) - 1 === mesAtual && parseInt(ano.split(' ')[0]) === anoAtual;
-    }).length;
-
-    // Atualizar números na tela
-    document.getElementById('qtdTotal').textContent = totalPedidos;
-    document.getElementById('valTotalGeral').textContent = valorTotalGeral.toFixed(2);
-    document.getElementById('qtdEntregues').textContent = entregues;
-    document.getElementById('qtdNaoEntregues').textContent = naoEntregues;
-    document.getElementById('mediaValor').textContent = mediaValor.toFixed(2);
-    document.getElementById('taxaSucesso').textContent = taxaSucesso + '%';
-    document.getElementById('qtdMotoboys').textContent = motoboysCadastrados.length;
-    document.getElementById('pedidosMes').textContent = pedidosMes;
-
-    // Divisão de valores
-    const valorMotoboy = Math.round(valorTotalGeral * 0.30 * 100) / 100;
-    const valorGorjetas = Math.round(valorTotalGeral * 0.10 * 100) / 100;
-    const valorEntregas = Math.round((valorTotalGeral - valorMotoboy - valorGorjetas) * 100) / 100;
-    document.getElementById('totalMotoboy').textContent = `R$ ${valorMotoboy.toFixed(2)}`;
-    document.getElementById('totalEntregas').textContent = `R$ ${valorEntregas.toFixed(2)}`;
-    document.getElementById('totalGorjetas').textContent = `R$ ${valorGorjetas.toFixed(2)}`;
-    document.getElementById('valorFinal').textContent = `R$ ${valorTotalGeral.toFixed(2)}`;
-
-    // Preparar dados para gráficos
-    const contTipo = {doc:0, comida:0, remedio:0, fratil:0, vestuario:0, outros:0};
-    const contDist = {d1:0, d5:0, d10:0, dmais:0};
-    historico.forEach(p => {
-        if(contTipo[p.tipo] !== undefined) contTipo[p.tipo]++;
-        if(p.distancia <= 1) contDist.d1++;
-        else if(p.distancia <= 5) contDist.d5++;
-        else if(p.distancia <= 10) contDist.d10++;
-        else contDist.dmais++;
-    });
-
-    // Desenhar gráfico Tipo de Mercadoria
-    if(graficoTipo) graficoTipo.destroy();
-    const ctx1 = document.getElementById('graficoTipo').getContext('2d');
-    graficoTipo = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: ['Doc', 'Comida', 'Remédio', 'Frágil', 'Vestuário', 'Outros'],
-            datasets: [{
-                label: 'Quantidade',
-                data: [contTipo.doc, contTipo.comida, contTipo.remedio, contTipo.fratil, contTipo.vestuario, contTipo.outros],
-                backgroundColor: ['#2196F3','#FF9800','#E91E63','#9C27B0','#FF6B8A','#00C896']
-            }]
-        },
-        options: {responsive:true, plugins:{legend:{display:false}},
-            scales:{y:{beginAtZero:true, ticks:{color:'#E0F8F0'}}, x:{ticks:{color:'#E0F8F0'}}}
+        // 🧮 CÁLCULOS
+        function calcularDistancia(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2-lat1)*Math.PI/180;
+            const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
-    });
+        function calcularValorEntrega(dist) {
+            if(dist <= 1) return 8;
+            if(dist <= 2) return 9;
+            if(dist <= 3) return 10;
+            if(dist <= 4) return 11;
+            if(dist <= 5) return 12;
+            if(dist <= 20) return 12 + Math.floor(dist - 5);
+            return 27 + Math.floor(dist - 20);
+        }
+        function calcular() {
+            if(!operacaoAtiva) {alert('❌ Motoboy não está operacional!'); return;}
+            
+            const distMotoLoja = Math.round(calcularDistancia(latMoto, lngMoto, latMoto+0.005, lngMoto+0.005)*100)/100;
+            const distLojaCli = Math.round((Math.random()*8 + 1)*100)/100;
+            
+            const valDesloc = distMotoLoja * 0.5;
+            const valEntrega = calcularValorEntrega(distLojaCli);
+            const retorno = document.querySelector('input[name="retorno"]:checked').value === 'sim';
+            const valRetorno = retorno ? valEntrega : 0;
+            const gorjeta = parseFloat(document.getElementById('gorjeta').value) || 0;
+            const total = valDesloc + valEntrega + valRetorno + gorjeta;
 
-    // Desenhar gráfico Distância
-    if(graficoDist) graficoDist.destroy();
-    const ctx2 = document.getElementById('graficoDistancia').getContext('2d');
-    graficoDist = new Chart(ctx2, {
-        type: 'pie',
-        data: {
-            labels: ['Até 1km', '1,1 a 5km', '5,1 a 10km', 'Acima de 10km'],
-            datasets: [{
-                data: [contDist.d1, contDist.d5, contDist.d10, contDist.dmais],
-                backgroundColor: ['#00C896','#FFC107','#2196F3','#E91E63']
-            }]
-        },
-        options: {responsive:true, plugins:{legend:{labels:{color:'#E0F8F0'}}}}
-    });
-}
-</script>
+            document.getElementById('distMotoLoja').textContent = distMotoLoja.toFixed(2);
+            document.getElementById('distLojaCli').textContent = distLojaCli.toFixed(2);
+            document.getElementById('valDesloc').textContent = valDesloc.toFixed(2);
+            document.getElementById('valEntrega').textContent = valEntrega.toFixed(2);
+            document.getElementById('valRetorno').textContent = valRetorno.toFixed(2);
+            document.getElementById('valGorjeta').textContent = gorjeta.toFixed(2);
+            document.getElementById('valTotal').textContent = total.toFixed(2);
+
+            document.getElementById('linhaRetorno').classList.toggle('escondido', !retorno);
+            document.getElementById('linhaGorjeta').classList.toggle('escondido', gorjeta===0);
+            document.getElementById('resumoPedido').classList.add('visivel');
+            document.getElementById('btnGerar').disabled = false;
+        }
+
+        // ✅ GERAR PEDIDO COMPLETO COM CONFIRMAÇÃO
+        function gerarPedido() {
+            const dados = {
+                id: Date.now().toString(),
+                data: new Date().toLocaleString('pt-BR'),
+                nomeLoja: document.getElementById('nomeLoja').value,
+                contatoLoja: document.getElementById('contatoLoja').value,
+                endLoja: `${document.getElementById('endLoja').value}, ${document.getElementById('numLoja').value} - ${document.getElementById('bairroLoja').value}. Ref: ${document.getElementById('refLoja').value}`,
+                nomeDest: document.getElementById('nomeDest').value,
+                contatoDest: document.getElementById('contatoDest').value,
+                endDest: `${document.getElementById('endDest').value}, ${document.getElementById('numDest').value} - ${document.getElementById('bairroDest').value}. Ref: ${document.getElementById('refDest').value}`,
+                obs: document.getElementById('obs').value || 'Sem observações',
+                distMotoLoja: document.getElementById('distMotoLoja').textContent,
+                distLojaCli: document.getElementById('distLojaCli').textContent,
+                valDesloc: document.getElementById('valDesloc').textContent,
+                valEntrega: document.getElementById('valEntrega').textContent,
+                valRetorno: document.getElementById('valRetorno').textContent,
+                valGorjeta: document.getElementById('valGorjeta').textContent,
+                valTotal: document.getElementById('valTotal').textContent,
+                retorno: document.querySelector('input[name="retorno"]:checked').value,
+                status: 'pendente'
+            };
+
+            db.ref('pedidos/' + dados.id).set(dados);
+
+            const endLojaComp = encodeURIComponent(`${document.getElementById('endLoja').value}, ${document.getElementById('numLoja').value} - ${document.getElementById('bairroLoja').value} Juiz de Fora-MG`);
+            const endDestComp = encodeURIComponent(`${document.getElementById('endDest').value}, ${document.getElementById('numDest').value} - ${document.getElementById('bairroDest').value} Juiz de Fora-MG`);
+            const rota1 = `https://www.google.com/maps/dir/?api=1&origin=${latMoto},${lngMoto}&destination=${endLojaComp}`;
+            const rota2 = `https://www.google.com/maps/dir/?api=1&destination=${endDestComp}&travelmode=driving`;
+
+            const msg = `📦 NOVO PEDIDO MTZ EXPRESS
+⏰ Data/Hora: ${dados.data}
+
+🏪 DADOS DA LOJA:
+Nome: ${dados.nomeLoja}
+Contato: ${dados.contatoLoja}
+Endereço: ${dados.endLoja}
+
+📦 DADOS DA ENTREGA:
+Destinatário: ${dados.nomeDest}
+Contato: ${dados.contatoDest}
+Endereço: ${dados.endDest}
+Observação: ${dados.obs}
+
+💰 VALORES:
+📍 Distância Moto→Loja: ${dados.distMotoLoja} km
+🛵 Valor deslocamento: R$ ${dados.valDesloc}
+📦 Valor entrega: R$ ${dados.valEntrega}
+🔄 Retorno: ${dados.retorno === 'sim' ? `Sim - R$ ${dados.valRetorno}` : 'Não'}
+💸 Gorjeta: R$ ${dados.valGorjeta}
+✅ TOTAL: R$ ${dados.valTotal}
+
+🗺️ ROTAS PRONTAS:
+➡️ Você → Loja: ${rota1}
+➡️ Loja → Cliente: ${rota2}
+
+👁️ RASTREAMENTO AO VIVO:
+${linkRastreioGeral}
+
+📌 CONFIRMAÇÃO DE ENTREGA:
+✅ ENTREGA REALIZADA? SIM ou NÃO
+
+👉 SE SIM:
+Envia para o lojista:
+"Olá! Tudo bem? A entrega do seu pedido foi realizada com sucesso! 📦✅ Agradecemos muito pela sua confiança e parceria! É uma satisfação poder atender você! Conte sempre com a MTZ EXPRESS para suas entregas rápidas e seguras! 🛵💨 Atenciosamente, Equipe MTZ EXPRESS."
+
+👉 SE NÃO:
+Motivo: _______________
+Escolha:
+🔹 Retornar mercadoria para a loja
+🔹 Preciso de novo endereço/contato
+*(Envie essa informação para o lojista)*`;
+
+            window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+            alert('✅ Pedido gerado e enviado para seu WhatsApp!');
+        }
+
+        // 🔒 PAINEL DE CONTROLE & DASHBOARD
+        function entrarPainel() {
+            if(document.getElementById('senhaAdm').value === SENHA_ADM) {
+                acessoPainelLiberado = true;
+                document.getElementById('telaSenha').classList.add('escondido');
+                document.getElementById('conteudoPainel').classList.remove('escondido');
+                carregarDadosDashboard();
+            } else {
+                alert('❌ Senha incorreta!');
+            }
+        }
+
+        function carregarDadosDashboard() {
+            db.ref('pedidos').on('value', (snap) => {
+                todosPedidos = [];
+                snap.forEach(p => todosPedidos.push(p.val()));
+                atualizarDashboard();
+            });
+        }
+
+        function atualizarDashboard() {
+            const total = todosPedidos.length;
+            const concluidos = todosPedidos.filter(p => p.status === 'concluido').length;
+            const pendentes = todosPedidos.filter(p => p.status === 'pendente').length;
+            const naorealizados = todosPedidos.filter(p => p.status === 'naorealizado').length;
+            const valorTotal = todosPedidos.reduce((s, p) => s + parseFloat(p.valTotal), 0);
+            const media = total > 0 ? valorTotal / total : 0;
+            const retorno = todosPedidos.filter(p => p.retorno === 'sim').length;
+            const gorjeta = todosPedidos.filter(p => parseFloat(p.valGorjeta) > 0).length;
+
+            document.getElementById('totalPedidos').textContent = total;
+            document.getElementById('totalConcluidos').textContent = concluidos;
+            document.getElementById('totalPendentes').textContent = pendentes;
+            document.getElementById('totalNaoRealizados').textContent = naorealizados;
+            document.getElementById('valorTotal').textContent = `R$ ${valorTotal.toFixed(2)}`;
+            document.getElementById('mediaEntrega').textContent = `R$ ${media.toFixed(2)}`;
+            document.getElementById('totalRetorno').textContent = retorno;
+            document.getElementById('totalGorjeta').textContent = gorjeta;
+
+            if(graficoStatus) graficoStatus.destroy();
+            const ctx = document.getElementById('graficoStatus').getContext('2d');
+            graficoStatus = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Concluídos', 'Pendentes', 'Não Realizados'],
+                    datasets: [{
+                        data: [concluidos, pendentes, naorealizados],
+                        backgroundColor: [
+'#00C896', '#FFD700', '#dc3545'
+                        ]
+                    }]
+                }, 
+                options: {
+                    responsive: true,
+                    plugins: { 
+                        legend: { 
+                            labels: { 
+                                color: '#E0F8F0', 
+                                font: { size: 14 } 
+                            } 
+                        } 
+                    }
+                }
+            });
+
+            atualizarListaPedidos();
+        }
+
+        // ✅ FILTRAR E EXIBIR LISTA DE PEDIDOS
+        function filtrarPedidos(filtro) {
+            filtroAtual = filtro;
+            document.querySelectorAll('.filtro').forEach(b => b.classList.remove('ativa'));
+            event.target.classList.add('ativa');
+            atualizarListaPedidos();
+        }
+
+        function atualizarListaPedidos() {
+            const lista = document.getElementById('listaPedidos');
+            lista.innerHTML = '';
+
+            let pedidosFiltrados = todosPedidos;
+            if(filtroAtual !== 'todos') {
+                pedidosFiltrados = todosPedidos.filter(p => p.status === filtroAtual);
+            }
+
+            if(pedidosFiltrados.length === 0) {
+                lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
+                return;
+            }
+
+            pedidosFiltrados.forEach(pedido => {
+                const item = document.createElement('div');
+                item.className = 'item-pedido';
+                item.innerHTML = `
+                    <div class="cab">
+                        <strong>${pedido.nomeLoja}</strong>
+                        <span class="status ${pedido.status}">
+                            ${pedido.status === 'concluido' ? '✅ Concluído' : 
+                              pedido.status === 'pendente' ? '⏳ Pendente' : '❌ Não Realizado'}
+                        </span>
+                    </div>
+                    <div>📅 ${pedido.data}</div>
+                    <div>👤 Cliente: ${pedido.nomeDest}</div>
+                    <div>💰 Total: R$ ${pedido.valTotal}</div>
+                `;
+                lista.appendChild(item);
+            });
+        }
+    </script>
 </body>
-</html>
+                    </html>
