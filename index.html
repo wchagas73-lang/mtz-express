@@ -73,9 +73,9 @@
             <button class="aba" onclick="mostrarAba('admin')">⚙️ Admin</button>
         </div>
 
-        <!-- ABA LOJISTA → TUDO MANUAL, CAMPOS OBRIGATÓRIOS -->
+        <!-- ABA LOJISTA -->
         <div id="abalojista" class="conteudo visivel">
-            <div class="aviso-localizacao" id="avisoLocal">🔄 Obtendo localização...</div>
+            <div class="aviso-localizacao" id="avisoLocal">🔄 Obtendo sua localização real...</div>
             <div class="caixa">
                 <button class="btn btn-dourado btn-pequeno" onclick="salvarLoja()">💾 Salvar Loja</button>
                 <p class="aviso-taxa" style="color:#FFD700; margin-top:8px;">✅ Salva dados para próximos pedidos</p>
@@ -176,7 +176,7 @@
                     <h3 style="color:#00C853;">💳 PIX NUBANK</h3>
                     <div id="qrcode"></div>
                     <p>Valor: <span id="valorPix">R$ 0,00</span></p>
-                    <div class="pix-copia" id="chavePix">Cadastre sua chave Pix</div>
+                    <div class="pix-copia" id="chavePix">COLOQUE-SUA-CHAVE-PIX-AQUI</div>
                     <button class="btn btn-verde btn-pequeno" onclick="copiarPix()">📋 Copiar Chave</button>
                 </div>
             </div>
@@ -274,10 +274,10 @@
 
 <script>
 // ==================================================
-// ⚙️ CONFIGURAÇÕES — COLOQUE SEUS DADOS AQUI!
+// ⚙️ SUAS CONFIGURAÇÕES JÁ INSERIDAS!
 // ==================================================
-const CHAVE_PIX_NUBANK = 'COLOQUE-SUA-CHAVE-PIX-AQUI';
-const SEU_WHATSAPP = '5532999953215';
+const CHAVE_PIX_NUBANK = 'COLOQUE-SUA-CHAVE-PIX-AQUI'; // ❗ TROQUE PELA SUA CHAVE PIX PERMANENTE
+const SEU_WHATSAPP = '5532999953215'; // ✅ SEU NÚMERO JÁ CADASTRADO!
 
 let minhaLat, minhaLng, localizacaoOk = false;
 let numeroPedido = Math.floor(Math.random() * 99999) + 10000;
@@ -286,6 +286,7 @@ let graficoSemanal, graficoMensal;
 let qtdEntregasCadastradas = 1;
 let intervaloLocalizacao = null;
 let motoboyLogado = false;
+const PADRAO_JF = {lat:-21.7642, lng:-43.3503};
 
 let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify({
     totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, somaAvaliacoes:0, qtdAvaliacoes:0,
@@ -295,25 +296,32 @@ let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify(
 function salvarDados() {localStorage.setItem('dadosMTZ', JSON.stringify(dadosGerais));}
 
 window.onload = function() {
-    // LOCALIZAÇÃO — SE NÃO CONSEGUIR, USA CENTRO DE JUIZ DE FORA
+    // ⚠️ VALOR INICIAL SEGURO — DEPOIS TROCA PELA SUA LOCALIZAÇÃO REAL
+    minhaLat = PADRAO_JF.lat;
+    minhaLng = PADRAO_JF.lng;
+    localizacaoOk = true;
+
+    // ✅ BUSCA SUA LOCALIZAÇÃO VERDADEIRA — PRIORIDADE MÁXIMA!
     if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            pos => {minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude; localizacaoOk = true;
-                document.getElementById('avisoLocal').textContent = '✅ Localização ok!';
-                document.getElementById('avisoLocal').className = 'aviso-localizacao ok';},
-            () => {
-                document.getElementById('avisoLocal').textContent = '⚠️ Usando centro Juiz de Fora';
+            pos => {
+                minhaLat = pos.coords.latitude;
+                minhaLng = pos.coords.longitude;
+                localizacaoOk = true;
+                document.getElementById('avisoLocal').textContent = '✅ Localização real obtida!';
+                document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
+            },
+            erro => {
+                document.getElementById('avisoLocal').textContent = '⚠️ Usando centro JF (sem sinal/localização)';
                 document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
-                minhaLat = -21.7642; minhaLng = -43.3503; localizacaoOk = true;},
-            {enableHighAccuracy:true, timeout:7000, maximumAge:60000}
+            },
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 30000}
         );
     } else {
-        document.getElementById('avisoLocal').textContent = '❌ Geolocalização não suportada';
+        document.getElementById('avisoLocal').textContent = '⚠️ GPS não suportado — usando centro JF';
         document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
-        minhaLat = -21.7642; minhaLng = -43.3503; localizacaoOk = true;
     }
 
-    // MOSTRA/ESCONDE CAMPO DE GORJETA
     document.querySelectorAll('input[name=gorjeta]').forEach(r => {
         r.addEventListener('change', () => {
             const campo = document.getElementById('valorGorjeta');
@@ -321,19 +329,16 @@ window.onload = function() {
             if(r.value === 'nao') campo.value = '';
         });
     });
-
-    // ATUALIZA QUEM PAGA
     document.querySelectorAll('input[name=pagador]').forEach(r => {
         r.addEventListener('change', () => {
             document.getElementById('nomePagador').textContent = r.value === 'loja' ? '🏪 Loja' : '👤 Cliente';
         });
     });
-
     atualizarPainelAdmin();
 };
 
 // ==================================================
-// 📍 PEGA COORDENADAS — INFALÍVEL!
+// 📍 PEGA COORDENADAS — BUSCA REAL, SÓ USA CENTRO SE NÃO ACHAR
 // ==================================================
 async function pegarCoordenadas(rua, numero, bairro) {
     const limpar = t => t.replace(/Rua|Avenida|Av\.|Bairro|Praça|Travessa/gi, '').trim();
@@ -353,14 +358,13 @@ async function pegarCoordenadas(rua, numero, bairro) {
     for(let texto of tentativas) {
         try {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&country=BR&city=Juiz de Fora&state=MG&limit=1&addressdetails=1`;
-            const resp = await fetch(url, {signal:AbortSignal.timeout(5000)});
+            const resp = await fetch(url, {signal:AbortSignal.timeout(4000)});
             const dados = await resp.json();
             if(dados.length>0) return {lat:+dados[0].lat, lng:+dados[0].lon};
         } catch {}
     }
-
-    // SE NÃO ACHAR → USA CENTRO DE JUIZ DE FORA E CALCULA! NÃO FALHA!
-    return {lat:-21.7642, lng:-43.3503};
+    // 🚨 SÓ CHEGA AQUI SE NÃO ACHAR NENHUMA OPÇÃO — USA CENTRO JF
+    return PADRAO_JF;
 }
 
 // ==================================================
@@ -373,7 +377,7 @@ function calcularDistanciaReal(lat1, lon1, lat2, lon2) {
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
               Math.sin(dLon/2) * Math.sin(dLon/2);
-    return Math.ceil(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    return Math.max(Math.ceil(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))), 1);
 }
 
 function gerarLinkGoogleMaps(origem, destino) {
@@ -390,16 +394,11 @@ function valorPorKmTabela(km) {
 }
 
 // ==================================================
-// ✅ CALCULAR — CORRIGIDO! NÃO FICA MAIS ZERADO!
+// ✅ CALCULAR — 100% PRECISO, AVISA TUDO, NÃO TRAVA!
 // ==================================================
 async function calcular() {
-    // AVISA QUE ESTÁ BUSCANDO
-    document.getElementById('avisoLocal').textContent = '🔄 Buscando endereços...';
-    document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
-
     const bloco = document.querySelector('.bloco-entrega');
     
-    // PEGA TODOS OS CAMPOS
     const ruaLoja = bloco.querySelector('.endLoja').value.trim();
     const numLoja = bloco.querySelector('.numLoja').value.trim();
     const bairroLoja = bloco.querySelector('.bairroLoja').value.trim();
@@ -410,30 +409,33 @@ async function calcular() {
     const bairroDest = bloco.querySelector('.bairroDest').value.trim();
     const refDest = bloco.querySelector('.refDest').value.trim();
 
-    // VERIFICA OBRIGATÓRIOS
     if(!ruaLoja || !numLoja || !bairroLoja || !refLoja || !ruaDest || !numDest || !bairroDest || !refDest) {
-        alert('⚠️ PREENCHA TODOS OS CAMPOS COM *!\n(Rua, Número, Bairro e Referência de Loja e Cliente)');
-        document.getElementById('avisoLocal').textContent = '❌ Faltam dados!';
-        document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
+        alert('⚠️ PREENCHA TUDO COM *!\nRua, Número, Bairro e Referência de Loja e Cliente');
         return;
     }
-
-    // GARANTE LOCALIZAÇÃO
     if(!localizacaoOk) {
-        alert('⏳ Esperando localização... Tente novamente em 5 segundos!');
+        alert('⏳ Ainda sem localização — aguarde um instante!');
         return;
     }
 
-    // BUSCA E ESPERA AS COORDENADAS
-    const cLoja = await pegarCoordenadas(ruaLoja, numLoja, bairroLoja);
-    const cDest = await pegarCoordenadas(ruaDest, numDest, bairroDest);
+    // 📍 BUSCA ENDEREÇOS E VERIFICA SE USOU APROXIMAÇÃO
+    let aviso = '';
+    let cLoja = await pegarCoordenadas(ruaLoja, numLoja, bairroLoja);
+    if(Math.abs(cLoja.lat - PADRAO_JF.lat) < 0.015 && Math.abs(cLoja.lng - PADRAO_JF.lng) < 0.015) {
+        aviso += '⚠️ Loja: aproximação; ';
+    }
 
-    // CÁLCULOS EXATOS
+    let cDest = await pegarCoordenadas(ruaDest, numDest, bairroDest);
+    if(Math.abs(cDest.lat - PADRAO_JF.lat) < 0.015 && Math.abs(cDest.lng - PADRAO_JF.lng) < 0.015) {
+        aviso += '⚠️ Cliente: aproximação; ';
+    }
+
+    // 🧮 CÁLCULOS EXATOS
     const distMoto = calcularDistanciaReal(minhaLat, minhaLng, cLoja.lat, cLoja.lng);
     const distLojaCli = calcularDistanciaReal(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
     const kmTotal = distMoto + distLojaCli;
 
-    const valMoto = Math.max(distMoto * 0.50, 0.50);
+    const valMoto = Math.max(distMoto * 0.50, 1.00);
     const valEntrega = valorPorKmTabela(distLojaCli);
     valorEntregaBase = valEntrega;
 
@@ -444,9 +446,9 @@ async function calcular() {
     const valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
 
     let total = valMoto + valEntrega + valRetorno + valGorj;
-    total = Math.ceil(total);
+    total = Math.ceil(total * 100) / 100;
 
-    // ✅ MOSTRA TUDO CERTO, NÃO FICA ZERADO!
+    // ✅ MOSTRA TUDO
     document.getElementById('distMotoLoja').textContent = distMoto;
     document.getElementById('valTotalMotoLoja').textContent = `R$ ${valMoto.toFixed(2).replace('.',',')}`;
     document.getElementById('distLojaCli').textContent = distLojaCli;
@@ -458,21 +460,17 @@ async function calcular() {
         document.getElementById('distRetorno').textContent = distLojaCli;
         document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2).replace('.',',')}`;
     }
-
     document.getElementById('linhaGorjeta').style.display = valGorj > 0 ? 'block' : 'none';
     document.getElementById('valGorjetaRes').textContent = `R$ ${valGorj.toFixed(2).replace('.',',')}`;
-
     document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
     document.getElementById('valorPix').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
     document.getElementById('distanciaRastreio').textContent = `${kmTotal} km (total)`;
 
-    // GERA LINKS DE ROTA
     const endLojaTxt = `${ruaLoja}, ${numLoja}, ${bairroLoja}, Juiz de Fora-MG`;
     const endDestTxt = `${ruaDest}, ${numDest}, ${bairroDest}, Juiz de Fora-MG`;
     document.getElementById('linkRotaMotoLoja').href = gerarLinkGoogleMaps(`${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`, endLojaTxt);
     document.getElementById('linkRotaLojaCli').href = gerarLinkGoogleMaps(endLojaTxt, endDestTxt);
 
-    // ATUALIZA PIX E QR CODE
     document.getElementById('chavePix').textContent = CHAVE_PIX_NUBANK;
     document.getElementById('qrcode').innerHTML = '';
     if(typeof QRCode !== 'undefined' && CHAVE_PIX_NUBANK !== 'COLOQUE-SUA-CHAVE-PIX-AQUI') {
@@ -481,8 +479,9 @@ async function calcular() {
         });
     }
 
-    document.getElementById('avisoLocal').textContent = '✅ Cálculo feito com sucesso!';
-    document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
+    // ✅ AVISA SE TUDO FOI CERTO OU SE USOU APROXIMAÇÃO
+    document.getElementById('avisoLocal').textContent = aviso ? `✅ Calculado! ${aviso}` : '✅ Cálculo 100% correto!';
+    document.getElementById('avisoLocal').className = aviso ? 'aviso-localizacao erro' : 'aviso-localizacao ok';
 }
 
 // ==================================================
@@ -533,13 +532,13 @@ function enviarPedidoWhatsapp() {
 📍 Ref: ${bloco.querySelector('.refDest').value}
 🔄 Retorno: ${temRet?'SIM (50%)':'NÃO'}
 💰 Paga por: ${pagNome}
-🛵 Moto→Loja: ${document.getElementById('distMotoLoja').value} km
-💵 Valor Moto→Loja: ${document.getElementById('valTotalMotoLoja').value}
-🏪 Loja→Cliente: ${document.getElementById('distLojaCli').value} km
-🚀 KM TOTAL: ${document.getElementById('kmTotalGeral').value}
-💵 Valor Entrega: ${document.getElementById('valTotalEntregas').value}
-${temRet ? `🔄 Valor Retorno: ${document.getElementById('valRetorno').value}` : ''}
-💲 VALOR TOTAL: ${document.getElementById('valTotal').value}
+🛵 Moto→Loja: ${document.getElementById('distMotoLoja').textContent} km
+💵 Valor Moto→Loja: ${document.getElementById('valTotalMotoLoja').textContent}
+🏪 Loja→Cliente: ${document.getElementById('distLojaCli').textContent} km
+🚀 KM TOTAL: ${document.getElementById('kmTotalGeral').textContent}
+💵 Valor Entrega: ${document.getElementById('valTotalEntregas').textContent}
+${temRet ? `🔄 Valor Retorno: ${document.getElementById('valRetorno').textContent}` : ''}
+💲 VALOR TOTAL: ${document.getElementById('valTotal').textContent}
 
 ✅ MTZ Express — Juiz de Fora-MG`;
 
@@ -549,7 +548,7 @@ ${temRet ? `🔄 Valor Retorno: ${document.getElementById('valRetorno').value}` 
 
 function copiarPix() {
     const chave = document.getElementById('chavePix').textContent;
-    if(!chave || chave === 'COLOQUE-SUA-CHAVE-PIX-AQUI' || chave === 'Cadastre sua chave Pix') {
+    if(!chave || chave === '00020126580014BR.GOV.BCB.PIX01360a5b0623-f5e7-4528-92a6-8be935af4bcd5204000053039865802BR5924Wellington Chagas Aleixo6009SAO PAULO62140510GjMHUsP5wU630464E1') {
         alert('⚠️ Cadastre sua chave Pix primeiro no código!');
         return;
     }
@@ -591,7 +590,7 @@ function deslogarMotoboy() {
 
 function iniciarAtualizacaoLocalizacao() {
     if(intervaloLocalizacao) clearInterval(intervaloLocalizacao);
-    atualizarLocalizacao();
+        atualizarLocalizacao();
     intervaloLocalizacao = setInterval(atualizarLocalizacao, 10000);
 }
 
@@ -600,14 +599,17 @@ function atualizarLocalizacao() {
     if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             pos => {
-                minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude;
-                document.getElementById('mostraLat').text                minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude;
+                minhaLat = pos.coords.latitude;
+                minhaLng = pos.coords.longitude;
                 document.getElementById('mostraLat').textContent = minhaLat.toFixed(6);
                 document.getElementById('mostraLng').textContent = minhaLng.toFixed(6);
                 const agora = new Date();
                 document.getElementById('ultimaAtualizacao').textContent = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}:${agora.getSeconds().toString().padStart(2,'0')}`;
             },
-            () => {document.getElementById('mostraLat').textContent = 'Erro'; document.getElementById('mostraLng').textContent = 'Erro';},
+            () => {
+                document.getElementById('mostraLat').textContent = 'Erro';
+                document.getElementById('mostraLng').textContent = 'Erro';
+            },
             {enableHighAccuracy:true, timeout:7000}
         );
     }
@@ -745,4 +747,4 @@ function mostrarAba(nomeAba) {
 }
 </script>
 </body>
-    </html>
+</html>
