@@ -58,7 +58,6 @@
         .status-moto {padding:12px; border-radius:16px; text-align:center; font-weight:700; margin:15px 0;}
         .ativo {background:rgba(0,200,83,.25); color:#90EE90; border:2px solid #00C853;}
         .inativo {background:rgba(255,68,68,.25); color:#ff6b6b; border:2px solid #ff4444;}
-        .sugestoes {display:none;}
     </style>
 </head>
 <body>
@@ -354,7 +353,7 @@ async function pegarCoordenadas(rua, numero, bairro) {
     for(let texto of tentativas) {
         try {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&country=BR&city=Juiz de Fora&state=MG&limit=1&addressdetails=1`;
-            const resp = await fetch(url, {timeout:5000});
+            const resp = await fetch(url, {signal:AbortSignal.timeout(5000)});
             const dados = await resp.json();
             if(dados.length>0) return {lat:+dados[0].lat, lng:+dados[0].lon};
         } catch {}
@@ -391,9 +390,13 @@ function valorPorKmTabela(km) {
 }
 
 // ==================================================
-// ✅ CALCULAR — SIMPLES, VERIFICA TUDO, 100% FUNCIONAL!
+// ✅ CALCULAR — CORRIGIDO! NÃO FICA MAIS ZERADO!
 // ==================================================
 async function calcular() {
+    // AVISA QUE ESTÁ BUSCANDO
+    document.getElementById('avisoLocal').textContent = '🔄 Buscando endereços...';
+    document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
+
     const bloco = document.querySelector('.bloco-entrega');
     
     // PEGA TODOS OS CAMPOS
@@ -409,15 +412,23 @@ async function calcular() {
 
     // VERIFICA OBRIGATÓRIOS
     if(!ruaLoja || !numLoja || !bairroLoja || !refLoja || !ruaDest || !numDest || !bairroDest || !refDest) {
-        alert('⚠️ PREENCHA TODOS OS CAMPOS COM * (OBRIGATÓRIOS):\n• Rua, Número, Bairro e Referência de Loja e Cliente!');
+        alert('⚠️ PREENCHA TODOS OS CAMPOS COM *!\n(Rua, Número, Bairro e Referência de Loja e Cliente)');
+        document.getElementById('avisoLocal').textContent = '❌ Faltam dados!';
+        document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
         return;
     }
 
-    // BUSCA COORDENADAS
+    // GARANTE LOCALIZAÇÃO
+    if(!localizacaoOk) {
+        alert('⏳ Esperando localização... Tente novamente em 5 segundos!');
+        return;
+    }
+
+    // BUSCA E ESPERA AS COORDENADAS
     const cLoja = await pegarCoordenadas(ruaLoja, numLoja, bairroLoja);
     const cDest = await pegarCoordenadas(ruaDest, numDest, bairroDest);
 
-    // CÁLCULOS
+    // CÁLCULOS EXATOS
     const distMoto = calcularDistanciaReal(minhaLat, minhaLng, cLoja.lat, cLoja.lng);
     const distLojaCli = calcularDistanciaReal(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
     const kmTotal = distMoto + distLojaCli;
@@ -430,12 +441,12 @@ async function calcular() {
     const valRetorno = temRetorno ? valEntrega * 0.5 : 0;
 
     const temGorjeta = document.querySelector('input[name=gorjeta]:checked').value === 'sim';
-    const valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value)||0) : 0;
+    const valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
 
     let total = valMoto + valEntrega + valRetorno + valGorj;
     total = Math.ceil(total);
 
-    // MOSTRA TUDO, INCLUINDO KM TOTAL
+    // ✅ MOSTRA TUDO CERTO, NÃO FICA ZERADO!
     document.getElementById('distMotoLoja').textContent = distMoto;
     document.getElementById('valTotalMotoLoja').textContent = `R$ ${valMoto.toFixed(2).replace('.',',')}`;
     document.getElementById('distLojaCli').textContent = distLojaCli;
@@ -448,7 +459,7 @@ async function calcular() {
         document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2).replace('.',',')}`;
     }
 
-    document.getElementById('linhaGorjeta').style.display = valGorj>0 ? 'block' : 'none';
+    document.getElementById('linhaGorjeta').style.display = valGorj > 0 ? 'block' : 'none';
     document.getElementById('valGorjetaRes').textContent = `R$ ${valGorj.toFixed(2).replace('.',',')}`;
 
     document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
@@ -461,6 +472,7 @@ async function calcular() {
     document.getElementById('linkRotaMotoLoja').href = gerarLinkGoogleMaps(`${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`, endLojaTxt);
     document.getElementById('linkRotaLojaCli').href = gerarLinkGoogleMaps(endLojaTxt, endDestTxt);
 
+    // ATUALIZA PIX E QR CODE
     document.getElementById('chavePix').textContent = CHAVE_PIX_NUBANK;
     document.getElementById('qrcode').innerHTML = '';
     if(typeof QRCode !== 'undefined' && CHAVE_PIX_NUBANK !== 'COLOQUE-SUA-CHAVE-PIX-AQUI') {
@@ -468,6 +480,9 @@ async function calcular() {
             if(!err) document.getElementById('qrcode').appendChild(canvas);
         });
     }
+
+    document.getElementById('avisoLocal').textContent = '✅ Cálculo feito com sucesso!';
+    document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
 }
 
 // ==================================================
@@ -586,6 +601,7 @@ function atualizarLocalizacao() {
         navigator.geolocation.getCurrentPosition(
             pos => {
                 minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude;
+                document.getElementById('mostraLat').text                minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude;
                 document.getElementById('mostraLat').textContent = minhaLat.toFixed(6);
                 document.getElementById('mostraLng').textContent = minhaLng.toFixed(6);
                 const agora = new Date();
@@ -600,7 +616,6 @@ function atualizarLocalizacao() {
 // LOGIN ADMIN
 function verificarLoginAdmin() {
     const usuario = document.getElementById('usuarioAdmin').value.trim();
-   
     const senha = document.getElementById('senhaAdmin').value.trim();
     if(usuario === 'mtz2026' && senha === '1120') {
         document.getElementById('erroLoginAdmin').style.display = 'none';
@@ -730,4 +745,4 @@ function mostrarAba(nomeAba) {
 }
 </script>
 </body>
-</html>
+    </html>
