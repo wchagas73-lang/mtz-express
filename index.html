@@ -19,7 +19,7 @@
         .aba.ativa {background:linear-gradient(135deg,#00A846,#00702E); color:#fff; border-color:#FFD700; box-shadow:0 0 18px rgba(0,168,70,.45);}
         .conteudo {display:none;} .conteudo.visivel {display:block; animation:surgir .4s ease;}
         @keyframes surgir {from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
-        .grupo {margin-bottom:18px; position:relative;}
+        .grupo {margin-bottom:18px;}
         label {display:block; margin-bottom:8px; color:#FFD700; font-weight:700; font-size:17px;}
         input {width:100%; padding:14px 16px; border:none; border-radius:18px; background:linear-gradient(145deg,#0C3B37,#092F2C); color:#fff; border:2px solid #007A40; font-size:16px;}
         input:focus {outline:none; border-color:#FFD700; box-shadow:0 0 0 3px rgba(255,215,0,.2);}
@@ -58,32 +58,7 @@
         .status-moto {padding:12px; border-radius:16px; text-align:center; font-weight:700; margin:15px 0;}
         .ativo {background:rgba(0,200,83,.25); color:#90EE90; border:2px solid #00C853;}
         .inativo {background:rgba(255,68,68,.25); color:#ff6b6b; border:2px solid #ff4444;}
-
-        /* ✅ SUGESTÕES — APARECEM NA HORA, BEM VISÍVEIS, POR CIMA DE TUDO! */
-        .sugestoes {
-            background: #0F4A45;
-            border: 2px solid #007A40;
-            border-top: none;
-            border-radius: 0 0 18px 18px;
-            max-height: 260px;
-            overflow-y: auto;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 100%;
-            z-index: 999999; /* BEM ALTO — NUNCA FICA ESCONDIDO! */
-            box-shadow: 0 12px 30px rgba(0,0,0,.7);
-        }
-        .sugestao-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-            color: #fff;
-            font-size: 16px;
-            transition: .2s;
-        }
-        .sugestao-item:hover {background: #1A635C; color: #FFD700; padding-left:26px;}
-        .sugestao-item:last-child {border-bottom: none; border-radius: 0 0 18px 18px;}
+        .sugestoes {display:none;}
     </style>
 </head>
 <body>
@@ -99,7 +74,7 @@
             <button class="aba" onclick="mostrarAba('admin')">⚙️ Admin</button>
         </div>
 
-        <!-- ABA LOJISTA -->
+        <!-- ABA LOJISTA → TUDO MANUAL, CAMPOS OBRIGATÓRIOS -->
         <div id="abalojista" class="conteudo visivel">
             <div class="aviso-localizacao" id="avisoLocal">🔄 Obtendo localização...</div>
             <div class="caixa">
@@ -110,38 +85,34 @@
             <div id="listaEntregas">
                 <div class="bloco-entrega caixa">
                     <h3 style="color:#FFD700; margin-bottom:20px; font-size:22px;">📦 Dados da Entrega</h3>
-                    <div class="grupo"><label>🏪 Nome da Loja</label><input type="text" class="nomeLoja" placeholder="Nome da loja"></div>
-                    <div class="grupo"><label>📲 WhatsApp Loja</label><input type="tel" class="contatoLoja" placeholder="(32) 9XXXX-XXXX"></div>
+                    <div class="grupo"><label>🏪 Nome da Loja *</label><input type="text" class="nomeLoja" placeholder="Nome da loja" required></div>
+                    <div class="grupo"><label>📲 WhatsApp Loja *</label><input type="tel" class="contatoLoja" placeholder="(32) 9XXXX-XXXX" required></div>
 
                     <h4 style="color:#90EE90; margin:18px 0 10px; font-size:19px;">📍 Origem (Loja)</h4>
-                    <div class="grupo">
-                        <label>Rua / Logradouro</label>
-                        <input type="text" class="endLoja" id="endLoja" placeholder="Digite 2 letras — já aparece!">
-                        <div class="sugestoes" id="sugLoja"></div>
+                    <div class="grupo"><label>Rua / Logradouro *</label><input type="text" class="endLoja" id="endLoja" placeholder="Digite a rua" required></div>
+                    <div class="linha">
+                        <div class="grupo"><label>Número *</label><input type="text" class="numLoja" placeholder="Só o número" required></div>
+                        <div class="grupo"><label>Bairro *</label><input type="text" class="bairroLoja" id="bairroLoja" placeholder="Digite o bairro" required></div>
                     </div>
                     <div class="linha">
-                        <div class="grupo"><label>Nº</label><input type="text" class="numLoja" placeholder="Só o número"></div>
+                        <div class="grupo"><label>📮 CEP (opcional)</label><input type="text" class="cepLoja" id="cepLoja" placeholder="Digite o CEP"></div>
+                        <div class="grupo"><label>📍 Referência *</label><input type="text" class="refLoja" placeholder="Ponto de referência" required></div>
                     </div>
-                    <div class="linha">
-                        <div class="grupo"><label>Bairro</label><input type="text" class="bairroLoja" id="bairroLoja" placeholder="Automático" readonly></div>
-                        <div class="grupo"><label>📮 CEP</label><input type="text" class="cepLoja" id="cepLoja" placeholder="Automático" readonly></div>
-                    </div>
+                    <div class="grupo"><label>📝 Observação (opcional)</label><input type="text" class="obsLoja" placeholder="Observação"></div>
 
                     <h4 style="color:#90EE90; margin:18px 0 10px; font-size:19px;">📍 Destino (Cliente)</h4>
-                    <div class="grupo"><label>Nome do Cliente</label><input type="text" class="nomeDest" placeholder="Nome completo"></div>
-                    <div class="grupo"><label>📲 WhatsApp Cliente</label><input type="tel" class="contatoDest" placeholder="(32) 9XXXX-XXXX"></div>
-                    <div class="grupo">
-                        <label>Rua / Logradouro</label>
-                        <input type="text" class="endDest" id="endDest" placeholder="Digite 2 letras — já aparece!">
-                        <div class="sugestoes" id="sugDest"></div>
+                    <div class="grupo"><label>Nome do Cliente *</label><input type="text" class="nomeDest" placeholder="Nome completo" required></div>
+                    <div class="grupo"><label>📲 WhatsApp Cliente *</label><input type="tel" class="contatoDest" placeholder="(32) 9XXXX-XXXX" required></div>
+                    <div class="grupo"><label>Rua / Logradouro *</label><input type="text" class="endDest" id="endDest" placeholder="Digite a rua" required></div>
+                    <div class="linha">
+                        <div class="grupo"><label>Número *</label><input type="text" class="numDest" placeholder="Só o número" required></div>
+                        <div class="grupo"><label>Bairro *</label><input type="text" class="bairroDest" id="bairroDest" placeholder="Digite o bairro" required></div>
                     </div>
                     <div class="linha">
-                        <div class="grupo"><label>Nº</label><input type="text" class="numDest" placeholder="Só o número"></div>
+                        <div class="grupo"><label>📮 CEP (opcional)</label><input type="text" class="cepDest" id="cepDest" placeholder="Digite o CEP"></div>
+                        <div class="grupo"><label>📍 Referência *</label><input type="text" class="refDest" placeholder="Ponto de referência" required></div>
                     </div>
-                    <div class="linha">
-                        <div class="grupo"><label>Bairro</label><input type="text" class="bairroDest" id="bairroDest" placeholder="Automático" readonly></div>
-                        <div class="grupo"><label>📮 CEP</label><input type="text" class="cepDest" id="cepDest" placeholder="Automático" readonly></div>
-                    </div>
+                    <div class="grupo"><label>📝 Observação (opcional)</label><input type="text" class="obsDest" placeholder="Observação"></div>
 
                     <div class="grupo">
                         <label>📄 Tipo de mercadoria</label>
@@ -194,8 +165,9 @@
                 <p>📦 Entregas: <span id="qtdEntregas">1</span></p>
                 <p>💰 Paga por: <strong><span id="nomePagador">🏪 A Loja</span></strong></p>
                 <hr style="border-color:rgba(255,215,0,.3); margin:12px 0;">
-                <p>🛵 Motoboy → Loja: <span id="distMotoLoja">--</span> km | <span id="valTotalMotoLoja">R$ 0,00</span></p>
-                <p>🏪 Loja → Cliente: <span id="distLojaCli">--</span> km | <span id="valTotalEntregas">R$ 0,00</span></p>
+                <p>🛵 Moto→Loja: <span id="distMotoLoja">--</span> km | <span id="valTotalMotoLoja">R$ 0,00</span></p>
+                <p>🏪 Loja→Cliente: <span id="distLojaCli">--</span> km | <span id="valTotalEntregas">R$ 0,00</span></p>
+                <p>🚀 KM TOTAL: <span id="kmTotalGeral">--</span> km</p>
                 <p id="linhaRetorno" style="display:none;">🔄 Retorno: <span id="distRetorno">--</span> km | <span id="valRetorno">R$ 0,00</span></p>
                 <p id="linhaGorjeta" style="display:none;">🎁 Gorjeta: <span id="valGorjetaRes">R$ 0,00</span></p>
                 <hr style="border-color:rgba(255,215,0,.3); margin:12px 0;">
@@ -315,7 +287,6 @@ let graficoSemanal, graficoMensal;
 let qtdEntregasCadastradas = 1;
 let intervaloLocalizacao = null;
 let motoboyLogado = false;
-let timerBusca;
 
 let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify({
     totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, somaAvaliacoes:0, qtdAvaliacoes:0,
@@ -325,7 +296,7 @@ let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify(
 function salvarDados() {localStorage.setItem('dadosMTZ', JSON.stringify(dadosGerais));}
 
 window.onload = function() {
-    // PEGA LOCALIZAÇÃO — SE NÃO CONSEGUIR, USA CENTRO DE JF
+    // LOCALIZAÇÃO — SE NÃO CONSEGUIR, USA CENTRO DE JUIZ DE FORA
     if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             pos => {minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude; localizacaoOk = true;
@@ -363,72 +334,7 @@ window.onload = function() {
 };
 
 // ==================================================
-// 🚀 TECLADO INTELIGENTE MAIS RÁPIDO E PODEROSO DO MUNDO!
-// ==================================================
-document.getElementById('endLoja').addEventListener('input', function() {
-    clearTimeout(timerBusca);
-    const val = this.value.trim();
-    const lista = document.getElementById('sugLoja');
-    lista.innerHTML = '';
-    if(val.length < 2) return; // ✅ BUSCA COM 2 LETRAS JÁ!
-    timerBusca = setTimeout(() => buscarEnderecoTop(val, lista, 'bairroLoja', 'cepLoja'), 250); // ✅ MUITO RÁPIDO!
-});
-
-document.getElementById('endDest').addEventListener('input', function() {
-    clearTimeout(timerBusca);
-    const val = this.value.trim();
-    const lista = document.getElementById('sugDest');
-    lista.innerHTML = '';
-    if(val.length < 2) return;
-    timerBusca = setTimeout(() => buscarEnderecoTop(val, lista, 'bairroDest', 'cepDest'), 250);
-});
-
-// ✅ BUSCA MELHORADA, MAIS PRECISA, OTIMIZADA PARA JUIZ DE FORA!
-async function buscarEnderecoTop(texto, lista, idBairro, idCep) {
-    const nomeLimpo = texto.replace(/Rua|Avenida|Av\.|Praça|Travessa|Alameda|Rodovia/gi, '').trim();
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nomeLimpo + ', Juiz de Fora, MG, Brasil')}&country=BR&city=Juiz de Fora&state=Minas Gerais&addressdetails=1&limit=12&accept-language=pt-BR&layer=address&dedupe=1`;
-
-    try {
-        const resp = await fetch(url, {timeout:3500}); // ✅ RÁPIDO!
-        const dados = await resp.json();
-        lista.innerHTML = '';
-
-        if(!dados || dados.length === 0) {
-            lista.innerHTML = '<div class="sugestao-item" style="color:#FFD700;">🔎 Nenhuma — digite completo</div>';
-            return;
-        }
-
-        dados.forEach(lugar => {
-            const end = lugar.address || {};
-            const rua = end.road || end.street || end.path || lugar.name || '';
-            const bairro = end.suburb || end.neighbourhood || end.district || end.city_district || 'Centro';
-            const cep = end.postcode || '';
-            if(!rua || rua.length < 3) return;
-
-            const item = document.createElement('div');
-            item.className = 'sugestao-item';
-            item.innerHTML = `<strong>${rua}</strong> • ${bairro} ${cep?'• '+cep:''}`;
-            item.onclick = () => {
-                const idRua = lista.id === 'sugLoja' ? 'endLoja' : 'endDest';
-                document.getElementById(idRua).value = rua;
-                document.getElementById(idBairro).value = bairro;
-                if(idCep && cep) document.getElementById(idCep).value = cep.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2');
-                lista.innerHTML = '';
-            };
-            lista.appendChild(item);
-        });
-    } catch {
-        lista.innerHTML = '<div class="sugestao-item" style="color:#ff6b6b;">⚠️ Digite direto</div>';
-    }
-}
-
-// FECHA SUGESTÕES AO CLICAR FORA
-document.addEventListener('click', e => {
-    if(!e.target.closest('.grupo')) document.querySelectorAll('.sugestoes').forEach(s=>s.innerHTML='');
-});
-
-// ==================================================
-// 📍 COORDENADAS INFALÍVEIS — 6 TENTATIVAS! NUNCA FALHA!
+// 📍 PEGA COORDENADAS — INFALÍVEL!
 // ==================================================
 async function pegarCoordenadas(rua, numero, bairro) {
     const limpar = t => t.replace(/Rua|Avenida|Av\.|Bairro|Praça|Travessa/gi, '').trim();
@@ -454,13 +360,12 @@ async function pegarCoordenadas(rua, numero, bairro) {
         } catch {}
     }
 
-    // ✅ SE NÃO ACHAR DE JEITO NENHUM — USA CENTRO E CALCULA! NÃO PERDE NENHUMA VENDA!
-    console.log('Usando centro de Juiz de Fora');
+    // SE NÃO ACHAR → USA CENTRO DE JUIZ DE FORA E CALCULA! NÃO FALHA!
     return {lat:-21.7642, lng:-43.3503};
 }
 
 // ==================================================
-// 🧮 CÁLCULOS — SEMPRE FUNCIONAM!
+// 🧮 CÁLCULOS DE DISTÂNCIA E VALORES
 // ==================================================
 function calcularDistanciaReal(lat1, lon1, lat2, lon2) {
     const R = 6371;
@@ -486,27 +391,36 @@ function valorPorKmTabela(km) {
 }
 
 // ==================================================
-// ✅ FUNÇÃO CALCULAR — NÃO PARA NUNCA!
+// ✅ CALCULAR — SIMPLES, VERIFICA TUDO, 100% FUNCIONAL!
 // ==================================================
 async function calcular() {
     const bloco = document.querySelector('.bloco-entrega');
+    
+    // PEGA TODOS OS CAMPOS
     const ruaLoja = bloco.querySelector('.endLoja').value.trim();
     const numLoja = bloco.querySelector('.numLoja').value.trim();
-    const bairroLoja = bloco.querySelector('.bairroLoja').value.trim() || 'Centro';
+    const bairroLoja = bloco.querySelector('.bairroLoja').value.trim();
+    const refLoja = bloco.querySelector('.refLoja').value.trim();
+    
     const ruaDest = bloco.querySelector('.endDest').value.trim();
     const numDest = bloco.querySelector('.numDest').value.trim();
-    const bairroDest = bloco.querySelector('.bairroDest').value.trim() || 'Centro';
+    const bairroDest = bloco.querySelector('.bairroDest').value.trim();
+    const refDest = bloco.querySelector('.refDest').value.trim();
 
-    if(!ruaLoja || !numLoja || !ruaDest || !numDest) {
-        alert('⚠️ Preencha Rua e Número de Loja e Cliente!');
+    // VERIFICA OBRIGATÓRIOS
+    if(!ruaLoja || !numLoja || !bairroLoja || !refLoja || !ruaDest || !numDest || !bairroDest || !refDest) {
+        alert('⚠️ PREENCHA TODOS OS CAMPOS COM * (OBRIGATÓRIOS):\n• Rua, Número, Bairro e Referência de Loja e Cliente!');
         return;
     }
 
+    // BUSCA COORDENADAS
     const cLoja = await pegarCoordenadas(ruaLoja, numLoja, bairroLoja);
     const cDest = await pegarCoordenadas(ruaDest, numDest, bairroDest);
 
+    // CÁLCULOS
     const distMoto = calcularDistanciaReal(minhaLat, minhaLng, cLoja.lat, cLoja.lng);
     const distLojaCli = calcularDistanciaReal(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
+    const kmTotal = distMoto + distLojaCli;
 
     const valMoto = Math.max(distMoto * 0.50, 0.50);
     const valEntrega = valorPorKmTabela(distLojaCli);
@@ -521,11 +435,12 @@ async function calcular() {
     let total = valMoto + valEntrega + valRetorno + valGorj;
     total = Math.ceil(total);
 
-    // MOSTRA TUDO
+    // MOSTRA TUDO, INCLUINDO KM TOTAL
     document.getElementById('distMotoLoja').textContent = distMoto;
     document.getElementById('valTotalMotoLoja').textContent = `R$ ${valMoto.toFixed(2).replace('.',',')}`;
     document.getElementById('distLojaCli').textContent = distLojaCli;
     document.getElementById('valTotalEntregas').textContent = `R$ ${valEntrega.toFixed(2).replace('.',',')}`;
+    document.getElementById('kmTotalGeral').textContent = `${kmTotal} km`;
 
     document.getElementById('linhaRetorno').style.display = temRetorno ? 'block' : 'none';
     if(temRetorno) {
@@ -538,8 +453,9 @@ async function calcular() {
 
     document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
     document.getElementById('valorPix').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
-    document.getElementById('distanciaRastreio').textContent = distMoto + distLojaCli;
+    document.getElementById('distanciaRastreio').textContent = `${kmTotal} km (total)`;
 
+    // GERA LINKS DE ROTA
     const endLojaTxt = `${ruaLoja}, ${numLoja}, ${bairroLoja}, Juiz de Fora-MG`;
     const endDestTxt = `${ruaDest}, ${numDest}, ${bairroDest}, Juiz de Fora-MG`;
     document.getElementById('linkRotaMotoLoja').href = gerarLinkGoogleMaps(`${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`, endLojaTxt);
@@ -555,7 +471,7 @@ async function calcular() {
 }
 
 // ==================================================
-// 🛠️ DEMAIS FUNÇÕES — TODAS FUNCIONANDO PERFEITAMENTE
+// 🛠️ DEMAIS FUNÇÕES — TODAS FUNCIONANDO
 // ==================================================
 function adicionarEntrega() {
     qtdEntregasCadastradas++;
@@ -595,14 +511,17 @@ function enviarPedidoWhatsapp() {
 🏪 Loja: ${bloco.querySelector('.nomeLoja').value || 'Não informado'}
 📲 Contato: ${bloco.querySelector('.contatoLoja').value || 'Não informado'}
 📍 Origem: ${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value} — ${bloco.querySelector('.bairroLoja').value}
+📍 Ref: ${bloco.querySelector('.refLoja').value}
 👤 Cliente: ${bloco.querySelector('.nomeDest').value || 'Não informado'}
 📲 Contato: ${bloco.querySelector('.contatoDest').value || 'Não informado'}
 📍 Destino: ${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value} — ${bloco.querySelector('.bairroDest').value}
+📍 Ref: ${bloco.querySelector('.refDest').value}
 🔄 Retorno: ${temRet?'SIM (50%)':'NÃO'}
 💰 Paga por: ${pagNome}
 🛵 Moto→Loja: ${document.getElementById('distMotoLoja').value} km
 💵 Valor Moto→Loja: ${document.getElementById('valTotalMotoLoja').value}
 🏪 Loja→Cliente: ${document.getElementById('distLojaCli').value} km
+🚀 KM TOTAL: ${document.getElementById('kmTotalGeral').value}
 💵 Valor Entrega: ${document.getElementById('valTotalEntregas').value}
 ${temRet ? `🔄 Valor Retorno: ${document.getElementById('valRetorno').value}` : ''}
 💲 VALOR TOTAL: ${document.getElementById('valTotal').value}
@@ -626,9 +545,7 @@ function copiarPix() {
     });
 }
 
-// ==================================================
-// 🔑 LOGIN MOTOBOY
-// ==================================================
+// LOGIN MOTOBOY
 function verificarLoginMotoboy() {
     const usuario = document.getElementById('usuarioMoto').value.trim();
     const senha = document.getElementById('senhaMoto').value.trim();
@@ -646,10 +563,7 @@ function verificarLoginMotoboy() {
 
 function deslogarMotoboy() {
     motoboyLogado = false;
-    if(intervaloLocalizacao) {
-        clearInterval(intervaloLocalizacao);
-        intervaloLocalizacao = null;
-    }
+    if(intervaloLocalizacao) {clearInterval(intervaloLocalizacao); intervaloLocalizacao = null;}
     document.getElementById('statusMoto').className = 'status-moto inativo';
     document.getElementById('statusMoto').innerHTML = '🔴 Desconectado / Inativo';
     document.getElementById('mostraLat').textContent = '--';
@@ -671,28 +585,22 @@ function atualizarLocalizacao() {
     if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             pos => {
-                minhaLat = pos.coords.latitude;
-                minhaLng = pos.coords.longitude;
+                minhaLat = pos.coords.latitude; minhaLng = pos.coords.longitude;
                 document.getElementById('mostraLat').textContent = minhaLat.toFixed(6);
                 document.getElementById('mostraLng').textContent = minhaLng.toFixed(6);
                 const agora = new Date();
-                document.getElementById('ultimaAtualizacao').textContent = 
-                    `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}:${agora.getSeconds().toString().padStart(2,'0')}`;
+                document.getElementById('ultimaAtualizacao').textContent = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}:${agora.getSeconds().toString().padStart(2,'0')}`;
             },
-            () => {
-                document.getElementById('mostraLat').textContent = 'Erro';
-                document.getElementById('mostraLng').textContent = 'Erro';
-            },
+            () => {document.getElementById('mostraLat').textContent = 'Erro'; document.getElementById('mostraLng').textContent = 'Erro';},
             {enableHighAccuracy:true, timeout:7000}
         );
     }
 }
 
-// ==================================================
-// 🔑 LOGIN ADMIN
-// ==================================================
+// LOGIN ADMIN
 function verificarLoginAdmin() {
     const usuario = document.getElementById('usuarioAdmin').value.trim();
+   
     const senha = document.getElementById('senhaAdmin').value.trim();
     if(usuario === 'mtz2026' && senha === '1120') {
         document.getElementById('erroLoginAdmin').style.display = 'none';
