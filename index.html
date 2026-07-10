@@ -37,7 +37,6 @@
         label .opcional {color: #9CA3AF; font-weight: 500;}
         input, textarea {width: 100%; padding: 14px 16px; border: 2px solid var(--borda-escuro); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         input:focus, textarea:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
-        input[readonly] {background: rgba(15,43,51,0.35); color: #9CA3AF; cursor: default;}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
         .opcoes-linha {display: flex; gap: 15px; align-items: center; margin: 10px 0; flex-wrap: wrap;}
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
@@ -45,18 +44,6 @@
         .opcao-radio input {width: auto; transform: scale(1.3);}
         .opcao-radio span {font-size: 16px; font-weight: 600;}
 
-        .grupo-endereco {position: relative;}
-        .sugestoes-endereco {
-            position: absolute; left: 0; right: 0; top: 100%; z-index: 9999;
-            background: #1A3F4A; border: 2px solid var(--dourado); border-top: none;
-            border-radius: 0 0 16px 16px; max-height: 260px; overflow-y: auto;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        .item-sugestao {
-            padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--borda-escuro);
-            font-size: 15px; color: var(--texto-escuro); transition: all 0.2s;
-        }
-        .item-sugestao:hover {background: rgba(255,215,0,0.15); color: var(--dourado); padding-left: 20px;}
         .escondido {display: none !important;}
 
         .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
@@ -107,6 +94,7 @@
         .rastreio-box {background: linear-gradient(135deg, rgba(0,200,150,0.1), rgba(59,130,246,0.08)); border: 2px solid var(--primaria); border-radius:20px; padding:25px; margin-top:20px; text-align:center;}
         .status-rastreio {font-size:20px; font-weight:700; margin:15px 0;}
         .atualizacao-info {font-size:14px; color:#9CA3AF; margin-top:10px;}
+        .cep-automatico {font-size:13px; color:var(--primaria); margin-top:5px;}
     </style>
 </head>
 <body>
@@ -148,21 +136,25 @@
                         <input type="text" class="nomeLoja" required placeholder="Digite o nome da loja">
                         <label>Contato da Loja <span>*</span></label>
                         <input type="tel" class="contatoLoja" placeholder="(32) 9XXXX-XXXX" required>
-                        <div class="linha-dupla">
-                            <label>CEP <span>*</span></label>
-                            <label>Número <span>*</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="cepLoja" id="cepLoja_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
-                            <input type="text" class="numLoja" required placeholder="Só o número">
-                        </div>
                         <label>Rua / Endereço <span>*</span></label>
-                        <div class="grupo-endereco">
-                            <input type="text" class="endLoja" id="endLoja_1" placeholder="Digite 3 ou 4 letras da rua..." oninput="buscarSugestoes(this, 'Loja', 1)" autocomplete="off">
-                            <div class="sugestoes-endereco escondido" id="sugLoja_1"></div>
+                        <input type="text" class="endLoja" id="endLoja_1" placeholder="Digite o nome da rua" onblur="buscarCepLoja(this)">
+                        <div class="linha-dupla">
+                            <label>Número <span>*</span></label>
+                            <label>Bairro <span>*</span></label>
                         </div>
-                        <label>Bairro <span>*</span></label>
-                        <input type="text" class="bairroLoja" id="bairroLoja_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
+                        <div class="linha-dupla">
+                            <input type="text" class="numLoja" required placeholder="Número" onblur="buscarCepLoja(this)">
+                            <input type="text" class="bairroLoja" id="bairroLoja_1" placeholder="Digite o bairro" onblur="buscarCepLoja(this)">
+                        </div>
+                        <div class="linha-dupla">
+                            <label>Cidade/UF <span>*</span></label>
+                            <label>CEP <span>*</span></label>
+                        </div>
+                        <div class="linha-dupla">
+                            <input type="text" class="cidadeLoja" id="cidadeLoja_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cepLoja" id="cepLoja_1" placeholder="✅ Preenchido automaticamente" readonly>
+                        </div>
+                        <p class="cep-automatico" id="avisoCepLoja_1"></p>
                         <label>Ponto de Referência <span>*</span></label>
                         <input type="text" class="refLoja" placeholder="Próximo a qual lugar?">
 
@@ -171,21 +163,25 @@
                         <input type="text" class="nomeDest" required placeholder="Digite o nome completo">
                         <label>Contato do Destinatário <span>*</span></label>
                         <input type="tel" class="contatoDest" placeholder="(32) 9XXXX-XXXX" required>
-                        <div class="linha-dupla">
-                            <label>CEP <span>*</span></label>
-                            <label>Número <span>*</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="cepDest" id="cepDest_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
-                            <input type="text" class="numDest" required placeholder="Só o número">
-                        </div>
                         <label>Rua / Endereço <span>*</span></label>
-                        <div class="grupo-endereco">
-                            <input type="text" class="endDest" id="endDest_1" placeholder="Digite 3 ou 4 letras da rua..." oninput="buscarSugestoes(this, 'Dest', 1)" autocomplete="off">
-                            <div class="sugestoes-endereco escondido" id="sugDest_1"></div>
+                        <input type="text" class="endDest" id="endDest_1" placeholder="Digite o nome da rua" onblur="buscarCepDest(this)">
+                        <div class="linha-dupla">
+                            <label>Número <span>*</span></label>
+                            <label>Bairro <span>*</span></label>
                         </div>
-                        <label>Bairro <span>*</span></label>
-                        <input type="text" class="bairroDest" id="bairroDest_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
+                        <div class="linha-dupla">
+                            <input type="text" class="numDest" required placeholder="Número" onblur="buscarCepDest(this)">
+                            <input type="text" class="bairroDest" id="bairroDest_1" placeholder="Digite o bairro" onblur="buscarCepDest(this)">
+                        </div>
+                        <div class="linha-dupla">
+                            <label>Cidade/UF <span>*</span></label>
+                            <label>CEP <span>*</span></label>
+                        </div>
+                        <div class="linha-dupla">
+                            <input type="text" class="cidadeDest" id="cidadeDest_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cepDest" id="cepDest_1" placeholder="✅ Preenchido automaticamente" readonly>
+                        </div>
+                        <p class="cep-automatico" id="avisoCepDest_1"></p>
                         <label>Ponto de Referência <span>*</span></label>
                         <input type="text" class="refDest" required placeholder="Próximo a qual lugar?">
 
@@ -215,7 +211,7 @@
 
                         <label>Observação <span class="opcional">(Opcional)</span></label>
                         <input type="text" class="obs" placeholder="Valor do produto, detalhes...">
-                        <input type="hidden" class="distanciaReal" value="0">
+                        <input type="hidden" class="distanciaReal" value="3">
                     </div>
                 </div>
 
@@ -268,7 +264,7 @@
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center;">📑 RESUMO GERAL</h3>
                     <p>Quantidade de Entregas: <span id="qtdEntregas">1</span></p>
-                    <p>Distância Total Loja→Cliente: <span id="distTotalCli"></span> km</p>
+                    <p>Distância Total Loja→Cliente: <span id="distTotalCli">3,0</span> km</p>
                     <p>Valor Total Entregas: <span id="valTotalEntregas"></span></p>
                     <p id="linhaRetorno" class="escondido">✅ Valor Retorno (50%): <span id="valRetorno"></span></p>
                     <p id="linhaRetornoImprevisto" class="escondido">⚠️ Retorno por Imprevisto (50%): <span id="valRetornoImp"></span></p>
@@ -452,7 +448,6 @@
         let numeroPedido = 0;
         let intervaloRastreio = null;
         let statusRastreio = 'aguardando';
-        let timerBusca;
 
         window.onload = function() {
             setTimeout(() => {
@@ -465,57 +460,82 @@
                     });
                 }
             }, 150);
-
-            document.addEventListener('click', (e) => {
-                if(!e.target.closest('.grupo-endereco')) {
-                    document.querySelectorAll('.sugestoes-endereco').forEach(s => s.classList.add('escondido'));
-                }
-            });
         };
 
-        function buscarSugestoes(campo, tipo, id) {
-            clearTimeout(timerBusca);
-            const texto = campo.value.trim();
-            const sugestaoEl = document.getElementById(`sug${tipo}_${id}`);
-            
-            if(texto.length < 3) {
-                sugestaoEl.classList.add('escondido');
+        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — LOJA
+        function buscarCepLoja(campo) {
+            const bloco = campo.closest('.bloco-entrega');
+            const rua = bloco.querySelector('.endLoja').value.trim();
+            const bairro = bloco.querySelector('.bairroLoja').value.trim();
+            const numero = bloco.querySelector('.numLoja').value.trim();
+            const cidade = 'Juiz de Fora';
+            const uf = 'MG';
+            const cepEl = bloco.querySelector('.cepLoja');
+            const avisoEl = bloco.querySelector('[id^="avisoCepLoja"]');
+
+            if(rua.length < 5 || bairro.length < 3 || !numero) {
+                cepEl.value = '';
+                avisoEl.textContent = '';
                 return;
             }
 
-            timerBusca = setTimeout(() => {
-                fetch(`https://viacep.com.br/ws/${encodeURIComponent(texto)}/juizdefora/mg/json/`)
-                .then(res => res.json())
-                .then(dados => {
-                    sugestaoEl.innerHTML = '';
-                    if(!dados || dados.erro || dados.length === 0) {
-                        sugestaoEl.classList.add('escondido');
-                        return;
-                    }
+            avisoEl.textContent = '🔍 Buscando CEP...';
+            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
+            .then(res => res.json())
+            .then(dados => {
+                if(dados && dados.length > 0) {
+                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
+                    cepEl.value = endereco.cep;
+                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
+                    avisoEl.style.color = 'var(--primaria)';
+                } else {
+                    cepEl.value = '';
+                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
+                    avisoEl.style.color = 'var(--perigo)';
+                }
+            })
+            .catch(() => {
+                avisoEl.textContent = '❌ Erro ao buscar CEP';
+                avisoEl.style.color = 'var(--perigo)';
+            });
+        }
 
-                    dados.forEach(end => {
-                        const item = document.createElement('div');
-                        item.className = 'item-sugestao';
-                        item.textContent = `${end.logradouro}, ${end.bairro} - ${end.cep}`;
-                        item.onclick = () => {
-                            if(tipo === 'Loja') {
-                                document.getElementById(`endLoja_${id}`).value = end.logradouro;
-                                document.getElementById(`bairroLoja_${id}`).value = end.bairro;
-                                document.getElementById(`cepLoja_${id}`).value = end.cep.replace('-','').substring(0,5)+'-'+end.cep.replace('-','').substring(5,8);
-                            } else {
-                                document.getElementById(`endDest_${id}`).value = end.logradouro;
-                                document.getElementById(`bairroDest_${id}`).value = end.bairro;
-                                document.getElementById(`cepDest_${id}`).value = end.cep.replace('-','').substring(0,5)+'-'+end.cep.replace('-','').substring(5,8);
-                            }
-                            sugestaoEl.classList.add('escondido');
-                            calcularRotaDistancia();
-                        };
-                        sugestaoEl.appendChild(item);
-                    });
-                    sugestaoEl.classList.remove('escondido');
-                })
-                .catch(() => sugestaoEl.classList.add('escondido'));
-            }, 300);
+        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — DESTINATÁRIO
+        function buscarCepDest(campo) {
+            const bloco = campo.closest('.bloco-entrega');
+            const rua = bloco.querySelector('.endDest').value.trim();
+            const bairro = bloco.querySelector('.bairroDest').value.trim();
+            const numero = bloco.querySelector('.numDest').value.trim();
+            const cidade = 'Juiz de Fora';
+            const uf = 'MG';
+            const cepEl = bloco.querySelector('.cepDest');
+            const avisoEl = bloco.querySelector('[id^="avisoCepDest"]');
+
+            if(rua.length < 5 || bairro.length < 3 || !numero) {
+                cepEl.value = '';
+                avisoEl.textContent = '';
+                return;
+            }
+
+            avisoEl.textContent = '🔍 Buscando CEP...';
+            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
+            .then(res => res.json())
+            .then(dados => {
+                if(dados && dados.length > 0) {
+                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
+                    cepEl.value = endereco.cep;
+                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
+                    avisoEl.style.color = 'var(--primaria)';
+                } else {
+                    cepEl.value = '';
+                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
+                    avisoEl.style.color = 'var(--perigo)';
+                }
+            })
+            .catch(() => {
+                avisoEl.textContent = '❌ Erro ao buscar CEP';
+                avisoEl.style.color = 'var(--perigo)';
+            });
         }
 
         function mostrarAba(nome) {
@@ -534,7 +554,7 @@
             bloco.querySelectorAll('[id]').forEach(el => {
                 el.id = el.id.replace(/_1$/, `_${contadorEntregas}`);
             });
-            bloco.querySelector('h4').innerHTML = `📦 Entrega / Coleta ${contadorEntregas} <button class="btn btn-remover" style="float:right" onclick="this.closest('.bloco-entrega').remove(); calcular()">🗑️</button>`;
+            bloco.querySelector('h4').innerHTML = `📦 Entrega/ Coleta ${contadorEntregas} <button class="btn btn-remover" style="float:right" onclick="this.closest('.bloco-entrega').remove(); calcular()">🗑️</button>`;
             
             lista.appendChild(bloco);
         }
@@ -564,7 +584,7 @@
 
             valorEntregaBase = valTotalEntregas;
             document.getElementById('qtdEntregas').textContent = blocos.length;
-            document.getElementById('distTotalCli').textContent = distTotal.toFixed(1);
+            document.getElementById('distTotalCli').textContent = distTotal.toFixed(1).replace('.',',');
             document.getElementById('valTotalEntregas').textContent = `R$ ${valTotalEntregas.toFixed(2).replace('.',',')}`;
 
             const retorno = document.querySelector('input[name="retorno"]:checked').value;
@@ -604,11 +624,6 @@
             event.target.classList.add('selecionado');
             document.getElementById('valorGorjeta').value = valor;
             calcular();
-        }
-
-        function calcularRotaDistancia() {
-            const dist = (Math.random() * 8 + 2).toFixed(1);
-            document.querySelectorAll('.distanciaReal').forEach(inp => inp.value = dist);
         }
 
         function gerarPedido() {
@@ -685,10 +700,12 @@
         function enviarPedidoWhatsapp() {
             const nomeLoja = document.querySelector('.nomeLoja').value;
             const contatoLoja = document.querySelector('.contatoLoja').value;
-            const endLoja = `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value}`;
+            const endLoja = `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}`;
+            const cepLoja = document.querySelector('.cepLoja').value;
             const nomeDest = document.querySelector('.nomeDest').value;
             const contatoDest = document.querySelector('.contatoDest').value;
-            const endDest = `${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value}`;
+            const endDest = `${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value} - ${document.querySelector('.bairroDest').value}`;
+            const cepDest = document.querySelector('.cepDest').value;
             const total = document.getElementById('valTotal').textContent;
 
             const texto = `📦 NOVO PEDIDO MTZ EXPRESS 📦
@@ -700,11 +717,13 @@
 ▫️ Nome: ${nomeLoja}
 ▫️ Contato: ${contatoLoja}
 ▫️ Endereço: ${endLoja}
+▫️ CEP: ${cepLoja}
 
 📦 ENTREGA:
 ▫️ Destinatário: ${nomeDest}
 ▫️ Contato: ${contatoDest}
 ▫️ Endereço: ${endDest}
+▫️ CEP: ${cepDest}
 
 🗺️ ROTAS:
 🛵 Motoboy → Loja: ${document.getElementById('linkRotaMotoLoja').href}
@@ -818,4 +837,4 @@ Ação: ${acao}
         function copiarLink() { navigator.clipboard.writeText(linkNubank).then(() => alert('✅ Link copiado!')); }
     </script>
 </body>
-</html>
+                    </html>
