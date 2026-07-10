@@ -22,7 +22,6 @@
             color:#90EE90; font-size:16px; line-height:1.6; letter-spacing:.5px;
             background:rgba(0,0,0,.15); padding:12px; border-radius:16px; display:inline-block;
         }
-
         .caixa {
             background:linear-gradient(145deg, #1C6660 0%, #0F4A45 100%);
             border:2px solid transparent; border-image:linear-gradient(90deg,#FFD700,#FFF8DC,#FFD700)1;
@@ -31,7 +30,6 @@
             transition:transform .3s ease, box-shadow .3s ease;
         }
         .caixa:hover {transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);}
-
         .abas {display:flex; gap:10px; margin-bottom:25px;}
         .aba {
             flex:1; padding:15px 10px; border:none; border-radius:20px;
@@ -44,7 +42,6 @@
         }
         .conteudo {display:none;} .conteudo.visivel {display:block; animation:surgir .4s ease;}
         @keyframes surgir {from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
-
         .grupo {margin-bottom:20px;}
         label {display:block; margin-bottom:10px; color:#FFD700; font-weight:700; font-size:17px; letter-spacing:.3px;}
         input, select {
@@ -54,7 +51,6 @@
         }
         input:focus {outline:none; border-color:#FFD700; box-shadow:0 0 0 3px rgba(255,215,0,.2);}
         .linha {display:flex; gap:14px;} .linha .grupo {flex:1;}
-
         .botoes {display:flex; gap:14px; margin:28px 0; flex-wrap:wrap;}
         .btn {
             flex:1; min-width:200px; padding:20px 15px; border:none; border-radius:22px;
@@ -62,7 +58,7 @@
         }
         .btn-verde {
             background:linear-gradient(135deg,#00C853 0%,#008000 100%); color:#fff; border:2px solid #00FF7F;
-            box-shadow:0 6px 20px rgba(0,128,0,.35);
+            box-shadow:0 6px 20px rgba(128,0,0,.35);
         }
         .btn-verde:hover {transform:scale(1.04); box-shadow:0 8px 28px rgba(0,128,0,.5);}
         .btn-dourado {
@@ -70,8 +66,10 @@
             box-shadow:0 6px 20px rgba(255,165,0,.35);
         }
         .btn-dourado:hover {transform:scale(1.04); box-shadow:0 8px 28px rgba(255,165,0,.5);}
+        .btn-vermelho {
+            background:linear-gradient(135deg,#ff4444 0%,#cc0000 100%); color:#fff; border:2px solid #ff6b6b;
+        }
         .btn-pequeno {min-width:auto; padding:12px 15px; font-size:16px;}
-
         .resumo {
             background:linear-gradient(145deg,#1C6660 0%,#0F4A45 100%); border:3px solid #FFD700; border-radius:28px;
             padding:30px 25px; margin:28px 0; box-shadow:0 10px 35px rgba(255,215,0,.15);
@@ -80,16 +78,14 @@
         .resumo p {font-size:17px; margin:9px 0; line-height:1.6;}
         .resumo hr {border:none; border-top:1px solid rgba(255,215,0,.35); margin:15px 0;}
         .valor-total {text-align:center; font-size:36px; font-weight:900; color:#FFD700; margin:25px 0 10px; text-shadow:0 0 12px rgba(255,215,0,.4);}
-
         .tabela-container {
-            width:100%; max-height:380px; overflow-y:auto; border-radius:24px;
+            width:100%; max-height:420px; overflow-y:auto; border-radius:24px;
             box-shadow:0 6px 20px rgba(0,0,0,.25);
             scrollbar-width:thin; scrollbar-color:#FFD700 #0F4A45;
         }
         .tabela-container::-webkit-scrollbar {width:10px;}
         .tabela-container::-webkit-scrollbar-track {background:#0F4A45; border-radius:5px;}
         .tabela-container::-webkit-scrollbar-thumb {background:linear-gradient(180deg,#FFD700,#FFA500); border-radius:5px;}
-        
         .tabela-precos {width:100%; border-collapse:separate; border-spacing:0;}
         .tabela-precos th {
             background:linear-gradient(90deg,#FFD700,#FFC107); color:#000; padding:18px 10px;
@@ -101,7 +97,6 @@
             border:1px solid rgba(15,74,69,.6); padding:16px 10px; text-align:center; font-size:19px;
             background:linear-gradient(145deg,#1A5C57,#16524D);
         }
-
         .rastreio {
             background:linear-gradient(145deg,#1C6660 0%,#0F4A45 100%); border:3px solid #00C853; border-radius:28px;
             padding:30px 25px; text-align:center; margin:22px 0; box-shadow:0 8px 30px rgba(0,200,83,.2);
@@ -109,14 +104,12 @@
         .status-rastreio {font-size:24px; font-weight:900; margin:18px 0; color:#90EE90;}
         .link-rota {display:inline-block !important; color:#00FF7F; font-weight:700; text-decoration:none; margin:8px 5px; padding:8px 12px; border:2px solid #00FF7F; border-radius:16px; transition:all .2s ease;}
         .link-rota:hover {background:#00FF7F; color:#000;}
-
         .opcao-radio {display:flex; align-items:center; gap:10px; margin:10px 0; cursor:pointer; font-size:16px;}
         .opcao-radio input {width:auto; margin:0;}
         .aviso-localizacao {padding:15px; border-radius:20px; text-align:center; margin-bottom:18px; font-weight:700; font-size:16px;}
         .ok {background:rgba(0,128,0,.25); color:#90EE90; border:1px solid rgba(255,255,0,.3);}
         .erro {background:rgba(255,165,0,.25); color:#FFD700; border:1px solid rgba(255,215,0,.3);}
         .erro-login {color:#ff6b6b; border:1px solid rgba(255,107,107,.3); background:rgba(255,107,107,.15);}
-
         .painel-dados {display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:25px 0;}
         .card-dado {
             background:linear-gradient(145deg,#1C6660 0%,#0F4A45 100%); border:3px solid #FFD700; border-radius:24px;
@@ -125,15 +118,14 @@
         .card-dado h3 {font-size:17px; color:#90EE90; margin-bottom:10px; font-weight:700;}
         .card-dado .valor {font-size:30px; font-weight:900; color:#FFD700; text-shadow:0 0 8px rgba(255,215,0,.3);}
         .grafico {height:230px; margin:28px 0;}
-
         .pix-area {text-align:center; margin:20px 0; padding:20px; background:rgba(0,0,0,.15); border-radius:20px; border:2px solid #00C853;}
         .pix-copia {background:#0C3B37; padding:12px; border-radius:12px; font-size:14px; word-break:break-all; margin:12px 0; border:1px solid #FFD700;}
-        .estrelas {display:flex; justify-content:center; gap:8px; font-size:32px; cursor:pointer; margin:15px 0;}
-        .estrela {color:#444; transition:all .2s;} .estrela.ativa {color:#FFD700; text-shadow:0 0 8px rgba(255,215,0,.5);}
         .bloco-entrega {position:relative;} 
         .btn-remover {position:absolute; top:10px; right:10px; background:#ff4444; color:#fff; border:none; width:36px; height:36px; border-radius:50%; font-weight:bold; font-size:20px; cursor:pointer; z-index:10;}
         .aviso-taxa {color:#FFD700; font-weight:700; margin-top:8px; font-size:15px;}
-        .area-status-entrega {display: none !important;}
+        .status-moto {padding:12px; border-radius:16px; text-align:center; font-weight:700; margin:15px 0;}
+        .ativo {background:rgba(0,200,83,.25); color:#90EE90; border:2px solid #00C853;}
+        .inativo {background:rgba(255,68,68,.25); color:#ff6b6b; border:2px solid #ff4444;}
     </style>
 </head>
 <body>
@@ -155,7 +147,6 @@
         <!-- ABA LOJISTA -->
         <div id="abalojista" class="conteudo visivel">
             <div class="aviso-localizacao" id="avisoLocal">🔄 Obtendo localização...</div>
-
             <div class="caixa">
                 <button class="btn btn-dourado btn-pequeno" onclick="salvarLoja()">💾 Salvar Dados da Loja</button>
                 <p class="aviso-taxa">✅ Ao salvar, sua loja fica cadastrada automaticamente para próximos pedidos</p>
@@ -231,7 +222,7 @@
                 <p>💵 Valor: <span id="valTotalMotoLoja">R$ 0,00</span> <small>(mín R$0,50 — R$0,50/km)</small></p><br>
                 <p>🏪 <strong>Trajeto: Loja → Cliente</strong></p>
                 <p>📏 Distância: <span id="distLojaCli">--</span> km</p>
-                <p>💵 Valor: <span id="valTotalEntregas">R$ 0,00</span> <small>(até 1km R$8,00 + R$1,00/km extra)</small></p><br>
+                <p>💵 Valor: <span id="valTotalEntregas">R$ 0,00</span></p><br>
                 <p id="linhaRetorno">🔄 <strong>Retorno</strong></p>
                 <p id="linhaRetornoDist">📏 Distância: <span id="distRetorno">--</span> km</p>
                 <p id="linhaRetornoVal">💵 Valor: <span id="valRetorno">R$ 0,00</span> <small>(50% do valor da entrega)</small></p><br>
@@ -259,6 +250,7 @@
                 </div>
                 <p>📏 Distância total: <span id="distanciaRastreio">--</span> km</p>
                 <p style="font-size:15px; color:#B2DFDB; margin-top:8px;">🔄 Rotas abrem direto no Google Maps</p>
+                <p style="font-size:14px; color:#FFD700; margin-top:10px;">📍 Localização atualizada a cada 10s enquanto logado</p>
             </div>
 
             <div class="botoes">
@@ -275,17 +267,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Até 1 km</td><td>R$ 8,00</td></tr>
-                        <tr><td>1,1 a 2 km</td><td>R$ 9,00</td></tr>
-                        <tr><td>2,1 a 3 km</td><td>R$ 10,00</td></tr>
-                        <tr><td>3,1 a 4 km</td><td>R$ 11,00</td></tr>
-                        <tr><td>4,1 a 5 km</td><td>R$ 12,00</td></tr>
-                        <tr><td>5,1 a 6 km</td><td>R$ 13,00</td></tr>
-                        <tr><td>6,1 a 7 km</td><td>R$ 14,00</td></tr>
-                        <tr><td>7,1 a 8 km</td><td>R$ 15,00</td></tr>
-                        <tr><td>8,1 a 9 km</td><td>R$ 16,00</td></tr>
-                        <tr><td>9,1 a 10 km</td><td>R$ 17,00</td></tr>
-                        <tr><td>Acima de 10 km</td><td>+ R$1,00 por km</td></tr>
+                        <tr><td>Até 1 km</td><td>R$ 9,00</td></tr>
+                        <tr><td>1,1 a 2 km</td><td>R$ 10,00</td></tr>
+                        <tr><td>2,1 a 3 km</td><td>R$ 11,00</td></tr>
+                        <tr><td>3,1 a 4 km</td><td>R$ 12,00</td></tr>
+                        <tr><td>4,1 a 5 km</td><td>R$ 13,00</td></tr>
+                        <tr><td>5,1 a 6 km</td><td>R$ 14,00</td></tr>
+                        <tr><td>6,1 a 7 km</td><td>R$ 15,00</td></tr>
+                        <tr><td>7,1 a 8 km</td><td>R$ 16,00</td></tr>
+                        <tr><td>8,1 a 9 km</td><td>R$ 17,00</td></tr>
+                        <tr><td>9,1 a 10 km</td><td>R$ 18,00</td></tr>
+                        <tr><td>10,1 a 11 km</td><td>R$ 19,00</td></tr>
+                        <tr><td>11,1 a 12 km</td><td>R$ 20,00</td></tr>
+                        <tr><td>12,1 a 13 km</td><td>R$ 21,00</td></tr>
+                        <tr><td>13,1 a 14 km</td><td>R$ 22,00</td></tr>
+                        <tr><td>14,1 a 15 km</td><td>R$ 23,00</td></tr>
+                        <tr><td>15,1 a 16 km</td><td>R$ 24,00</td></tr>
+                        <tr><td>16,1 a 17 km</td><td>R$ 25,00</td></tr>
+                        <tr><td>17,1 a 18 km</td><td>R$ 26,00</td></tr>
+                        <tr><td>18,1 a 19 km</td><td>R$ 27,00</td></tr>
+                        <tr><td>19,1 a 20 km</td><td>R$ 28,00</td></tr>
+                        <tr><td>Acima de 20 km</td><td>+ R$1,00 por km</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -295,14 +297,22 @@
         <div id="abamotoboy" class="conteudo">
             <div class="caixa">
                 <h2 style="color:#FFD700; text-align:center; margin-bottom:25px; font-size:24px; font-weight:900;">🛵 Área do Motoboy</h2>
+                <div id="statusMoto" class="status-moto inativo">🔴 Desconectado / Inativo</div>
                 <div class="grupo"><label>👤 Usuário</label><input type="text" id="usuarioMoto" placeholder="Digite seu usuário"></div>
                 <div class="grupo"><label>🔒 Senha</label><input type="password" id="senhaMoto" placeholder="Digite sua senha"></div>
-                <button class="btn btn-verde" onclick="verificarLoginMotoboy()">🔑 Entrar</button>
+                <button class="btn btn-verde" onclick="verificarLoginMotoboy()">🔑 Entrar e Ativar Localização</button>
+                <button class="btn btn-dourado btn-pequeno" onclick="deslogarMotoboy()" style="margin-top:10px;">❌ Sair / Desativar</button>
                 <p id="erroLoginMoto" class="aviso-localizacao erro-login" style="margin-top:15px; display:none;">❌ Usuário ou senha incorretos!</p>
+                <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,.15); border-radius:16px; font-size:15px;">
+                    <p>📍 <strong>Latitude:</strong> <span id="mostraLat">--</span></p>
+                    <p>📍 <strong>Longitude:</strong> <span id="mostraLng">--</span></p>
+                    <p>⏱️ <strong>Última atualização:</strong> <span id="ultimaAtualizacao">--</span></p>
+                    <p style="margin-top:10px; color:#90EE90;">✅ Minimizar ou usar outros apps NÃO desativa — só fecha se sair ou fechar a página</p>
+                </div>
             </div>
         </div>
 
-        <!-- ABA ADMIN -->
+        <!-- ABA ADMIN / GESTÃO -->
         <div id="abaadmin" class="conteudo">
             <div class="caixa">
                 <h2 style="color:#FFD700; text-align:center; margin-bottom:25px; font-size:24px; font-weight:900;">⚙️ Painel Administrativo</h2>
@@ -322,6 +332,13 @@
                     <div class="card-dado"><h3>🏪 Lojas Cadastradas</h3><div class="valor" id="qtdLojas">0</div></div>
                 </div>
 
+                <div class="caixa" style="text-align:center; margin-top:20px;">
+                    <h3 style="color:#00C853; margin-bottom:15px; font-weight:900;">📲 RELATÓRIOS E GESTÃO</h3>
+                    <button class="btn btn-verde" style="margin-bottom:10px; width:100%;" onclick="enviarRelatorioWhatsapp()">📤 ENVIAR RELATÓRIO NO WHATSAPP</button>
+                    <button class="btn btn-vermelho btn-pequeno" style="width:100%;" onclick="zerarTodosDados()">🗑️ ZERAR TODOS OS DADOS</button>
+                    <p style="margin-top:12px; font-size:14px; color:#FFD700;">⚠️ Zerar apaga histórico e contadores — não desconfigura nada!</p>
+                </div>
+
                 <div class="caixa">
                     <h3 style="color:#FFD700; text-align:center; margin-bottom:20px; font-weight:900;">📊 Gráfico Semanal</h3>
                     <div class="grafico"><canvas id="graficoSemanal"></canvas></div>
@@ -336,18 +353,19 @@
 
 <script>
 const CHAVE_PIX_NUBANK = 'sua-chave-pix-nubank-aqui';
-const SEU_WHATSAPP = '5532999953215';
+const SEU_WHATSAPP = '5532999953215'; // ✅ SEU NÚMERO JÁ CADASTRADO!
 
 let minhaLat, minhaLng, localizacaoOk = false;
 let numeroPedido = Math.floor(Math.random() * 99999) + 10000;
 let valorEntregaBase = 0;
 let graficoSemanal, graficoMensal;
 let qtdEntregasCadastradas = 1;
-let avaliacaoNota = 0;
+let intervaloLocalizacao = null;
+let motoboyLogado = false;
 
 let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify({
     totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, somaAvaliacoes:0, qtdAvaliacoes:0,
-    lojas:[], dadosSemana:[12,19,15,25,22,30,10], dadosMes:[50,65,72,80,95,110]
+    lojas:[], dadosSemana:[0,0,0,0,0,0,0], dadosMes:[0,0,0,0,0,0]
 }));
 
 function salvarDados() {localStorage.setItem('dadosMTZ', JSON.stringify(dadosGerais));}
@@ -359,7 +377,7 @@ window.onload = function() {
                 document.getElementById('avisoLocal').textContent = '✅ Localização obtida!';
                 document.getElementById('avisoLocal').className = 'aviso-localizacao ok';},
             () => {
-                document.getElementById('avisoLocal').textContent = '⚠️ Usando localização central de Juiz de Fora';
+                document.getElementById('avisoLocal').textContent = '⚠️ Usando centro de Juiz de Fora';
                 document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
                 minhaLat = -21.7642; minhaLng = -43.3503; localizacaoOk = true;},
             {enableHighAccuracy:true, timeout:8000, maximumAge:60000}
@@ -421,31 +439,31 @@ function salvarLoja() {
             endereco: `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}, Juiz de Fora-MG`
         });
         salvarDados();
-        alert(`✅ Loja "${nome}" cadastrada com sucesso!`);
+        alert(`✅ Loja "${nome}" cadastrada!`);
     } else {
-        alert(`ℹ️ Loja "${nome}" já está cadastrada!`);
+        alert(`ℹ️ Loja "${nome}" já cadastrada!`);
     }
 }
 
-function buscarLoja() {
-    const nomeBusca = document.getElementById('buscaLoja').value.trim().toLowerCase();
-    if(!nomeBusca) {alert('⚠️ Digite o nome para buscar!'); return;}
-    const loja = dadosGerais.lojas.find(l => l.nome.toLowerCase().includes(nomeBusca));
-    if(loja) {
-        document.querySelector('.nomeLoja').value = loja.nome;
-        document.querySelector('.contatoLoja').value = loja.contato;
-        const partes = loja.endereco.split(', ');
-        if(partes.length >=4) {
-            document.querySelector('.endLoja').value = partes[0];
-            document.querySelector('.numLoja').value = partes[1].split(' - ')[0];
-            document.querySelector('.bairroLoja').value = partes[1].split(' - ')[1] || '';
+// ✅ BUSCA COORDENADAS REAIS GRÁTIS
+async function buscarCoordenadas(endereco) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&country=Brazil&city=Juiz de Fora&state=MG`;
+    try {
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+        if (dados.length > 0) {
+            return {lat: parseFloat(dados[0].lat), lng: parseFloat(dados[0].lon)};
+        } else {
+            alert(`⚠️ Não encontrei: ${endereco}\nUsando centro de JF.`);
+            return {lat: -21.7642, lng: -43.3503};
         }
-        alert('✅ Dados da loja carregados!');
-    } else {
-        alert('❌ Loja não encontrada! Cadastre abaixo.');
+    } catch (erro) {
+        alert(`❌ Erro na busca: ${erro}\nUsando centro de JF.`);
+        return {lat: -21.7642, lng: -43.3503};
     }
 }
 
+// ✅ CÁLCULO + ARREDONDA SEMPRE PARA CIMA
 function calcularDistanciaReal(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -467,19 +485,30 @@ function gerarLinkGoogleMaps(origem, destino) {
     return `${base}&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}`;
 }
 
+// ✅ NOVA TABELA DE VALORES EXATA QUE VOCÊ PEDIU!
 function valorPorKmTabela(km) {
     const kmArredondado = Math.ceil(km);
-    if(kmArredondado <= 1) return 8.00;
-    if(kmArredondado <= 2) return 9.00;
-    if(kmArredondado <= 3) return 10.00;
-    if(kmArredondado <= 4) return 11.00;
-    if(kmArredondado <= 5) return 12.00;
-    if(kmArredondado <= 6) return 13.00;
-    if(kmArredondado <= 7) return 14.00;
-    if(kmArredondado <= 8) return 15.00;
-    if(kmArredondado <= 9) return 16.00;
-    if(kmArredondado <= 10) return 17.00;
-    return 8.00 + ((kmArredondado - 1) * 1.00);
+    if(kmArredondado <= 1) return 9.00;
+    if(kmArredondado <= 2) return 10.00;
+    if(kmArredondado <= 3) return 11.00;
+    if(kmArredondado <= 4) return 12.00;
+    if(kmArredondado <= 5) return 13.00;
+    if(kmArredondado <= 6) return 14.00;
+    if(kmArredondado <= 7) return 15.00;
+    if(kmArredondado <= 8) return 16.00;
+    if(kmArredondado <= 9) return 17.00;
+    if(kmArredondado <= 10) return 18.00;
+    if(kmArredondado <= 11) return 19.00;
+    if(kmArredondado <= 12) return 20.00;
+    if(kmArredondado <= 13) return 21.00;
+    if(kmArredondado <= 14) return 22.00;
+    if(kmArredondado <= 15) return 23.00;
+    if(kmArredondado <= 16) return 24.00;
+    if(kmArredondado <= 17) return 25.00;
+    if(kmArredondado <= 18) return 26.00;
+    if(kmArredondado <= 19) return 27.00;
+    if(kmArredondado <= 20) return 28.00;
+    return 9.00 + ((kmArredondado - 1) * 1.00);
 }
 
 async function calcular() {
@@ -494,8 +523,8 @@ async function calcular() {
     const endLojaTexto = enderecoParaTexto(ruaLoja, numLoja, bairroLoja);
     const endDestTexto = enderecoParaTexto(ruaDest, numDest, bairroDest);
 
-    const cLoja = {lat: -21.76, lng: -43.35};
-    const cDest = {lat: -21.76, lng: -43.35};
+    const cLoja = await buscarCoordenadas(endLojaTexto);
+    const cDest = await buscarCoordenadas(endDestTexto);
     
     const distMoto = calcularDistanciaReal(minhaLat, minhaLng, cLoja.lat, cLoja.lng);
     const distLojaCliente = calcularDistanciaReal(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
@@ -536,29 +565,28 @@ async function calcular() {
     document.getElementById('distanciaRastreio').textContent = distMoto + distLojaCliente;
 
     const linkMotoLoja = gerarLinkGoogleMaps(`${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`, endLojaTexto);
-    const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
+        const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
     document.getElementById('linkRotaMotoLoja').href = linkMotoLoja;
     document.getElementById('linkRotaLojaCli').href = linkLojaCli;
 
     document.getElementById('chavePix').textContent = CHAVE_PIX_NUBANK;
     document.getElementById('qrcode').innerHTML = '';
-    QRCode.toCanvas(document.createElement('canvas'), CHAVE_PIX_NUBANK, {width:200}, (err, canvas) => {if(!err) document.getElementById('qrcode').appendChild(canvas);});
+    QRCode.toCanvas(document.createElement('canvas'), CHAVE_PIX_NUBANK, {width:200}, (err, canvas) => {
+        if(!err) document.getElementById('qrcode').appendChild(canvas);
+    });
 }
 
+// ✅ GERAR PEDIDO E ABRIR WHATSAPP
 function gerarPedido() {
     numeroPedido++;
     dadosGerais.totalEntregas++;
     dadosGerais.valorTotal += valorEntregaBase;
     salvarDados();
-    document.getElementById('textoStatusRastreio').textContent = '🚚 Pedido gerado! Abrindo WhatsApp automaticamente...';
-    abrirWhatsApp('📤 NOVO PEDIDO GERADO');
+    document.getElementById('textoStatusRastreio').textContent = '✅ Pedido gerado com sucesso!';
 }
 
 function enviarPedidoWhatsapp() {
     gerarPedido();
-}
-
-function abrirWhatsApp(status) {
     const bloco = document.querySelector('.bloco-entrega');
     const pagador = document.querySelector('input[name=pagador]:checked').value;
     const nomePagador = pagador === 'loja' ? '🏪 A Loja' : '👤 O Cliente';
@@ -574,9 +602,9 @@ function abrirWhatsApp(status) {
         bloco.querySelector('.bairroDest').value
     );
     
-    const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
+    const temRetorno = document.querySelector('input[name=retorno]:checked').value === 'sim';
 
-    const mensagem = `${status}
+    const mensagem = `📤 NOVO PEDIDO GERADO
 📄 PEDIDO Nº: ${numeroPedido}
 🏪 Loja: ${bloco.querySelector('.nomeLoja').value || 'Não informado'}
 📲 Contato Loja: ${bloco.querySelector('.contatoLoja').value || 'Não informado'}
@@ -584,46 +612,148 @@ function abrirWhatsApp(status) {
 👤 Cliente: ${bloco.querySelector('.nomeDest').value || 'Não informado'}
 📲 Contato Cliente: ${bloco.querySelector('.contatoDest').value || 'Não informado'}
 📍 Destino: ${endDestTexto}
-🔗 Ver rota Loja → Cliente: ${linkLojaCli}
-🔄 Retorno: ${document.querySelector('input[name=retorno]:checked').value === 'sim' ? 'SIM (50% do valor)' : 'NÃO'}
+🔄 Retorno: ${temRetorno ? 'SIM (50% do valor)' : 'NÃO'}
 💰 Quem paga: ${nomePagador}
-💵 Valor Total: ${document.getElementById('valTotal').textContent}
-💳 Pix: ${CHAVE_PIX_NUBANK}
+🛵 Distância Moto→Loja: ${document.getElementById('distMotoLoja').textContent} km
+💵 Valor Moto→Loja: ${document.getElementById('valTotalMotoLoja').textContent}
+🏪 Distância Loja→Cliente: ${document.getElementById('distLojaCli').textContent} km
+💵 Valor Entrega: ${document.getElementById('valTotalEntregas').textContent}
+${temRetorno ? `🔄 Valor Retorno: ${document.getElementById('valRetorno').textContent}` : ''}
+💲 VALOR TOTAL: ${document.getElementById('valTotal').textContent}
+
 ✅ MTZ Express — Juiz de Fora-MG`;
 
-    const linkWhatsApp = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
-    window.open(linkWhatsApp, '_blank');
+    const url = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
 }
 
 function copiarPix() {
-    navigator.clipboard.writeText(CHAVE_PIX_NUBANK)
-    .then(() => alert('✅ Chave Pix copiada com sucesso!'))
-    .catch(() => alert('❌ Erro ao copiar! Copie manualmente.'));
+    const chave = document.getElementById('chavePix').textContent;
+    navigator.clipboard.writeText(chave).then(() => {
+        alert('✅ Chave Pix copiada!');
+    }).catch(() => {
+        alert('❌ Erro ao copiar!');
+    });
 }
 
+// ✅ LOGIN MOTOBOY E LOCALIZAÇÃO AO VIVO
 function verificarLoginMotoboy() {
-    const user = document.getElementById('usuarioMoto').value.trim().toLowerCase();
-    const pass = document.getElementById('senhaMoto').value.trim();
-    if(user === 'mtz2026' && pass === '1120') {
-        alert('✅ Login realizado com sucesso! Bem-vindo(a) Motoboy MTZ Express!');
+    const usuario = document.getElementById('usuarioMoto').value.trim();
+    const senha = document.getElementById('senhaMoto').value.trim();
+    if(usuario === 'mtz2026' && senha === '1120') {
         document.getElementById('erroLoginMoto').style.display = 'none';
+        document.getElementById('statusMoto').className = 'status-moto ativo';
+        document.getElementById('statusMoto').innerHTML = '🟢 CONECTADO — LOCALIZAÇÃO ATIVA';
+        motoboyLogado = true;
+        iniciarAtualizacaoLocalizacao();
+        alert('✅ Login feito! Você está visível para os lojistas!');
     } else {
         document.getElementById('erroLoginMoto').style.display = 'block';
     }
 }
 
+function deslogarMotoboy() {
+    motoboyLogado = false;
+    if(intervaloLocalizacao) {
+        clearInterval(intervaloLocalizacao);
+        intervaloLocalizacao = null;
+    }
+    document.getElementById('statusMoto').className = 'status-moto inativo';
+    document.getElementById('statusMoto').innerHTML = '🔴 Desconectado / Inativo';
+    document.getElementById('mostraLat').textContent = '--';
+    document.getElementById('mostraLng').textContent = '--';
+    document.getElementById('ultimaAtualizacao').textContent = '--';
+    document.getElementById('usuarioMoto').value = '';
+    document.getElementById('senhaMoto').value = '';
+    alert('✅ Deslogado! Localização parou de enviar.');
+}
+
+function iniciarAtualizacaoLocalizacao() {
+    if(intervaloLocalizacao) clearInterval(intervaloLocalizacao);
+    atualizarLocalizacao();
+    intervaloLocalizacao = setInterval(atualizarLocalizacao, 10000); // 10 segundos
+}
+
+function atualizarLocalizacao() {
+    if(!motoboyLogado) return;
+    if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                minhaLat = pos.coords.latitude;
+                minhaLng = pos.coords.longitude;
+                document.getElementById('mostraLat').textContent = minhaLat.toFixed(6);
+                document.getElementById('mostraLng').textContent = minhaLng.toFixed(6);
+                const agora = new Date();
+                document.getElementById('ultimaAtualizacao').textContent = 
+                    `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}:${agora.getSeconds().toString().padStart(2,'0')}`;
+            },
+            () => {
+                document.getElementById('mostraLat').textContent = 'Erro';
+                document.getElementById('mostraLng').textContent = 'Erro';
+            },
+            {enableHighAccuracy:true, timeout:7000}
+        );
+    }
+}
+
+// ✅ LOGIN ADMIN
 function verificarLoginAdmin() {
-    const user = document.getElementById('usuarioAdmin').value.trim().toLowerCase();
-    const pass = document.getElementById('senhaAdmin').value.trim();
-    if(user === 'mtz2026' && pass === '1120') {
-        document.getElementById('painelAdminDados').style.display = 'block';
+    const usuario = document.getElementById('usuarioAdmin').value.trim();
+    const senha = document.getElementById('senhaAdmin').value.trim();
+    if(usuario === 'mtz2026' && senha === '1120') {
         document.getElementById('erroLoginAdmin').style.display = 'none';
+        document.getElementById('painelAdminDados').style.display = 'block';
+        atualizarPainelAdmin();
         desenharGraficos();
     } else {
         document.getElementById('erroLoginAdmin').style.display = 'block';
     }
 }
 
+// ✅ FUNÇÃO ZERAR TODOS OS DADOS
+function zerarTodosDados() {
+    if(confirm('⚠️ ATENÇÃO! Tem certeza que quer ZERAR TUDO?\n\nApaga todo histórico, contadores e valores.\nNÃO PODE SER DESFEITO!')) {
+        dadosGerais = {
+            totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0,
+            somaAvaliacoes:0, qtdAvaliacoes:0, lojas:[],
+            dadosSemana:[0,0,0,0,0,0,0], dadosMes:[0,0,0,0,0,0]
+        };
+        salvarDados();
+        atualizarPainelAdmin();
+        desenharGraficos();
+        alert('✅ TUDO ZERADO! Pronto para uso real!');
+    }
+}
+
+// ✅ ENVIAR RELATÓRIO NO WHATSAPP
+function enviarRelatorioWhatsapp() {
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    const mensagem = `📊 RELATÓRIO GERAL — MTZ Express
+📅 Data: ${dataAtual}
+
+📦 TOTAL DE ENTREGAS: ${dadosGerais.totalEntregas}
+✅ Concluídas: ${dadosGerais.entregues}
+❌ Não realizadas: ${dadosGerais.naoEntregues}
+💰 VALOR TOTAL ACUMULADO: R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}
+
+📅 SEMANA:
+Seg: ${dadosGerais.dadosSemana[0]} | Ter: ${dadosGerais.dadosSemana[1]} | Qua: ${dadosGerais.dadosSemana[2]}
+Qui: ${dadosGerais.dadosSemana[3]} | Sex: ${dadosGerais.dadosSemana[4]} | Sáb: ${dadosGerais.dadosSemana[5]} | Dom: ${dadosGerais.dadosSemana[6]}
+
+📆 ÚLTIMOS 6 MESES:
+M1: ${dadosGerais.dadosMes[0]} | M2: ${dadosGerais.dadosMes[1]} | M3: ${dadosGerais.dadosMes[2]}
+M4: ${dadosGerais.dadosMes[3]} | M5: ${dadosGerais.dadosMes[4]} | M6: ${dadosGerais.dadosMes[5]}
+
+🏪 Lojas cadastradas: ${dadosGerais.lojas.length}
+⭐ Média de avaliações: ${dadosGerais.qtdAvaliacoes > 0 ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) : '--'}
+
+✅ MTZ Express — Relatório Completo`;
+
+    const url = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+}
+
+// ✅ ATUALIZAR PAINEL E GRÁFICOS
 function atualizarPainelAdmin() {
     document.getElementById('totalEntregas').textContent = dadosGerais.totalEntregas;
     document.getElementById('valorTotalGeral').textContent = `R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}`;
