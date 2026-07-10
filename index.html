@@ -192,6 +192,7 @@
                             <label class="opcao-radio"><input type="radio" name="categoria1" value="alimentos" checked> 🍔 Alimentos</label>
                             <label class="opcao-radio"><input type="radio" name="categoria1" value="farmacia"> 💊 Farmácia</label>
                             <label class="opcao-radio"><input type="radio" name="categoria1" value="documentos"> 📄 Documentos</label>
+                            <label class="opcao-radio"><input type="radio" name="categoria1" value="vestuario"> 👕 Vestuário</label>
                             <label class="opcao-radio"><input type="radio" name="categoria1" value="outros"> 📦 Outros</label>
                         </div>
                     </div>
@@ -441,6 +442,8 @@ function adicionarEntrega() {
     novoBloco.querySelectorAll('input:not([type=radio])').forEach(i => i.value = '');
     const radiosRetorno = novoBloco.querySelectorAll('input[name=retorno]');
     radiosRetorno.forEach(r => r.checked = r.value === 'sim');
+    const radiosCategoria = novoBloco.querySelectorAll('input[name^=categoria]');
+    radiosCategoria[0].checked = true;
     lista.appendChild(novoBloco);
     document.getElementById('qtdEntregas').textContent = qtdEntregasCadastradas;
 }
@@ -504,8 +507,6 @@ async function calcular() {
     const bloco = document.querySelector('.bloco-entrega');
     const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value} - ${bloco.querySelector('.bairroLoja').value}`;
     const endDest = `${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value} - ${bloco.querySelector('.bairroDest').value}`;
-    const temRetorno = true;
-    const temGorjeta = document.querySelector('input[name=gorjeta][value=sim]').checked;
 
     const cLoja = await buscarCoordenadas(endLoja);
     const cDest = await buscarCoordenadas(endDest);
@@ -516,6 +517,7 @@ async function calcular() {
     valorEntregaBase = valEntrega;
 
     let valRetorno = valEntrega * 0.5;
+    const temGorjeta = document.querySelector('input[name=gorjeta][value=sim]').checked;
     let valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value)||0) : 0;
     const valTotalGeral = valMoto + valEntrega + valRetorno + valGorj;
 
@@ -586,14 +588,26 @@ function copiarPix() {navigator.clipboard.writeText(CHAVE_PIX_NUBANK).then(() =>
 function enviarPedidoWhatsapp() {abrirWhatsApp('📤 NOVO PEDIDO GERADO');}
 
 function verificarLoginMotoboy() {
-    if(document.getElementById('usuarioMoto').value==='motoboy' && document.getElementById('senhaMoto').value==='123456') alert('✅ Login ok!');
-    else document.getElementById('erroLoginMoto').style.display='block';
+    const user = document.getElementById('usuarioMoto').value.trim().toLowerCase();
+    const pass = document.getElementById('senhaMoto').value.trim();
+    if(user === 'mtz2026' && pass === '1120') {
+        alert('✅ Login realizado com sucesso! Bem-vindo(a) Motoboy MTZ Express!');
+        document.getElementById('erroLoginMoto').style.display='none';
+    } else {
+        document.getElementById('erroLoginMoto').style.display='block';
+    }
 }
 
 function verificarLoginAdmin() {
-    if(document.getElementById('usuarioAdmin').value==='admin' && document.getElementById('senhaAdmin').value==='admin123') {
-        document.getElementById('painelAdminDados').style.display='block'; desenharGraficos();
-    } else document.getElementById('erroLoginAdmin').style.display='block';
+    const user = document.getElementById('usuarioAdmin').value.trim().toLowerCase();
+    const pass = document.getElementById('senhaAdmin').value.trim();
+    if(user === 'mtz2026' && pass === '1120') {
+        document.getElementById('painelAdminDados').style.display='block';
+        document.getElementById('erroLoginAdmin').style.display='none';
+        desenharGraficos();
+    } else {
+        document.getElementById('erroLoginAdmin').style.display='block';
+    }
 }
 
 function atualizarPainelAdmin() {
@@ -601,14 +615,73 @@ function atualizarPainelAdmin() {
     document.getElementById('valorTotalGeral').textContent = `R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdEntregues').textContent = dadosGerais.entregues;
     document.getElementById('qtdNaoEntregues').textContent = dadosGerais.naoEntregues;
-    document.getElementById('qtdLojas').textContent = dadosGerais.lojas.length;
-    const media = dadosGerais.qtdAvaliacoes > 0 ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) : '--';
+        document.getElementById('qtdLojas').textContent = dadosGerais.lojas.length;
+    
+    const media = dadosGerais.qtdAvaliacoes > 0 
+        ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) 
+        : '--';
     document.getElementById('mediaAvaliacao').textContent = media;
 }
 
 function desenharGraficos() {
-    const estilo = {color:'#fff'};
-    const opt = {
-        responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#fff', font:{size:14}}}},
-        scales:{x:{ticks:{color:'#fff', grid:{color:'rgba(255,255
+    if(graficoSemanal) graficoSemanal.destroy();
+    if(graficoMensal) graficoMensal.destroy();
+
+    const ctxSemanal = document.getElementById('graficoSemanal').getContext('2d');
+    graficoSemanal = new Chart(ctxSemanal, {
+        type: 'bar',
+        data: {
+            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Entregas',
+                data: dadosGerais.dadosSemana,
+                backgroundColor: '#FFD700',
+                borderColor: '#FFA500',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#FFD700', font: { size: 16 } } } },
+            scales: {
+                y: { ticks: { color: '#90EE90' }, grid: { color: 'rgba(255,255,255,.1)' } },
+                x: { ticks: { color: '#90EE90' }, grid: { display: false } }
+            }
+        }
+    });
+
+    const ctxMensal = document.getElementById('graficoMensal').getContext('2d');
+    graficoMensal = new Chart(ctxMensal, {
+        type: 'line',
+        data: {
+            labels: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'],
+            datasets: [{
+                label: 'Entregas',
+                data: dadosGerais.dadosMes,
+                backgroundColor: 'rgba(0,200,83,.2)',
+                borderColor: '#00C853',
+                borderWidth: 3,
+                fill: true,
+                tension: .4,
+                pointBackgroundColor: '#FFD700',
+                pointBorderColor: '#FFA500',
+                pointBorderWidth: 2,
+                pointRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#FFD700', font: { size: 16 } } } },
+            scales: {
+                y: { ticks: { color: '#90EE90' }, grid: { color: 'rgba(255,255,255,.1)' } },
+                x: { ticks: { color: '#90EE90' }, grid: { display: false } }
+            }
+        }
+    });
+}
+</script>
+</body>
+                                                           </html>
