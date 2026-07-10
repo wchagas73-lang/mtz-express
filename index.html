@@ -102,7 +102,6 @@
         .atualizacao-info {font-size:14px; color:#9CA3AF; margin-top:10px;}
         .dados-distancia {background:rgba(59,130,246,0.08); border:1px solid var(--azul); border-radius:12px; padding:10px; margin:10px 0; font-size:15px;}
 
-        /* ESTILOS DO DASHBOARD */
         .grade-dashboard {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0;}
         .card-dados {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; text-align: center;}
         .card-dados.primario {border-color: var(--primaria); background: rgba(0,200,150,0.08);}
@@ -504,14 +503,13 @@
         const SENHA_SISTEMA = "1120";
 
         const dadosPIX = `00020126580014br.gov.bcb.pix0114+55329999532150212MTZEXPRESS5204000053039865802BR5925Wellington Chagas Aleixo6014Juiz de Fora62070503YlHwcSq7496304E596`;
-        const linkNubank = `https://nubank.com.br/cobrar/4vx6y/6a5
-const linkNubank = `https://nubank.com.br/cobrar/4vx6y/6a50c3f2-6720-4e46-9ca4-f21198288be7`;
+        const linkNubank = `https://nubank.com.br/cobrar/4vx6y/6a50c3f2-6720-4e46-9ca4-f21198288be7`;
         const telefoneLoja = '5532999953215';
         const tabelaValores = [
             {km:1, valor:8.00}, {km:2, valor:8.50}, {km:3, valor:9.00}, {km:4, valor:9.50},
             {km:5, valor:10.00}, {km:6, valor:11.00}, {km:7, valor:12.00}, {km:8, valor:14.00},
             {km:9, valor:16.00}, {km:10, valor:17.00}, {km:11, valor:18.00}, {km:12, valor:19.00},
-            {km:13, valor:20.00}, {km:14, valor:21.00}, {km:15, valor:22.00}, {km:16, valor:23.00},
+                        {km:13, valor:20.00}, {km:14, valor:21.00}, {km:15, valor:22.00}, {km:16, valor:23.00},
             {km:17, valor:24.00}, {km:18, valor:25.00}, {km:19, valor:26.00}, {km:20, valor:27.00}
         ];
 
@@ -746,7 +744,7 @@ Ação: ${document.querySelector('input[name=acaoImprevisto]:checked').value==='
         }
 
         function verificarLoginMotoboy() {
-            if(document.getElementById('usuarioMoto').value.trim().toLowerCase()===USUARIO_SISTEMA &&
+            if(document.getElementById('usuarioMoto').value.trim()===USUARIO_SISTEMA &&
                document.getElementById('senhaMoto').value.trim()===SENHA_SISTEMA) {
                 document.getElementById('areaLoginMoto').classList.add('escondido');
                 document.getElementById('conteudoMoto').classList.remove('escondido');
@@ -775,7 +773,7 @@ Ação: ${document.querySelector('input[name=acaoImprevisto]:checked').value==='
         }
 
         function verificarLoginPainel() {
-            if(document.getElementById('usuarioPainel').value.trim().toLowerCase()===USUARIO_SISTEMA &&
+            if(document.getElementById('usuarioPainel').value.trim()===USUARIO_SISTEMA &&
                document.getElementById('senhaPainel').value.trim()===SENHA_SISTEMA) {
                 document.getElementById('areaLoginPainel').classList.add('escondido');
                 document.getElementById('conteudoPainel').classList.remove('escondido');
@@ -822,4 +820,4 @@ Ação: ${document.querySelector('input[name=acaoImprevisto]:checked').value==='
         function copiarLink() {navigator.clipboard.writeText(linkNubank).then(()=>alert('✅ Link copiado!'));}
     </script>
 </body>
-    </html>
+                                </html>
