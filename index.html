@@ -40,6 +40,11 @@
         input:focus, textarea:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
 
+        /* ✅ CAIXA DE SUGESTÕES DE ENDEREÇO */
+        .sugestoes-endereco {background: #1A3F4A; border: 2px solid var(--dourado); border-top: none; border-radius: 0 0 16px 16px; max-height: 220px; overflow-y: auto; margin-top: -2px; position: relative; z-index: 999;}
+        .item-sugestao {padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--borda-escuro); font-size: 15px;}
+        .item-sugestao:hover {background: rgba(255,215,0,0.15); color: var(--dourado);}
+
         .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
         .aviso {padding: 18px; border-radius: 18px; border-left: 5px solid; margin: 20px 0; font-weight: 600;}
         .aviso.sucesso {background: rgba(0,200,150,0.15); border-left-color: var(--primaria); color: #E0F8F0;}
@@ -117,7 +122,7 @@
                 <button class="aba" onclick="mostrarAba('painel')">📊 Painel</button>
             </div>
 
-            <!-- 🏪 ABA LOJISTA -->
+            <!-- 🏪 ABA LOJISTA — COM PREENCHIMENTO AUTOMÁTICO AO DIGITAR RUA -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
                 
@@ -134,20 +139,21 @@
                 <input type="tel" id="contatoLoja" placeholder="(32) 9XXXX-XXXX" required>
 
                 <div class="linha-dupla">
-                    <label>CEP <span class="opcional">(Opcional)</span></label>
+                    <label>CEP <span class="opcional">(Opcional - preenche ao digitar a rua)</span></label>
                     <label>Número <span>*</span></label>
                 </div>
                 <div class="linha-dupla">
-                    <input type="text" id="cepLoja" placeholder="Apenas números" onblur="buscarCep(this.value, 'Loja')">
-                    <input type="text" id="numLoja" required>
+                    <input type="text" id="cepLoja" readonly placeholder="✅ Preenchido automaticamente">
+                    <input type="text" id="numLoja" required placeholder="Digite só o número">
                 </div>
                 <div class="aviso-busca" id="avisoCepLoja"></div>
 
-                <label>Rua / Endereço <span>*</span></label>
-                <input type="text" id="endLoja" placeholder="Nome da Rua, Avenida" required>
+                <label>Rua / Endereço <span>*</span> — comece a digitar que aparece as opções</label>
+                <input type="text" id="endLoja" placeholder="Ex: Rua Rio Branco, Av. Getúlio Vargas..." oninput="buscarEnderecoPorRua(this.value, 'Loja')" autocomplete="off">
+                <div class="sugestoes-endereco escondido" id="sugestoesLoja"></div>
 
-                <label>Bairro <span>*</span></label>
-                <input type="text" id="bairroLoja" required>
+                <label>Bairro <span>*</span> — preenchido automaticamente</label>
+                <input type="text" id="bairroLoja" readonly placeholder="✅ Preenchido automaticamente">
 
                 <label>Ponto de Referência <span>*</span></label>
                 <input type="text" id="refLoja" placeholder="Próximo a qual ponto de referência" required>
@@ -159,19 +165,20 @@
                 <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX" required>
 
                 <div class="linha-dupla">
-                    <label>CEP <span class="opcional">(Opcional)</span></label>
+                    <label>CEP <span class="opcional">(Opcional - preenche ao digitar a rua)</span></label>
                     <label>Número <span>*</span></label>
                 </div>
                 <div class="linha-dupla">
-                    <input type="text" id="cepDest" placeholder="Apenas números" onblur="buscarCep(this.value, 'Dest')">
-                    <input type="text" id="numDest" required>
+                    <input type="text" id="cepDest" readonly placeholder="✅ Preenchido automaticamente">
+                    <input type="text" id="numDest" required placeholder="Digite só o número">
                 </div>
 
-                <label>Rua / Endereço <span>*</span></label>
-                <input type="text" id="endDest" required>
+                <label>Rua / Endereço <span>*</span> — comece a digitar que aparece as opções</label>
+                <input type="text" id="endDest" placeholder="Ex: Rua Rio Branco, Av. Getúlio Vargas..." oninput="buscarEnderecoPorRua(this.value, 'Dest')" autocomplete="off">
+                <div class="sugestoes-endereco escondido" id="sugestoesDest"></div>
 
-                <label>Bairro <span>*</span></label>
-                <input type="text" id="bairroDest" required>
+                <label>Bairro <span>*</span> — preenchido automaticamente</label>
+                <input type="text" id="bairroDest" readonly placeholder="✅ Preenchido automaticamente">
 
                 <label>Ponto de Referência <span>*</span></label>
                 <input type="text" id="refDest" required>
@@ -333,6 +340,7 @@
         const SENHA_AUTORIZADA = '1120';
         let acessoMotoboyLiberado = false;
         let acessoPainelLiberado = false;
+        let timerBusca; // Para não buscar a cada tecla, só quando parar de digitar
 
         // 🔥 FIREBASE
         const firebaseConfig = {
@@ -352,6 +360,58 @@
         let graficoStatus;
         let filtroAtual = 'todos';
         let todosPedidos = [];
+
+        // ✅ FUNÇÃO NOVA: BUSCA ENDEREÇO AO DIGITAR A RUA — JUIZ DE FORA-MG
+        async function buscarEnderecoPorRua(nomeRua, tipo) {
+            clearTimeout(timerBusca);
+            nomeRua = nomeRua.trim();
+            const caixaSugestoes = document.getElementById(`sugestoes${tipo}`);
+            caixaSugestoes.classList.add('escondido');
+            caixaSugestoes.innerHTML = '';
+
+            if(nomeRua.length < 4) return; // Só busca se digitar pelo menos 4 letras
+
+            timerBusca = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://viacep.com.br/ws/${encodeURIComponent(nomeRua)}/juizdefora/mg/json/`);
+                    const enderecos = await res.json();
+                    
+                    if(!Array.isArray(enderecos) || enderecos.length === 0) return;
+
+                    caixaSugestoes.classList.remove('escondido');
+                    enderecos.slice(0,8).forEach(end => { // Mostra até 8 opções
+                        const item = document.createElement('div');
+                        item.className = 'item-sugestao';
+                        item.innerHTML = `<strong>${end.logradouro}</strong> — ${end.bairro} | CEP: ${end.cep}`;
+                        item.onclick = () => {
+                            document.getElementById(`end${tipo}`).value = end.logradouro;
+                            document.getElementById(`bairro${tipo}`).value = end.bairro;
+                            document.getElementById(`cep${tipo}`).value = end.cep.replace(/(\d{5})(\d{3})/, '$1-$2');
+                            document.getElementById(`avisoCep${tipo}`).textContent = '✅ Endereço preenchido! Agora coloque só o número.';
+                            caixaSugestoes.classList.add('escondido');
+                        };
+                        caixaSugestoes.appendChild(item);
+                    });
+                } catch (erro) {
+                    console.log('Erro ao buscar endereço:', erro);
+                }
+            }, 400); // Espera 400ms depois que parou de digitar
+        }
+
+        // ✅ BUSCA CEP (mantive também se quiser usar)
+        async function buscarCep(cep, tipo) {
+            cep = cep.replace(/\D/g,'');
+            if(cep.length!==8) return;
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const dados = await res.json();
+                if(!dados.erro && dados.localidade === 'Juiz de Fora' && dados.uf === 'MG') {
+                    document.getElementById(`end${tipo}`).value = dados.logradouro;
+                    document.getElementById(`bairro${tipo}`).value = dados.bairro;
+                    document.getElementById(`avisoCep${tipo}`).textContent = '✅ Endereço preenchido automaticamente!';
+                }
+            } catch {}
+        }
 
         // ✅ VERIFICA ACESSO ANTES DE ABRIR ABAS RESTRITAS
         function verificarAcesso(tipo) {
@@ -384,21 +444,6 @@
             if(nomeAba === 'painel' && acessoPainelLiberado) {
                 carregarDadosDashboard();
             }
-        }
-
-        // ✅ BUSCA CEP AUTOMÁTICA
-        async function buscarCep(cep, tipo) {
-            cep = cep.replace(/\D/g,'');
-            if(cep.length!==8) return;
-            try {
-                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                const dados = await res.json();
-                if(!dados.erro) {
-                    document.getElementById(`end${tipo}`).value = dados.logradouro;
-                    document.getElementById(`bairro${tipo}`).value = dados.bairro;
-                    document.getElementById(`avisoCep${tipo}`).textContent = '✅ Endereço preenchido automaticamente!';
-                }
-            } catch {}
         }
 
         // ✅ CONTROLE DA GORJETA
@@ -623,9 +668,7 @@ Escolha:
                     labels: ['Concluídos', 'Pendentes', 'Não Realizados'],
                     datasets: [{
                         data: [concluidos, pendentes, naorealizados],
-                        backgroundColor: [
-'#00C896', '#FFD700', '#dc3545'
-                        ]
+                        backgroundColor: ['#00C896', '#FFD700', '#dc3545']
                     }]
                 }, 
                 options: {
