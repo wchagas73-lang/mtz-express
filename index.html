@@ -71,7 +71,7 @@
         
         .caixa-retorno, .caixa-pagamento, .caixa-gorjeta, .caixa-status-entrega, .bloco-entrega {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
         .bloco-entrega {border-color: var(--azul); background: rgba(59,130,246,0.06);}
-        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2.3;}
+        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
         .opcao {display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 0;}
         .opcao input {width: auto; transform: scale(1.4);}
         .tabela-valores {width:100%; border-collapse:separate; border-spacing:0; border-radius:18px; overflow:hidden; margin:40px 0;}
@@ -141,7 +141,7 @@
                 <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
                 
                 <div class="destaque-percurso">
-                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM<br>
+                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM — VALOR MÍNIMO R$ 0,50<br>
                     🏪 LOJA → CLIENTE: Valor conforme tabela abaixo
                 </div>
 
@@ -204,7 +204,7 @@
                         <input type="text" class="refDest" required placeholder="Próximo a qual lugar?">
 
                         <div class="dados-distancia escondido" id="dadosDist_1">
-                            <p>🛵 Moto→Loja: <span class="distMotoLoja">0,0</span> km = R$ <span class="valMotoLoja">0,00</span> | 🏪→Cliente: <span class="distLojaCli">0,0</span> km = R$ <span class="valLojaCli">0,00</span></p>
+                            <p>🛵 Moto→Loja: <span class="distMotoLoja">0,0</span> km = R$ <span class="valMotoLoja">0,50</span> | 🏪→Cliente: <span class="distLojaCli">0,0</span> km = R$ <span class="valLojaCli">0,00</span></p>
                         </div>
                         <input type="hidden" class="distMotoLojaVal" value="0">
                         <input type="hidden" class="distanciaReal" value="0">
@@ -284,15 +284,27 @@
                     <button class="btn btn-secundario" id="btnGerarPedido" onclick="gerarPedido()" disabled>✅ GERAR PEDIDO</button>
                 </div>
 
+                <!-- 📑 RESUMO DETALHADO — SÓ APARECE AO CLICAR EM CALCULAR -->
                 <div class="resumo escondido" id="resumoPedido">
-                    <h3 style="color:var(--dourado); text-align:center;">📑 RESUMO GERAL</h3>
-                    <p>Quantidade de Entregas: <span id="qtdEntregas">1</span></p>
-                    <p>🛵 Valor Moto → Loja: <span id="valTotalMotoLoja">R$ 0,00</span></p>
-                    <p>🏪 Valor Loja → Cliente: <span id="valTotalEntregas">R$ 0,00</span></p>
-                    <p id="linhaRetorno" class="escondido">✅ Valor Retorno (50%): <span id="valRetorno">R$ 0,00</span></p>
-                    <p id="linhaRetornoImprevisto" class="escondido">⚠️ Retorno por Imprevisto (50%): <span id="valRetornoImp">R$ 0,00</span></p>
-                    <p id="linhaGorjeta" class="escondido">Gorjeta: <span id="valGorjetaRes">R$ 0,00</span></p>
-                    <p style="font-size:22px; font-weight:900; color:var(--dourado);">VALOR TOTAL GERAL: <span id="valTotal">R$ 0,00</span></p>
+                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO DETALHADO DO PEDIDO</h3>
+
+                    <div style="background:rgba(0,200,150,0.1); border-left:4px solid var(--primaria); padding:12px; border-radius:12px; margin:10px 0;">
+                        <p>🛵 <strong>Meu local → até a Loja:</strong> <span id="detalheDistMoto">0,0</span> km</p>
+                        <p>💸 <strong>Valor deslocamento:</strong> <span id="valTotalMotoLoja">R$ 0,50</span> <small>(mínimo R$0,50)</small></p>
+                    </div>
+
+                    <div style="background:rgba(59,130,246,0.1); border-left:4px solid var(--azul); padding:12px; border-radius:12px; margin:10px 0;">
+                        <p>🏪 <strong>Loja → até o Cliente:</strong> <span id="detalheDistLoja">0,0</span> km</p>
+                        <p>💸 <strong>Valor entrega:</strong> <span id="valTotalEntregas">R$ 0,00</span> <small>(conforme tabela)</small></p>
+                    </div>
+
+                    <p id="linhaRetorno" class="escondido">🔄 <strong>Retorno para Loja:</strong> <span id="valRetorno">R$ 0,00</span> <small>(50% do valor entrega)</small></p>
+                    <p id="linhaRetornoImprevisto" class="escondido">⚠️ <strong>Retorno por imprevisto:</strong> <span id="valRetornoImp">R$ 0,00</span></p>
+                    <p id="linhaGorjeta" class="escondido">💸 <strong>Gorjeta:</strong> <span id="valGorjetaRes">R$ 0,00</span></p>
+
+                    <hr style="border:1px solid var(--dourado); margin:15px 0;">
+                    <p style="font-size:22px; font-weight:900; color:var(--dourado); text-align:center;">VALOR TOTAL GERAL: <span id="valTotal">R$ 0,00</span></p>
+                    <p style="font-size:13px; opacity:0.8; text-align:center; margin-top:5px;">✅ Cálculo feito pela MTZ Express — Juiz de Fora-MG</p>
                 </div>
 
                 <div class="escondido" id="areaRastreioCompleto">
@@ -502,14 +514,14 @@
         const USUARIO_SISTEMA = "mtz2026";
         const SENHA_SISTEMA = "1120";
 
-        const dadosPIX = `00020126580014br.gov.bcb.pix0114+55329999532150212MTZEXPRESS5204000053039865802BR5925Wellington Chagas Aleixo6014Juiz de Fora62070503YlHwcSq7496304E596`;
+        const dadosPIX = `000201265802BR5925Wellington Chagas Aleixo6014Juiz de Fora62070503YlHwcSq7496304E596`;
         const linkNubank = `https://nubank.com.br/cobrar/4vx6y/6a50c3f2-6720-4e46-9ca4-f21198288be7`;
         const telefoneLoja = '5532999953215';
         const tabelaValores = [
             {km:1, valor:8.00}, {km:2, valor:8.50}, {km:3, valor:9.00}, {km:4, valor:9.50},
             {km:5, valor:10.00}, {km:6, valor:11.00}, {km:7, valor:12.00}, {km:8, valor:14.00},
             {km:9, valor:16.00}, {km:10, valor:17.00}, {km:11, valor:18.00}, {km:12, valor:19.00},
-                        {km:13, valor:20.00}, {km:14, valor:21.00}, {km:15, valor:22.00}, {km:16, valor:23.00},
+            {km:13, valor:20.00}, {km:14, valor:21.00}, {km:15, valor:22.00}, {km:16, valor:23.00},
             {km:17, valor:24.00}, {km:18, valor:25.00}, {km:19, valor:26.00}, {km:20, valor:27.00}
         ];
 
@@ -597,6 +609,8 @@
 
         async function calcular() {
             let valEntregas=0, valMotoLoja=0;
+            let somaDistMoto=0, somaDistLoja=0;
+
             for(const bloco of document.querySelectorAll('.bloco-entrega')){
                 const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value}, ${bloco.querySelector('.bairroLoja').value}`;
                 const endDest = `${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value}, ${bloco.querySelector('.bairroDest').value}`;
@@ -607,16 +621,22 @@
                 if(cLoja && cDest) dLojaCli = calcularDistancia(cLoja.lat,cLoja.lng,cDest.lat,cDest.lng);
                 
                 bloco.querySelector('.distMotoLoja').textContent = dMoto.toFixed(1).replace('.',',');
-                bloco.querySelector('.valMotoLoja').textContent = (dMoto*0.5).toFixed(2).replace('.',',');
+                const valMotoLojaCalc = Math.max(dMoto * 0.5, 0.50);
+                bloco.querySelector('.valMotoLoja').textContent = valMotoLojaCalc.toFixed(2).replace('.',',');
                 bloco.querySelector('.distLojaCli').textContent = dLojaCli.toFixed(1).replace('.',',');
                 const vLojaCli = buscarValorPorKm(dLojaCli);
                 bloco.querySelector('.valLojaCli').textContent = vLojaCli.toFixed(2).replace('.',',');
                 bloco.querySelector('.dados-distancia').classList.remove('escondido');
-                valEntregas += vLojaCli; valMotoLoja += dMoto*0.5;
+
+                valEntregas += vLojaCli;
+                valMotoLoja += valMotoLojaCalc;
+                somaDistMoto += dMoto;
+                somaDistLoja += dLojaCli;
             }
 
             valorEntregaBase = valEntregas;
-            document.getElementById('qtdEntregas').textContent = document.querySelectorAll('.bloco-entrega').length;
+            document.getElementById('detalheDistMoto').textContent = somaDistMoto.toFixed(1).replace('.',',');
+            document.getElementById('detalheDistLoja').textContent = somaDistLoja.toFixed(1).replace('.',',');
             document.getElementById('valTotalEntregas').textContent = `R$ ${valEntregas.toFixed(2).replace('.',',')}`;
             document.getElementById('valTotalMotoLoja').textContent = `R$ ${valMotoLoja.toFixed(2).replace('.',',')}`;
 
@@ -632,6 +652,7 @@
 
             const total = valEntregas + valMotoLoja + valRet + valGorj + valorRetornoImprevisto;
             document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+            
             document.getElementById('resumoPedido').classList.remove('escondido');
             document.getElementById('btnGerarPedido').disabled = false;
         }
@@ -820,4 +841,4 @@ Ação: ${document.querySelector('input[name=acaoImprevisto]:checked').value==='
         function copiarLink() {navigator.clipboard.writeText(linkNubank).then(()=>alert('✅ Link copiado!'));}
     </script>
 </body>
-                                </html>
+    </html>
