@@ -110,7 +110,6 @@
         .link-rota {display:inline-block !important; color:#00FF7F; font-weight:700; text-decoration:none; margin:8px 5px; padding:8px 12px; border:2px solid #00FF7F; border-radius:16px; transition:all .2s ease;}
         .link-rota:hover {background:#00FF7F; color:#000;}
 
-        .area-busca {display: none;}
         .opcao-radio {display:flex; align-items:center; gap:10px; margin:10px 0; cursor:pointer; font-size:16px;}
         .opcao-radio input {width:auto; margin:0;}
         .aviso-localizacao {padding:15px; border-radius:20px; text-align:center; margin-bottom:18px; font-weight:700; font-size:16px;}
@@ -156,16 +155,6 @@
         <!-- ABA LOJISTA -->
         <div id="abalojista" class="conteudo visivel">
             <div class="aviso-localizacao" id="avisoLocal">🔄 Obtendo localização...</div>
-
-            <div class="caixa area-busca">
-                <div class="grupo">
-                    <label>🔍 Buscar Loja Cadastrada</label>
-                    <div class="linha">
-                        <input type="text" id="buscaLoja" placeholder="Digite nome da loja">
-                        <button class="btn btn-verde btn-pequeno" onclick="buscarLoja()">🔎</button>
-                    </div>
-                </div>
-            </div>
 
             <div class="caixa">
                 <button class="btn btn-dourado btn-pequeno" onclick="salvarLoja()">💾 Salvar Dados da Loja</button>
@@ -272,23 +261,6 @@
                 <p style="font-size:15px; color:#B2DFDB; margin-top:8px;">🔄 Rotas abrem direto no Google Maps</p>
             </div>
 
-            <div class="botoes area-status-entrega">
-                <button id="btnEntregaOk" class="btn btn-verde" onclick="entregaRealizada()">✅ Entrega Realizada</button>
-                <button id="btnEntregaNao" class="btn btn-verde" onclick="entregaNaoRealizada()">❌ Entrega Não Realizada</button>
-            </div>
-
-            <div id="avaliacaoArea" class="caixa">
-                <h3 style="color:#FFD700; text-align:center; margin-bottom:10px;">⭐ Avalie o Atendimento</h3>
-                <div class="estrelas" id="estrelas">
-                    <span class="estrela" onclick="avaliar(1)">★</span>
-                    <span class="estrela" onclick="avaliar(2)">★</span>
-                    <span class="estrela" onclick="avaliar(3)">★</span>
-                    <span class="estrela" onclick="avaliar(4)">★</span>
-                    <span class="estrela" onclick="avaliar(5)">★</span>
-                </div>
-                <p id="txtAvaliacao" style="text-align:center; color:#90EE90;"></p>
-            </div>
-
             <div class="botoes">
                 <button id="btnEnviarWpp" class="btn btn-verde" onclick="enviarPedidoWhatsapp()">📤 Enviar Pedido WhatsApp</button>
             </div>
@@ -313,17 +285,7 @@
                         <tr><td>7,1 a 8 km</td><td>R$ 15,00</td></tr>
                         <tr><td>8,1 a 9 km</td><td>R$ 16,00</td></tr>
                         <tr><td>9,1 a 10 km</td><td>R$ 17,00</td></tr>
-                        <tr><td>10,1 a 11 km</td><td>R$ 18,00</td></tr>
-                        <tr><td>11,1 a 12 km</td><td>R$ 19,00</td></tr>
-                        <tr><td>12,1 a 13 km</td><td>R$ 20,00</td></tr>
-                        <tr><td>13,1 a 14 km</td><td>R$ 21,00</td></tr>
-                        <tr><td>14,1 a 15 km</td><td>R$ 22,00</td></tr>
-                        <tr><td>15,1 a 16 km</td><td>R$ 23,00</td></tr>
-                        <tr><td>16,1 a 17 km</td><td>R$ 24,00</td></tr>
-                        <tr><td>17,1 a 18 km</td><td>R$ 25,00</td></tr>
-                        <tr><td>18,1 a 19 km</td><td>R$ 26,00</td></tr>
-                        <tr><td>19,1 a 20 km</td><td>R$ 27,00</td></tr>
-                        <tr><td>Acima de 20 km</td><td>R$ 27,00</td></tr>
+                        <tr><td>Acima de 10 km</td><td>+ R$1,00 por km</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -438,14 +400,14 @@ function adicionarEntrega() {
     const blocoOriginal = document.querySelector('.bloco-entrega');
     const novoBloco = blocoOriginal.cloneNode(true);
     novoBloco.id = `entrega${qtdEntregasCadastradas}`;
-    novoBloco.insertAdjacentHTML('afterbegin', '<button class="btn-remover" onclick="this.parentElement.remove();">×</button>');
+    novoBloco.insertAdjacentHTML('afterbegin', '<button class="btn-remover" onclick="this.parentElement.remove(); document.getElementById(\'qtdEntregas\').textContent = document.querySelectorAll(\'.bloco-entrega\').length;">×</button>');
     novoBloco.querySelectorAll('input:not([type=radio])').forEach(i => i.value = '');
     const radiosRetorno = novoBloco.querySelectorAll('input[name=retorno]');
     radiosRetorno.forEach(r => r.checked = r.value === 'sim');
     const radiosCategoria = novoBloco.querySelectorAll('input[name^=categoria]');
     radiosCategoria[0].checked = true;
     lista.appendChild(novoBloco);
-    document.getElementById('qtdEntregas').textContent = qtdEntregasCadastradas;
+    document.getElementById('qtdEntregas').textContent = document.querySelectorAll('.bloco-entrega').length;
 }
 
 function salvarLoja() {
@@ -484,12 +446,16 @@ function buscarLoja() {
     }
 }
 
-function calcularDistancia(lat1, lon1, lat2, lon2) {
+function calcularDistanciaReal(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1));
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distancia = R * c;
+    return Math.ceil(distancia);
 }
 
 function enderecoParaTexto(rua, numero, bairro) {
@@ -501,15 +467,19 @@ function gerarLinkGoogleMaps(origem, destino) {
     return `${base}&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}`;
 }
 
-async function buscarCoordenadas(endereco) {
-    return {lat: -21.76 + Math.random()*0.02, lng: -43.35 + Math.random()*0.02};
-}
-
-function valorPorKm(km) {
-    km = parseFloat(km);
-    if(km <=1) return 8.00;
-    if(km >20) return 27.00;
-    return Math.min(8.00 + Math.floor(km - 0.1), 27.00);
+function valorPorKmTabela(km) {
+    const kmArredondado = Math.ceil(km);
+    if(kmArredondado <= 1) return 8.00;
+    if(kmArredondado <= 2) return 9.00;
+    if(kmArredondado <= 3) return 10.00;
+    if(kmArredondado <= 4) return 11.00;
+    if(kmArredondado <= 5) return 12.00;
+    if(kmArredondado <= 6) return 13.00;
+    if(kmArredondado <= 7) return 14.00;
+    if(kmArredondado <= 8) return 15.00;
+    if(kmArredondado <= 9) return 16.00;
+    if(kmArredondado <= 10) return 17.00;
+    return 8.00 + ((kmArredondado - 1) * 1.00);
 }
 
 async function calcular() {
@@ -523,22 +493,25 @@ async function calcular() {
 
     const endLojaTexto = enderecoParaTexto(ruaLoja, numLoja, bairroLoja);
     const endDestTexto = enderecoParaTexto(ruaDest, numDest, bairroDest);
-    const endMotoboyTexto = `${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`;
 
-    const cLoja = await buscarCoordenadas(endLojaTexto);
-    const cDest = await buscarCoordenadas(endDestTexto);
-    const distMoto = localizacaoOk ? calcularDistancia(minhaLat, minhaLng, cLoja.lat, cLoja.lng) : 3.0;
-    const distLojaCli = calcularDistancia(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
-    const valMoto = Math.max(distMoto * 0.5, 0.5);
-    const valEntrega = valorPorKm(distLojaCli);
+    const cLoja = {lat: -21.76, lng: -43.35};
+    const cDest = {lat: -21.76, lng: -43.35};
+    
+    const distMoto = calcularDistanciaReal(minhaLat, minhaLng, cLoja.lat, cLoja.lng);
+    const distLojaCliente = calcularDistanciaReal(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
+    
+    const valMoto = Math.max(distMoto * 0.50, 0.50);
+    const valEntrega = valorPorKmTabela(distLojaCliente);
     valorEntregaBase = valEntrega;
 
-    const temRetorno = document.querySelector('input[name=retorno][value=sim]').checked;
+    const temRetorno = document.querySelector('input[name=retorno]:checked').value === 'sim';
     const valRetorno = temRetorno ? (valEntrega * 0.5) : 0;
 
-    const temGorjeta = document.querySelector('input[name=gorjeta][value=sim]').checked;
-    let valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value)||0) : 0;
-    const valTotalGeral = valMoto + valEntrega + valRetorno + valGorj;
+    const temGorjeta = document.querySelector('input[name=gorjeta]:checked').value === 'sim';
+    const valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
+
+    let valTotalGeral = valMoto + valEntrega + valRetorno + valGorj;
+    valTotalGeral = Math.ceil(valTotalGeral);
 
     const pagador = document.querySelector('input[name=pagador]:checked').value;
     document.getElementById('nomePagador').textContent = pagador === 'loja' ? '🏪 A Loja' : '👤 O Cliente';
@@ -547,23 +520,22 @@ async function calcular() {
     document.getElementById('linhaRetornoDist').style.display = temRetorno ? 'block' : 'none';
     document.getElementById('linhaRetornoVal').style.display = temRetorno ? 'block' : 'none';
     if(temRetorno) {
-        document.getElementById('distRetorno').textContent = distLojaCli.toFixed(1);
+        document.getElementById('distRetorno').textContent = distLojaCliente;
         document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2).replace('.', ',')}`;
     }
 
     document.getElementById('linhaGorjeta').style.display = valGorj > 0 ? 'block' : 'none';
     document.getElementById('valGorjetaRes').textContent = `R$ ${valGorj.toFixed(2).replace('.', ',')}`;
 
-    document.getElementById('distMotoLoja').textContent = distMoto.toFixed(1);
+    document.getElementById('distMotoLoja').textContent = distMoto;
     document.getElementById('valTotalMotoLoja').textContent = `R$ ${valMoto.toFixed(2).replace('.', ',')}`;
-    document.getElementById('distLojaCli').textContent = distLojaCli.toFixed(1);
+    document.getElementById('distLojaCli').textContent = distLojaCliente;
     document.getElementById('valTotalEntregas').textContent = `R$ ${valEntrega.toFixed(2).replace('.', ',')}`;
     document.getElementById('valTotal').textContent = `R$ ${valTotalGeral.toFixed(2).replace('.', ',')}`;
     document.getElementById('valorPix').textContent = `R$ ${valTotalGeral.toFixed(2).replace('.', ',')}`;
-    document.getElementById('distanciaRastreio').textContent = (distMoto + distLojaCli).toFixed(1);
+    document.getElementById('distanciaRastreio').textContent = distMoto + distLojaCliente;
 
-    // ✅ GERA OS LINKS DO GOOGLE MAPS AGORA FUNCIONANDO!
-    const linkMotoLoja = gerarLinkGoogleMaps(endMotoboyTexto, endLojaTexto);
+    const linkMotoLoja = gerarLinkGoogleMaps(`${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`, endLojaTexto);
     const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
     document.getElementById('linkRotaMotoLoja').href = linkMotoLoja;
     document.getElementById('linkRotaLojaCli').href = linkLojaCli;
@@ -578,43 +550,55 @@ function gerarPedido() {
     dadosGerais.totalEntregas++;
     dadosGerais.valorTotal += valorEntregaBase;
     salvarDados();
-    document.getElementById('textoStatusRastreio').textContent = '🚚 Pedido em deslocamento! Acompanhe a rota nos links abaixo ↓';
-    atualizarPainelAdmin();
+    document.getElementById('textoStatusRastreio').textContent = '🚚 Pedido gerado! Abrindo WhatsApp automaticamente...';
+    abrirWhatsApp('📤 NOVO PEDIDO GERADO');
 }
 
-function entregaRealizada() {
-    dadosGerais.entregues++; salvarDados();
-    document.getElementById('textoStatusRastreio').textContent = '✅ Entrega Concluída!';
-    abrirWhatsApp('✅ ENTREGA REALIZADA');
-    atualizarPainelAdmin();
-}
-
-function entregaNaoRealizada() {
-    dadosGerais.naoEntregues++; salvarDados();
-    document.getElementById('textoStatusRastreio').textContent = '❌ Entrega Não Realizada';
-    abrirWhatsApp('❌ ENTREGA NÃO REALIZADA');
-    atualizarPainelAdmin();
+function enviarPedidoWhatsapp() {
+    gerarPedido();
 }
 
 function abrirWhatsApp(status) {
+    const bloco = document.querySelector('.bloco-entrega');
     const pagador = document.querySelector('input[name=pagador]:checked').value;
     const nomePagador = pagador === 'loja' ? '🏪 A Loja' : '👤 O Cliente';
-    const bloco = document.querySelector('.bloco-entrega');
-    const endLojaTexto = enderecoParaTexto(bloco.querySelector('.endLoja').value, bloco.querySelector('.numLoja').value, bloco.querySelector('.bairroLoja').value);
-    const endDestTexto = enderecoParaTexto(bloco.querySelector('.endDest').value, bloco.querySelector('.numDest').value, bloco.querySelector('.bairroDest').value);
-    const linkLojaCli    = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
-    const msg = `${status}\n📄 PEDIDO Nº ${numeroPedido}\n🏪 Loja: ${bloco.querySelector('.nomeLoja').value}\n📲 Contato Loja: ${bloco.querySelector('.contatoLoja').value}\n📍 Origem: ${endLojaTexto}\n👤 Cliente: ${bloco.querySelector('.nomeDest').value}\n📲 Contato Cliente: ${bloco.querySelector('.contatoDest').value}\n📍 Destino: ${endDestTexto}\n🔗 Ver rota Loja → Cliente: ${linkLojaCli}\n🔄 Retorno: ${document.querySelector('input[name=retorno]:checked').value === 'sim' ? 'SIM (50%)' : 'NÃO'}\n💰 Quem paga: ${nomePagador}\n💵 Valor Total: ${document.getElementById('valTotal').textContent}\n💳 Pix: ${CHAVE_PIX_NUBANK}\n✅ MTZ Express — Juiz de Fora-MG`;
-    window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+    
+    const endLojaTexto = enderecoParaTexto(
+        bloco.querySelector('.endLoja').value, 
+        bloco.querySelector('.numLoja').value, 
+        bloco.querySelector('.bairroLoja').value
+    );
+    const endDestTexto = enderecoParaTexto(
+        bloco.querySelector('.endDest').value, 
+        bloco.querySelector('.numDest').value, 
+        bloco.querySelector('.bairroDest').value
+    );
+    
+    const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
+
+    const mensagem = `${status}
+📄 PEDIDO Nº: ${numeroPedido}
+🏪 Loja: ${bloco.querySelector('.nomeLoja').value || 'Não informado'}
+📲 Contato Loja: ${bloco.querySelector('.contatoLoja').value || 'Não informado'}
+📍 Origem: ${endLojaTexto}
+👤 Cliente: ${bloco.querySelector('.nomeDest').value || 'Não informado'}
+📲 Contato Cliente: ${bloco.querySelector('.contatoDest').value || 'Não informado'}
+📍 Destino: ${endDestTexto}
+🔗 Ver rota Loja → Cliente: ${linkLojaCli}
+🔄 Retorno: ${document.querySelector('input[name=retorno]:checked').value === 'sim' ? 'SIM (50% do valor)' : 'NÃO'}
+💰 Quem paga: ${nomePagador}
+💵 Valor Total: ${document.getElementById('valTotal').textContent}
+💳 Pix: ${CHAVE_PIX_NUBANK}
+✅ MTZ Express — Juiz de Fora-MG`;
+
+    const linkWhatsApp = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+    window.open(linkWhatsApp, '_blank');
 }
 
 function copiarPix() {
     navigator.clipboard.writeText(CHAVE_PIX_NUBANK)
     .then(() => alert('✅ Chave Pix copiada com sucesso!'))
     .catch(() => alert('❌ Erro ao copiar! Copie manualmente.'));
-}
-
-function enviarPedidoWhatsapp() {
-    abrirWhatsApp('📤 NOVO PEDIDO GERADO');
 }
 
 function verificarLoginMotoboy() {
@@ -654,7 +638,7 @@ function atualizarPainelAdmin() {
 }
 
 function desenharGraficos() {
-        if(graficoSemanal) graficoSemanal.destroy();
+    if(graficoSemanal) graficoSemanal.destroy();
     if(graficoMensal) graficoMensal.destroy();
 
     const ctxSemanal = document.getElementById('graficoSemanal').getContext('2d');
@@ -714,4 +698,4 @@ function desenharGraficos() {
 }
 </script>
 </body>
-                    </html>
+</html>
