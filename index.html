@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- ✅ GOOGLE MAPS PLACES API — CHAVE PADRÃO FUNCIONAL PARA TESTES -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5uZ9K1XzPqQZ7X7z9X7z9X7z9X7z9X7z9&libraries=places&language=pt-BR&region=BR"></script>
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;}
         :root {
@@ -47,20 +45,19 @@
         .opcao-radio input {width: auto; transform: scale(1.3);}
         .opcao-radio span {font-size: 16px; font-weight: 600;}
 
-        /* ✅ ESTILO PARA AUTOCOMPLETE DO GOOGLE — FICA BONITO E ALINHADO */
         .grupo-endereco {position: relative;}
-        .pac-container {
-            background: #1A3F4A !important; border: 2px solid var(--dourado) !important; border-top: none !important; 
-            border-radius: 0 0 16px 16px !important; max-height: 260px !important; overflow-y: auto !important;
-            margin-top: -2px !important; width: 100% !important; left: 0 !important; z-index: 9999 !important;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+        .sugestoes-endereco {
+            position: absolute; left: 0; right: 0; top: 100%; z-index: 9999;
+            background: #1A3F4A; border: 2px solid var(--dourado); border-top: none;
+            border-radius: 0 0 16px 16px; max-height: 260px; overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        .pac-item {
-            padding: 12px 16px !important; cursor: pointer !important; border-bottom: 1px solid var(--borda-escuro) !important;
-            font-size: 15px !important; color: var(--texto-escuro) !important; transition: all 0.2s !important;
+        .item-sugestao {
+            padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--borda-escuro);
+            font-size: 15px; color: var(--texto-escuro); transition: all 0.2s;
         }
-        .pac-item:hover {background: rgba(255,215,0,0.15) !important; color: var(--dourado) !important; padding-left: 20px !important;}
-        .pac-item-query {color: var(--dourado) !important;}
+        .item-sugestao:hover {background: rgba(255,215,0,0.15); color: var(--dourado); padding-left: 20px;}
+        .escondido {display: none !important;}
 
         .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
         .aviso {padding: 18px; border-radius: 18px; border-left: 5px solid; margin: 20px 0; font-weight: 600;}
@@ -75,7 +72,6 @@
         .btn-pequeno {width: auto; padding: 10px 16px; font-size: 15px;}
         .btn-mais {background: linear-gradient(90deg, var(--azul), #2563eb); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0;}
         .btn-remover {background: var(--perigo); color: white; padding: 8px 12px; font-size: 14px; width: auto;}
-        .escondido {display: none !important;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
         @keyframes aparecer {from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
@@ -162,7 +158,8 @@
                         </div>
                         <label>Rua / Endereço <span>*</span></label>
                         <div class="grupo-endereco">
-                            <input type="text" class="endLoja" id="endLoja_1" placeholder="Digite nome da rua, avenida..." autocomplete="off">
+                            <input type="text" class="endLoja" id="endLoja_1" placeholder="Digite 3 ou 4 letras da rua..." oninput="buscarSugestoes(this, 'Loja', 1)" autocomplete="off">
+                            <div class="sugestoes-endereco escondido" id="sugLoja_1"></div>
                         </div>
                         <label>Bairro <span>*</span></label>
                         <input type="text" class="bairroLoja" id="bairroLoja_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
@@ -184,7 +181,8 @@
                         </div>
                         <label>Rua / Endereço <span>*</span></label>
                         <div class="grupo-endereco">
-                            <input type="text" class="endDest" id="endDest_1" placeholder="Digite nome da rua, avenida..." autocomplete="off">
+                            <input type="text" class="endDest" id="endDest_1" placeholder="Digite 3 ou 4 letras da rua..." oninput="buscarSugestoes(this, 'Dest', 1)" autocomplete="off">
+                            <div class="sugestoes-endereco escondido" id="sugDest_1"></div>
                         </div>
                         <label>Bairro <span>*</span></label>
                         <input type="text" class="bairroDest" id="bairroDest_1" placeholder="PREENCHIDO AUTOMATICAMENTE" readonly>
@@ -454,7 +452,7 @@
         let numeroPedido = 0;
         let intervaloRastreio = null;
         let statusRastreio = 'aguardando';
-        let listaAutocomplete = []; // Guarda os autocompletes para não repetir
+        let timerBusca;
 
         window.onload = function() {
             setTimeout(() => {
@@ -468,71 +466,58 @@
                 }
             }, 150);
 
-            // ✅ INICIA AUTOCOMPLETE GOOGLE MAPS PARA TODOS OS CAMPOS — SOMENTE JUIZ DE FORA!
-            inicializarTodosAutocomplete();
+            document.addEventListener('click', (e) => {
+                if(!e.target.closest('.grupo-endereco')) {
+                    document.querySelectorAll('.sugestoes-endereco').forEach(s => s.classList.add('escondido'));
+                }
+            });
         };
 
-        // ✅ FUNÇÃO PRINCIPAL — AUTOCOMPLETE 100% FUNCIONAL COM GOOGLE MAPS
-        function inicializarTodosAutocomplete() {
-            // Campos iniciais
-            criarAutocomplete('endLoja_1', 'Loja', 1);
-            criarAutocomplete('endDest_1', 'Dest', 1);
+        function buscarSugestoes(campo, tipo, id) {
+            clearTimeout(timerBusca);
+            const texto = campo.value.trim();
+            const sugestaoEl = document.getElementById(`sug${tipo}_${id}`);
+            
+            if(texto.length < 3) {
+                sugestaoEl.classList.add('escondido');
+                return;
+            }
+
+            timerBusca = setTimeout(() => {
+                fetch(`https://viacep.com.br/ws/${encodeURIComponent(texto)}/juizdefora/mg/json/`)
+                .then(res => res.json())
+                .then(dados => {
+                    sugestaoEl.innerHTML = '';
+                    if(!dados || dados.erro || dados.length === 0) {
+                        sugestaoEl.classList.add('escondido');
+                        return;
+                    }
+
+                    dados.forEach(end => {
+                        const item = document.createElement('div');
+                        item.className = 'item-sugestao';
+                        item.textContent = `${end.logradouro}, ${end.bairro} - ${end.cep}`;
+                        item.onclick = () => {
+                            if(tipo === 'Loja') {
+                                document.getElementById(`endLoja_${id}`).value = end.logradouro;
+                                document.getElementById(`bairroLoja_${id}`).value = end.bairro;
+                                document.getElementById(`cepLoja_${id}`).value = end.cep.replace('-','').substring(0,5)+'-'+end.cep.replace('-','').substring(5,8);
+                            } else {
+                                document.getElementById(`endDest_${id}`).value = end.logradouro;
+                                document.getElementById(`bairroDest_${id}`).value = end.bairro;
+                                document.getElementById(`cepDest_${id}`).value = end.cep.replace('-','').substring(0,5)+'-'+end.cep.replace('-','').substring(5,8);
+                            }
+                            sugestaoEl.classList.add('escondido');
+                            calcularRotaDistancia();
+                        };
+                        sugestaoEl.appendChild(item);
+                    });
+                    sugestaoEl.classList.remove('escondido');
+                })
+                .catch(() => sugestaoEl.classList.add('escondido'));
+            }, 300);
         }
 
-        function criarAutocomplete(campoId, tipo, id) {
-            const campo = document.getElementById(campoId);
-            if(!campo || listaAutocomplete.find(a=>a.campo===campoId)) return;
-
-            // 📍 FILTRO EXCLUSIVO: SOMENTE JUIZ DE FORA, MINAS GERAIS, BRASIL
-            const opcoes = {
-                componentRestrictions: { country: 'br' },
-                types: ['address'],
-                location: new google.maps.LatLng(-21.764773, -43.351278), // Centro de Juiz de Fora
-                radius: 15000 // 15km — toda a cidade
-            };
-
-            const autocomplete = new google.maps.places.Autocomplete(campo, opcoes);
-            listaAutocomplete.push({campo: campoId, instancia: autocomplete});
-
-            // 📥 QUANDO SELECIONAR O ENDEREÇO — PREENCHE TUDO AUTOMÁTICO!
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                if (!place.address_components) return;
-
-                let rua = '', bairro = '', cep = '';
-
-                // 📍 EXTRAI CADA PARTE DO ENDEREÇO DO GOOGLE
-                for (const comp of place.address_components) {
-                    const tipo = comp.types[0];
-                    if (tipo === 'route' || tipo === 'street_number') {
-                        if(!rua) rua = comp.long_name;
-                    }
-                    if (tipo === 'sublocality_level_1' || tipo === 'sublocality' || tipo === 'neighborhood') {
-                        bairro = comp.long_name;
-                    }
-                    if (tipo === 'postal_code') {
-                        cep = comp.long_name.replace('-', '');
-                        cep = cep.substring(0,5)+'-'+cep.substring(5,8);
-                    }
-                }
-
-                // ✅ COLOCA OS DADOS NOS CAMPOS — SEM NÚMERO NA RUA!
-                if(tipo === 'Loja') {
-                    document.getElementById(`endLoja_${id}`).value = rua || '';
-                    document.getElementById(`bairroLoja_${id}`).value = bairro || '';
-                    document.getElementById(`cepLoja_${id}`).value = cep || '';
-                } else {
-                    document.getElementById(`endDest_${id}`).value = rua || '';
-                    document.getElementById(`bairroDest_${id}`).value = bairro || '';
-                    document.getElementById(`cepDest_${id}`).value = cep || '';
-                }
-
-                calcularRotaDistancia();
-                calcularRotaDistancia();
-            });
-        }
-
-        // ✅ FUNÇÕES GERAIS — FUNCIONAM TUDO!
         function mostrarAba(nome) {
             document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
@@ -551,10 +536,7 @@
             });
             bloco.querySelector('h4').innerHTML = `📦 Entrega / Coleta ${contadorEntregas} <button class="btn btn-remover" style="float:right" onclick="this.closest('.bloco-entrega').remove(); calcular()">🗑️</button>`;
             
-            // ✅ INICIA AUTOCOMPLETE NO NOVO BLOCO ADICIONADO
             lista.appendChild(bloco);
-            criarAutocomplete(`endLoja_${contadorEntregas}`, 'Loja', contadorEntregas);
-            criarAutocomplete(`endDest_${contadorEntregas}`, 'Dest', contadorEntregas);
         }
 
         function marcarRadio(el) {
@@ -824,7 +806,7 @@ Ação: ${acao}
         function desligarMotoboy() {
             document.getElementById('statusOperacao').classList.remove('on');
             document.getElementById('statusOperacao').classList.add('off');
-            document.getElementById('statusOperacao').innerHTML = '⏳ Não operando';
+            document.getElementById('statusOperacao').innerHTML = '⏳ Não está operando';
             document.getElementById('btnDesligar').classList.add('escondido');
             document.getElementById('avisoMoto').classList.remove('on');
             document.getElementById('avisoMoto').classList.add('off');
@@ -836,4 +818,4 @@ Ação: ${acao}
         function copiarLink() { navigator.clipboard.writeText(linkNubank).then(() => alert('✅ Link copiado!')); }
     </script>
 </body>
-                            </html>
+</html>
