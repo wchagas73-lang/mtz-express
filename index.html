@@ -27,6 +27,10 @@
         .slogan {font-size: 19px; color: #FFF8C1; margin-bottom: 18px; font-weight: 600;}
         .dados-rapidos {padding: 18px; background: rgba(255,215,0,0.1); border-radius: 20px; border-left: 5px solid var(--dourado); font-size: 16px; line-height: 2; margin-bottom:10px;}
         .dados-rapidos strong {color: var(--dourado);}
+        .aviso-localizacao {padding:12px; border-radius:12px; text-align:center; margin:15px 0; font-weight:600;}
+        .aviso-localizacao.ok {background:rgba(0,200,150,0.15); border:2px solid var(--primaria); color:var(--primaria);}
+        .aviso-localizacao.aguardando {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); color:var(--dourado);}
+        .aviso-localizacao.erro {background:rgba(220,53,69,0.15); border:2px solid var(--perigo); color:var(--perigo);}
 
         .abas {display: flex; gap: 12px; margin: 28px 0; flex-wrap: wrap;}
         .aba {flex: 1; min-width: 115px; padding: 16px 12px; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,0.05); color: #B2DFDB; border: 1px solid var(--borda-escuro);}
@@ -37,6 +41,7 @@
         label .opcional {color: #9CA3AF; font-weight: 500;}
         input, textarea {width: 100%; padding: 14px 16px; border: 2px solid var(--borda-escuro); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
         input:focus, textarea:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
+        input[readonly] {background: rgba(15,43,51,0.35); color: #9CA3AF; cursor: default;}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
         .opcoes-linha {display: flex; gap: 15px; align-items: center; margin: 10px 0; flex-wrap: wrap;}
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
@@ -95,6 +100,7 @@
         .status-rastreio {font-size:20px; font-weight:700; margin:15px 0;}
         .atualizacao-info {font-size:14px; color:#9CA3AF; margin-top:10px;}
         .cep-automatico {font-size:13px; color:var(--primaria); margin-top:5px;}
+        .dados-distancia {background:rgba(59,130,246,0.08); border:1px solid var(--azul); border-radius:12px; padding:10px; margin:10px 0; font-size:15px;}
     </style>
 </head>
 <body>
@@ -118,6 +124,7 @@
             </div>
 
             <div class="conteudo-aba visivel" id="abaLoja">
+                <div class="aviso-localizacao aguardando" id="avisoLocal">🔍 Obtendo sua localização... Ative a localização!</div>
                 <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
                 
                 <div class="destaque-percurso">
@@ -151,7 +158,7 @@
                             <label>CEP <span>*</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="cidadeLoja" id="cidadeLoja_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cidadeLoja" id="cidadeLoja_1" value="Juiz de Fora-MG" readonly>
                             <input type="text" class="cepLoja" id="cepLoja_1" placeholder="✅ Preenchido automaticamente" readonly>
                         </div>
                         <p class="cep-automatico" id="avisoCepLoja_1"></p>
@@ -178,12 +185,18 @@
                             <label>CEP <span>*</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="cidadeDest" id="cidadeDest_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cidadeDest" id="cidadeDest_1" value="Juiz de Fora-MG" readonly>
                             <input type="text" class="cepDest" id="cepDest_1" placeholder="✅ Preenchido automaticamente" readonly>
                         </div>
                         <p class="cep-automatico" id="avisoCepDest_1"></p>
                         <label>Ponto de Referência <span>*</span></label>
                         <input type="text" class="refDest" required placeholder="Próximo a qual lugar?">
+
+                        <div class="dados-distancia escondido" id="dadosDist_1">
+                            <p>🛵 Moto→Loja: <span class="distMotoLoja">0,0</span> km = R$ <span class="valMotoLoja">0,00</span> | 🏪→Cliente: <span class="distLojaCli">0,0</span> km = R$ <span class="valLojaCli">0,00</span></p>
+                        </div>
+                        <input type="hidden" class="distMotoLojaVal" value="0">
+                        <input type="hidden" class="distanciaReal" value="0">
 
                         <label style="margin-top:25px;">📂 Categoria do Item <span>*</span></label>
                         <div class="opcoes-linha">
@@ -211,7 +224,6 @@
 
                         <label>Observação <span class="opcional">(Opcional)</span></label>
                         <input type="text" class="obs" placeholder="Valor do produto, detalhes...">
-                        <input type="hidden" class="distanciaReal" value="3">
                     </div>
                 </div>
 
@@ -264,12 +276,12 @@
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center;">📑 RESUMO GERAL</h3>
                     <p>Quantidade de Entregas: <span id="qtdEntregas">1</span></p>
-                    <p>Distância Total Loja→Cliente: <span id="distTotalCli">3,0</span> km</p>
-                    <p>Valor Total Entregas: <span id="valTotalEntregas"></span></p>
-                    <p id="linhaRetorno" class="escondido">✅ Valor Retorno (50%): <span id="valRetorno"></span></p>
-                    <p id="linhaRetornoImprevisto" class="escondido">⚠️ Retorno por Imprevisto (50%): <span id="valRetornoImp"></span></p>
-                    <p id="linhaGorjeta" class="escondido">Gorjeta: <span id="valGorjetaRes"></span></p>
-                    <p style="font-size:22px; font-weight:900; color:var(--dourado);">VALOR TOTAL GERAL: <span id="valTotal"></span></p>
+                    <p>🛵 Valor Moto → Loja: <span id="valTotalMotoLoja">R$ 0,00</span></p>
+                    <p>🏪 Valor Loja → Cliente: <span id="valTotalEntregas">R$ 0,00</span></p>
+                    <p id="linhaRetorno" class="escondido">✅ Valor Retorno (50%): <span id="valRetorno">R$ 0,00</span></p>
+                    <p id="linhaRetornoImprevisto" class="escondido">⚠️ Retorno por Imprevisto (50%): <span id="valRetornoImp">R$ 0,00</span></p>
+                    <p id="linhaGorjeta" class="escondido">Gorjeta: <span id="valGorjetaRes">R$ 0,00</span></p>
+                    <p style="font-size:22px; font-weight:900; color:var(--dourado);">VALOR TOTAL GERAL: <span id="valTotal">R$ 0,00</span></p>
                 </div>
 
                 <div class="escondido" id="areaRastreioCompleto">
@@ -316,7 +328,7 @@
                     </div>
                 </div>
 
-                <h3 style="color:var(--dourado); margin:40px 0 14px;">📋 Tabela de Valores de Entrega</h3>
+                <h3 style="color:var(--dourado); margin:40px 0 14px;">📋 Tabela de Valores de Entrega (Loja → Cliente)</h3>
                 <table class="tabela-valores">
                     <thead>
                         <tr><th>Distância</th><th>Valor</th><th>Distância</th><th>Valor</th></tr>
@@ -448,8 +460,32 @@
         let numeroPedido = 0;
         let intervaloRastreio = null;
         let statusRastreio = 'aguardando';
+        let minhaLat = null, minhaLng = null;
+        let localizacaoOk = false;
 
         window.onload = function() {
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        minhaLat = pos.coords.latitude;
+                        minhaLng = pos.coords.longitude;
+                        localizacaoOk = true;
+                        const aviso = document.getElementById('avisoLocal');
+                        aviso.textContent = '✅ Localização obtida com sucesso!';
+                        aviso.className = 'aviso-localizacao ok';
+                    },
+                    (erro) => {
+                        const aviso = document.getElementById('avisoLocal');
+                        aviso.textContent = '⚠️ Usando distância média padrão';
+                        aviso.className = 'aviso-localizacao erro';
+                    },
+                    {enableHighAccuracy: true, timeout: 8000, maximumAge: 0}
+                );
+            } else {
+                document.getElementById('avisoLocal').textContent = '❌ Geolocalização não suportada';
+                document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
+            }
+
             setTimeout(() => {
                 const canvas = document.getElementById('qrcodePIX');
                 if(canvas) {
@@ -462,101 +498,135 @@
             }, 150);
         };
 
-        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — LOJA
-        function buscarCepLoja(campo) {
-            const bloco = campo.closest('.bloco-entrega');
-            const rua = bloco.querySelector('.endLoja').value.trim();
-            const bairro = bloco.querySelector('.bairroLoja').value.trim();
-            const numero = bloco.querySelector('.numLoja').value.trim();
-            const cidade = 'Juiz de Fora';
-            const uf = 'MG';
-            const cepEl = bloco.querySelector('.cepLoja');
-            const avisoEl = bloco.querySelector('[id^="avisoCepLoja"]');
-
-            if(rua.length < 5 || bairro.length < 3 || !numero) {
-                cepEl.value = '';
-                avisoEl.textContent = '';
-                return;
-            }
-
-            avisoEl.textContent = '🔍 Buscando CEP...';
-            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
-            .then(res => res.json())
-            .then(dados => {
-                if(dados && dados.length > 0) {
-                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
-                    cepEl.value = endereco.cep;
-                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
-                    avisoEl.style.color = 'var(--primaria)';
-                } else {
-                    cepEl.value = '';
-                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
-                    avisoEl.style.color = 'var(--perigo)';
-                }
-            })
-            .catch(() => {
-                avisoEl.textContent = '❌ Erro ao buscar CEP';
-                avisoEl.style.color = 'var(--perigo)';
-            });
+        function calcularDistancia(lat1, lon1, lat2, lon2) {
+            if(!lat1 || !lon1 || !lat2 || !lon2) return 3;
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(a));
+            return Math.round(R * c * 10) / 10;
         }
 
-        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — DESTINATÁRIO
-        function buscarCepDest(campo) {
-            const bloco = campo.closest('.bloco-entrega');
-            const rua = bloco.querySelector('.endDest').value.trim();
-            const bairro = bloco.querySelector('.bairroDest').value.trim();
-            const numero = bloco.querySelector('.numDest').value.trim();
-            const cidade = 'Juiz de Fora';
-            const uf = 'MG';
-            const cepEl = bloco.querySelector('.cepDest');
-            const avisoEl = bloco.querySelector('[id^="avisoCepDest"]');
-
-            if(rua.length < 5 || bairro.length < 3 || !numero) {
-                cepEl.value = '';
-                avisoEl.textContent = '';
-                return;
-            }
-
-            avisoEl.textContent = '🔍 Buscando CEP...';
-            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
-            .then(res => res.json())
-            .then(dados => {
-                if(dados && dados.length > 0) {
-                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
-                    cepEl.value = endereco.cep;
-                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
-                    avisoEl.style.color = 'var(--primaria)';
-                } else {
-                    cepEl.value = '';
-                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
-                    avisoEl.style.color = 'var(--perigo)';
+        async function buscarCoordenadas(endereco, tipo, id) {
+            try {
+                const resposta = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco + ', Juiz de Fora, Minas Gerais, Brasil')}&limit=1`);
+                const dados = await resposta.json();
+                if(dados.length > 0) {
+                    return {lat: parseFloat(dados[0].lat), lng: parseFloat(dados[0].lon)};
                 }
-            })
-            .catch(() => {
-                avisoEl.textContent = '❌ Erro ao buscar CEP';
-                avisoEl.style.color = 'var(--perigo)';
-            });
+            } catch(e) {
+                console.log('Erro ao buscar endereço:', e);
+            }
+            return null;
         }
 
-        function mostrarAba(nome) {
+        async function buscarCepLoja(campo) {
+            const bloco = campo.closest('.bloco-entrega');
+            const end = bloco.querySelector('.endLoja').value;
+            const num = bloco.querySelector('.numLoja').value;
+            const bairro = bloco.querySelector('.bairroLoja').value;
+            const aviso = bloco.querySelector('.cep-automatico');
+            
+            if(end && num && bairro) {
+                aviso.textContent = '🔍 Buscando CEP e distância...';
+                const enderecoCompleto = `${end}, ${num}, ${bairro}`;
+                
+                try {
+                    const resp = await fetch(`https://viacep.com.br/ws/${encodeURIComponent(end)}/${encodeURIComponent(bairro)}/MG/json/`);
+                    const ceps = await resp.json();
+                    if(Array.isArray(ceps) && ceps.length > 0) {
+                        bloco.querySelector('.cepLoja').value = ceps[0].cep;
+                        aviso.textContent = '✅ CEP encontrado!';
+                    } else {
+                        aviso.textContent = '⚠️ CEP não encontrado, confere o endereço';
+                    }
+                } catch {
+                    aviso.textContent = '⚠️ Erro ao buscar CEP';
+                }
+
+                const coordsLoja = await buscarCoordenadas(enderecoCompleto);
+                if(coordsLoja && localizacaoOk) {
+                    const distMotoLoja = calcularDistancia(minhaLat, minhaLng, coordsLoja.lat, coordsLoja.lng);
+                    bloco.querySelector('.distMotoLoja').textContent = distMotoLoja.toFixed(1).replace('.', ',');
+                    bloco.querySelector('.valMotoLoja').textContent = (distMotoLoja * 0.5).toFixed(2).replace('.', ',');
+                    bloco.querySelector('.distMotoLojaVal').value = distMotoLoja;
+                    bloco.querySelector('#dadosDist_1').classList.remove('escondido');
+                }
+            }
+        }
+
+        async function buscarCepDest(campo) {
+            const bloco = campo.closest('.bloco-entrega');
+            const end = bloco.querySelector('.endDest').value;
+            const num = bloco.querySelector('.numDest').value;
+            const bairro = bloco.querySelector('.bairroDest').value;
+            const aviso = bloco.querySelector('#avisoCepDest_1');
+            
+            if(end && num && bairro) {
+                aviso.textContent = '🔍 Buscando CEP e distância...';
+                const enderecoCompleto = `${end}, ${num}, ${bairro}`;
+                
+                try {
+                    const resp = await fetch(`https://viacep.com.br/ws/${encodeURIComponent(end)}/${encodeURIComponent(bairro)}/MG/json/`);
+                    const ceps = await resp.json();
+                    if(Array.isArray(ceps) && ceps.length > 0) {
+                        bloco.querySelector('.cepDest').value = ceps[0].cep;
+                        aviso.textContent = '✅ CEP encontrado!';
+                    } else {
+                        aviso.textContent = '⚠️ CEP não encontrado, confere o endereço';
+                    }
+                } catch {
+                    aviso.textContent = '⚠️ Erro ao buscar CEP';
+                }
+
+                const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value}, ${bloco.querySelector('.bairroLoja').value}`;
+                const coordsLoja = await buscarCoordenadas(endLoja);
+                const coordsDest = await buscarCoordenadas(enderecoCompleto);
+                if(coordsLoja && coordsDest) {
+                    const distLojaCli = calcularDistancia(coordsLoja.lat, coordsLoja.lng, coordsDest.lat, coordsDest.lng);
+                    bloco.querySelector('.distLojaCli').textContent = distLojaCli.toFixed(1).replace('.', ',');
+                    const valor = buscarValorPorKm(distLojaCli);
+                    bloco.querySelector('.valLojaCli').textContent = valor.toFixed(2).replace('.', ',');
+                    bloco.querySelector('.distanciaReal').value = distLojaCli;
+                    bloco.querySelector('#dadosDist_1').classList.remove('escondido');
+                }
+            }
+        }
+
+        function mostrarAba(nomeAba) {
             document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
             event.target.classList.add('ativa');
-            document.getElementById(`aba${nome.charAt(0).toUpperCase() + nome.slice(1)}`).classList.add('visivel');
+            document.getElementById(`aba${nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)}`).classList.add('visivel');
         }
 
         function adicionarEntrega() {
             contadorEntregas++;
             const lista = document.getElementById('listaEntregas');
-            const bloco = document.querySelector('#entrega_1').cloneNode(true);
-            bloco.id = `entrega_${contadorEntregas}`;
+            const ultimo = lista.lastElementChild;
+            const novo = ultimo.cloneNode(true);
             
-            bloco.querySelectorAll('[id]').forEach(el => {
-                el.id = el.id.replace(/_1$/, `_${contadorEntregas}`);
+            novo.id = `entrega_${contadorEntregas}`;
+            novo.querySelectorAll('[id]').forEach(el => {
+                el.id = el.id.replace(/_\d+$/, `_${contadorEntregas}`);
             });
-            bloco.querySelector('h4').innerHTML = `📦 Entrega/ Coleta ${contadorEntregas} <button class="btn btn-remover" style="float:right" onclick="this.closest('.bloco-entrega').remove(); calcular()">🗑️</button>`;
+            novo.querySelectorAll('input, select, textarea').forEach(el => {
+                if(!el.type.match(/radio|checkbox/)) el.value = '';
+                if(el.name) el.name = el.name.replace(/_\d+$/, `_${contadorEntregas}`);
+            });
+            novo.querySelector('.dados-distancia').classList.add('escondido');
+            novo.querySelector('.distMotoLoja').textContent = '0,0';
+            novo.querySelector('.valMotoLoja').textContent = '0,00';
+            novo.querySelector('.distLojaCli').textContent = '0,0';
+            novo.querySelector('.valLojaCli').textContent = '0,00';
             
-            lista.appendChild(bloco);
+            const titulo = novo.querySelector('h4');
+            titulo.innerHTML = `📦 Entrega / Coleta ${contadorEntregas} <button class="btn btn-remover" style="float:right" onclick="this.closest('.bloco-entrega').remove(); calcular()">🗑️</button>`;
+            
+            lista.appendChild(novo);
         }
 
         function marcarRadio(el) {
@@ -573,19 +643,23 @@
 
         function calcular() {
             let valTotalEntregas = 0;
+            let valTotalMotoLoja = 0;
             let distTotal = 0;
             let blocos = document.querySelectorAll('.bloco-entrega');
             
             blocos.forEach(bloco => {
                 let dist = parseFloat(bloco.querySelector('.distanciaReal').value) || 3;
+                let distMoto = parseFloat(bloco.querySelector('.distMotoLojaVal').value) || 0;
                 distTotal += dist;
                 valTotalEntregas += buscarValorPorKm(dist);
+                valTotalMotoLoja += distMoto * 0.5;
             });
 
             valorEntregaBase = valTotalEntregas;
             document.getElementById('qtdEntregas').textContent = blocos.length;
             document.getElementById('distTotalCli').textContent = distTotal.toFixed(1).replace('.',',');
             document.getElementById('valTotalEntregas').textContent = `R$ ${valTotalEntregas.toFixed(2).replace('.',',')}`;
+            document.getElementById('valTotalMotoLoja').textContent = `R$ ${valTotalMotoLoja.toFixed(2).replace('.',',')}`;
 
             const retorno = document.querySelector('input[name="retorno"]:checked').value;
             let valRet = 0;
@@ -607,7 +681,7 @@
                 document.getElementById('linhaGorjeta').classList.add('escondido');
             }
 
-            const totalGeral = valTotalEntregas + valRet + valGorj + valorRetornoImprevisto;
+            const totalGeral = valTotalEntregas + valTotalMotoLoja + valRet + valGorj + valorRetornoImprevisto;
             document.getElementById('valTotal').textContent = `R$ ${totalGeral.toFixed(2).replace('.',',')}`;
             document.getElementById('resumoPedido').classList.remove('escondido');
             document.getElementById('btnGerarPedido').disabled = false;
@@ -632,8 +706,9 @@
             document.getElementById('areaRastreioCompleto').classList.remove('escondido');
             document.getElementById('areaStatusEntrega').classList.remove('escondido');
 
-            const endLoja = `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}, Juiz de Fora-MG`;
-            const endDest = `${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value} - ${document.querySelector('.bairroDest').value}, Juiz de Fora-MG`;
+            const bloco = document.querySelector('.bloco-entrega');
+            const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value} - ${bloco.querySelector('.bairroLoja').value}, Juiz de Fora-MG`;
+            const endDest = `${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value} - ${bloco.querySelector('.bairroDest').value}, Juiz de Fora-MG`;
             document.getElementById('linkRotaMotoLoja').href = `https://www.google.com/maps/dir/?api=1&origin=Meu+Local&destination=${encodeURIComponent(endLoja)}`;
             document.getElementById('linkRotaLojaCli').href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(endLoja)}&destination=${encodeURIComponent(endDest)}`;
 
@@ -698,14 +773,15 @@
         }
 
         function enviarPedidoWhatsapp() {
-            const nomeLoja = document.querySelector('.nomeLoja').value;
-            const contatoLoja = document.querySelector('.contatoLoja').value;
-            const endLoja = `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}`;
-            const cepLoja = document.querySelector('.cepLoja').value;
-            const nomeDest = document.querySelector('.nomeDest').value;
-            const contatoDest = document.querySelector('.contatoDest').value;
-            const endDest = `${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value} - ${document.querySelector('.bairroDest').value}`;
-            const cepDest = document.querySelector('.cepDest').value;
+            const bloco = document.querySelector('.bloco-entrega');
+            const nomeLoja = bloco.querySelector('.nomeLoja').value;
+            const contatoLoja = bloco.querySelector('.contatoLoja').value;
+            const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value} - ${bloco.querySelector('.bairroLoja').value}`;
+            const cepLoja = bloco.querySelector('.cepLoja').value;
+            const nomeDest = bloco.querySelector('.nomeDest').value;
+            const contatoDest = bloco.querySelector('.contatoDest').value;
+            const endDest = `${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value} - ${bloco.querySelector('.bairroDest').value}`;
+            const cepDest = bloco.querySelector('.cepDest').value;
             const total = document.getElementById('valTotal').textContent;
 
             const texto = `📦 NOVO PEDIDO MTZ EXPRESS 📦
@@ -837,4 +913,4 @@ Ação: ${acao}
         function copiarLink() { navigator.clipboard.writeText(linkNubank).then(() => alert('✅ Link copiado!')); }
     </script>
 </body>
-                    </html>
+                            </html>
