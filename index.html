@@ -107,13 +107,14 @@
             padding:30px 25px; text-align:center; margin:22px 0; box-shadow:0 8px 30px rgba(0,200,83,.2);
         }
         .status-rastreio {font-size:24px; font-weight:900; margin:18px 0; color:#90EE90;}
-        .link-rota {display:none !important;}
+        .link-rota {display:inline-block !important; color:#00FF7F; font-weight:700; text-decoration:none; margin:8px 5px; padding:8px 12px; border:2px solid #00FF7F; border-radius:16px; transition:all .2s ease;}
+        .link-rota:hover {background:#00FF7F; color:#000;}
 
         .area-busca {display: none;}
         .opcao-radio {display:flex; align-items:center; gap:10px; margin:10px 0; cursor:pointer; font-size:16px;}
         .opcao-radio input {width:auto; margin:0;}
         .aviso-localizacao {padding:15px; border-radius:20px; text-align:center; margin-bottom:18px; font-weight:700; font-size:16px;}
-        .ok {background:rgba(0,128,0,.25); color:#90EE90; border:1px solid rgba(0,255,0,.3);}
+        .ok {background:rgba(0,128,0,.25); color:#90EE90; border:1px solid rgba(255,255,0,.3);}
         .erro {background:rgba(255,165,0,.25); color:#FFD700; border:1px solid rgba(255,215,0,.3);}
         .erro-login {color:#ff6b6b; border:1px solid rgba(255,107,107,.3); background:rgba(255,107,107,.15);}
 
@@ -133,8 +134,6 @@
         .bloco-entrega {position:relative;} 
         .btn-remover {position:absolute; top:10px; right:10px; background:#ff4444; color:#fff; border:none; width:36px; height:36px; border-radius:50%; font-weight:bold; font-size:20px; cursor:pointer; z-index:10;}
         .aviso-taxa {color:#FFD700; font-weight:700; margin-top:8px; font-size:15px;}
-        .item-invisivel {display: none !important;}
-        .area-rotas {display: none !important;}
         .area-status-entrega {display: none !important;}
     </style>
 </head>
@@ -186,6 +185,7 @@
                     <div class="grupo"><label>📲 Contato do Cliente</label><input type="tel" class="contatoDest" placeholder="(32) 9XXXX-XXXX"></div>
                     <div class="linha"><div class="grupo"><label>Rua</label><input type="text" class="endDest" placeholder="Nome da Rua"></div><div class="grupo"><label>Nº</label><input type="text" class="numDest" placeholder="Número"></div></div>
                     <div class="grupo"><label>Bairro</label><input type="text" class="bairroDest" placeholder="Bairro"></div>
+                    
                     <div class="grupo">
                         <label>📄 Tipo de Mercadoria</label>
                         <div>
@@ -197,13 +197,13 @@
                         </div>
                     </div>
 
-                    <div class="grupo item-invisivel">
+                    <div class="grupo">
                         <label>🔄 Retorno para buscar nova entrega?</label>
                         <div>
                             <label class="opcao-radio"><input type="radio" name="retorno" value="nao"> Não</label>
                             <label class="opcao-radio"><input type="radio" name="retorno" value="sim" checked> Sim</label>
                         </div>
-                        <p class="aviso-taxa">ℹ️ Taxa de retorno: 50% do valor da entrega — calculada automaticamente</p>
+                        <p class="aviso-taxa">ℹ️ Se tiver retorno: taxa de 50% sobre o valor da entrega. Se não tiver: sem taxa.</p>
                     </div>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                 <p>💵 Valor: <span id="valTotalEntregas">R$ 0,00</span> <small>(até 1km R$8,00 + R$1,00/km extra)</small></p><br>
                 <p id="linhaRetorno">🔄 <strong>Retorno</strong></p>
                 <p id="linhaRetornoDist">📏 Distância: <span id="distRetorno">--</span> km</p>
-                <p id="linhaRetornoVal">💵 Valor: <span id="valRetorno">R$ 0,00</span> <small>(50% do valor)</small></p><br>
+                <p id="linhaRetornoVal">💵 Valor: <span id="valRetorno">R$ 0,00</span> <small>(50% do valor da entrega)</small></p><br>
                 <p id="linhaGorjeta">🎁 Gorjeta: <span id="valGorjetaRes">R$ 0,00</span></p><hr>
 
                 <div class="valor-total">💲 VALOR TOTAL GERAL:<br><span id="valTotal">R$ 0,00</span></div>
@@ -261,17 +261,15 @@
                 <p style="text-align:center; color:#90EE90; margin-top:18px; font-weight:600;">✅ MTZ Express — Juiz de Fora-MG</p>
             </div>
 
-            <div class="area-rotas" id="areaRotas">
-                <a href="#" target="_blank" class="link-rota" id="linkRotaMotoLoja">🛵 Ver rota: Motoboy → Loja</a>
-                <a href="#" target="_blank" class="link-rota" id="linkRotaLojaCli">🏪 Ver rota: Loja → Cliente</a>
-            </div>
-
             <div class="rastreio" id="areaRastreio">
                 <h3 style="color:#FFD700; font-size:22px; font-weight:900;">📡 ACOMPANHAMENTO AO VIVO</h3>
                 <div class="status-rastreio" id="textoStatusRastreio">⏳ Aguardando geração...</div>
-                <a id="linkRastreioMapa" href="#" target="_blank" class="link-rota">📍 Ver localização no Mapa</a>
-                <p>📏 Distância: <span id="distanciaRastreio">--</span> km | ⏱️ Tempo: <span id="tempoRastreio">--</span> min</p>
-                <p style="font-size:15px; color:#B2DFDB; margin-top:8px;">🔄 Atualiza a cada 30 segundos</p>
+                <div id="botoesRota">
+                    <a href="#" target="_blank" class="link-rota" id="linkRotaMotoLoja">🛵 Ver rota: Motoboy → Loja</a>
+                    <a href="#" target="_blank" class="link-rota" id="linkRotaLojaCli">🏪 Ver rota: Loja → Cliente</a>
+                </div>
+                <p>📏 Distância total: <span id="distanciaRastreio">--</span> km</p>
+                <p style="font-size:15px; color:#B2DFDB; margin-top:8px;">🔄 Rotas abrem direto no Google Maps</p>
             </div>
 
             <div class="botoes area-status-entrega">
@@ -376,7 +374,7 @@
 
 <script>
 const CHAVE_PIX_NUBANK = 'sua-chave-pix-nubank-aqui';
-const SEU_WHATSAPP = '5532999998888';
+const SEU_WHATSAPP = '5532999953215';
 
 let minhaLat, minhaLng, localizacaoOk = false;
 let numeroPedido = Math.floor(Math.random() * 99999) + 10000;
@@ -399,13 +397,15 @@ window.onload = function() {
                 document.getElementById('avisoLocal').textContent = '✅ Localização obtida!';
                 document.getElementById('avisoLocal').className = 'aviso-localizacao ok';},
             () => {
-                document.getElementById('avisoLocal').textContent = '⚠️ Usando distância padrão';
-                document.getElementById('avisoLocal').className = 'aviso-localizacao erro';},
-            {enableHighAccuracy:true, timeout:5000, maximumAge:60000}
+                document.getElementById('avisoLocal').textContent = '⚠️ Usando localização central de Juiz de Fora';
+                document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
+                minhaLat = -21.7642; minhaLng = -43.3503; localizacaoOk = true;},
+            {enableHighAccuracy:true, timeout:8000, maximumAge:60000}
         );
     } else {
         document.getElementById('avisoLocal').textContent = '❌ Geolocalização não suportada';
         document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
+        minhaLat = -21.7642; minhaLng = -43.3503; localizacaoOk = true;
     }
 
     document.querySelectorAll('input[name=gorjeta]').forEach(radio => {
@@ -456,7 +456,7 @@ function salvarLoja() {
         dadosGerais.lojas.push({
             nome: nome,
             contato: document.querySelector('.contatoLoja').value,
-            endereco: `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}`
+            endereco: `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}, Juiz de Fora-MG`
         });
         salvarDados();
         alert(`✅ Loja "${nome}" cadastrada com sucesso!`);
@@ -473,7 +473,7 @@ function buscarLoja() {
         document.querySelector('.nomeLoja').value = loja.nome;
         document.querySelector('.contatoLoja').value = loja.contato;
         const partes = loja.endereco.split(', ');
-        if(partes.length >=3) {
+        if(partes.length >=4) {
             document.querySelector('.endLoja').value = partes[0];
             document.querySelector('.numLoja').value = partes[1].split(' - ')[0];
             document.querySelector('.bairroLoja').value = partes[1].split(' - ')[1] || '';
@@ -492,6 +492,15 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1));
 }
 
+function enderecoParaTexto(rua, numero, bairro) {
+    return `${rua}, ${numero}, ${bairro}, Juiz de Fora, Minas Gerais, Brasil`;
+}
+
+function gerarLinkGoogleMaps(origem, destino) {
+    const base = 'https://www.google.com/maps/dir/?api=1&travelmode=driving';
+    return `${base}&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}`;
+}
+
 async function buscarCoordenadas(endereco) {
     return {lat: -21.76 + Math.random()*0.02, lng: -43.35 + Math.random()*0.02};
 }
@@ -505,18 +514,28 @@ function valorPorKm(km) {
 
 async function calcular() {
     const bloco = document.querySelector('.bloco-entrega');
-    const endLoja = `${bloco.querySelector('.endLoja').value}, ${bloco.querySelector('.numLoja').value} - ${bloco.querySelector('.bairroLoja').value}`;
-    const endDest = `${bloco.querySelector('.endDest').value}, ${bloco.querySelector('.numDest').value} - ${bloco.querySelector('.bairroDest').value}`;
+    const ruaLoja = bloco.querySelector('.endLoja').value;
+    const numLoja = bloco.querySelector('.numLoja').value;
+    const bairroLoja = bloco.querySelector('.bairroLoja').value;
+    const ruaDest = bloco.querySelector('.endDest').value;
+    const numDest = bloco.querySelector('.numDest').value;
+    const bairroDest = bloco.querySelector('.bairroDest').value;
 
-    const cLoja = await buscarCoordenadas(endLoja);
-    const cDest = await buscarCoordenadas(endDest);
+    const endLojaTexto = enderecoParaTexto(ruaLoja, numLoja, bairroLoja);
+    const endDestTexto = enderecoParaTexto(ruaDest, numDest, bairroDest);
+    const endMotoboyTexto = `${minhaLat.toFixed(6)},${minhaLng.toFixed(6)}`;
+
+    const cLoja = await buscarCoordenadas(endLojaTexto);
+    const cDest = await buscarCoordenadas(endDestTexto);
     const distMoto = localizacaoOk ? calcularDistancia(minhaLat, minhaLng, cLoja.lat, cLoja.lng) : 3.0;
     const distLojaCli = calcularDistancia(cLoja.lat, cLoja.lng, cDest.lat, cDest.lng);
     const valMoto = Math.max(distMoto * 0.5, 0.5);
     const valEntrega = valorPorKm(distLojaCli);
     valorEntregaBase = valEntrega;
 
-    let valRetorno = valEntrega * 0.5;
+    const temRetorno = document.querySelector('input[name=retorno][value=sim]').checked;
+    const valRetorno = temRetorno ? (valEntrega * 0.5) : 0;
+
     const temGorjeta = document.querySelector('input[name=gorjeta][value=sim]').checked;
     let valGorj = temGorjeta ? (parseFloat(document.getElementById('valorGorjeta').value)||0) : 0;
     const valTotalGeral = valMoto + valEntrega + valRetorno + valGorj;
@@ -524,11 +543,13 @@ async function calcular() {
     const pagador = document.querySelector('input[name=pagador]:checked').value;
     document.getElementById('nomePagador').textContent = pagador === 'loja' ? '🏪 A Loja' : '👤 O Cliente';
 
-    document.getElementById('linhaRetorno').style.display = 'block';
-    document.getElementById('linhaRetornoDist').style.display = 'block';
-    document.getElementById('linhaRetornoVal').style.display = 'block';
-    document.getElementById('distRetorno').textContent = distLojaCli.toFixed(1);
-    document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2).replace('.', ',')}`;
+    document.getElementById('linhaRetorno').style.display = temRetorno ? 'block' : 'none';
+    document.getElementById('linhaRetornoDist').style.display = temRetorno ? 'block' : 'none';
+    document.getElementById('linhaRetornoVal').style.display = temRetorno ? 'block' : 'none';
+    if(temRetorno) {
+        document.getElementById('distRetorno').textContent = distLojaCli.toFixed(1);
+        document.getElementById('valRetorno').textContent = `R$ ${valRetorno.toFixed(2).replace('.', ',')}`;
+    }
 
     document.getElementById('linhaGorjeta').style.display = valGorj > 0 ? 'block' : 'none';
     document.getElementById('valGorjetaRes').textContent = `R$ ${valGorj.toFixed(2).replace('.', ',')}`;
@@ -539,6 +560,13 @@ async function calcular() {
     document.getElementById('valTotalEntregas').textContent = `R$ ${valEntrega.toFixed(2).replace('.', ',')}`;
     document.getElementById('valTotal').textContent = `R$ ${valTotalGeral.toFixed(2).replace('.', ',')}`;
     document.getElementById('valorPix').textContent = `R$ ${valTotalGeral.toFixed(2).replace('.', ',')}`;
+    document.getElementById('distanciaRastreio').textContent = (distMoto + distLojaCli).toFixed(1);
+
+    // ✅ GERA OS LINKS DO GOOGLE MAPS AGORA FUNCIONANDO!
+    const linkMotoLoja = gerarLinkGoogleMaps(endMotoboyTexto, endLojaTexto);
+    const linkLojaCli = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
+    document.getElementById('linkRotaMotoLoja').href = linkMotoLoja;
+    document.getElementById('linkRotaLojaCli').href = linkLojaCli;
 
     document.getElementById('chavePix').textContent = CHAVE_PIX_NUBANK;
     document.getElementById('qrcode').innerHTML = '';
@@ -550,7 +578,7 @@ function gerarPedido() {
     dadosGerais.totalEntregas++;
     dadosGerais.valorTotal += valorEntregaBase;
     salvarDados();
-    document.getElementById('textoStatusRastreio').textContent = '🚚 Pedido em deslocamento!';
+    document.getElementById('textoStatusRastreio').textContent = '🚚 Pedido em deslocamento! Acompanhe a rota nos links abaixo ↓';
     atualizarPainelAdmin();
 }
 
@@ -571,30 +599,32 @@ function entregaNaoRealizada() {
 function abrirWhatsApp(status) {
     const pagador = document.querySelector('input[name=pagador]:checked').value;
     const nomePagador = pagador === 'loja' ? '🏪 A Loja' : '👤 O Cliente';
-    const msg = `${status}\n📄 PEDIDO Nº ${numeroPedido}\n🏪 Loja: ${document.querySelector('.nomeLoja').value}\n👤 Cliente: ${document.querySelector('.nomeDest').value}\n💰 Quem paga: ${nomePagador}\n💵 Valor Total: ${document.getElementById('valTotal').textContent}\n💳 Pix: ${CHAVE_PIX_NUBANK}\n✅ MTZ Express`;
+    const bloco = document.querySelector('.bloco-entrega');
+    const endLojaTexto = enderecoParaTexto(bloco.querySelector('.endLoja').value, bloco.querySelector('.numLoja').value, bloco.querySelector('.bairroLoja').value);
+    const endDestTexto = enderecoParaTexto(bloco.querySelector('.endDest').value, bloco.querySelector('.numDest').value, bloco.querySelector('.bairroDest').value);
+    const linkLojaCli    = gerarLinkGoogleMaps(endLojaTexto, endDestTexto);
+    const msg = `${status}\n📄 PEDIDO Nº ${numeroPedido}\n🏪 Loja: ${bloco.querySelector('.nomeLoja').value}\n📲 Contato Loja: ${bloco.querySelector('.contatoLoja').value}\n📍 Origem: ${endLojaTexto}\n👤 Cliente: ${bloco.querySelector('.nomeDest').value}\n📲 Contato Cliente: ${bloco.querySelector('.contatoDest').value}\n📍 Destino: ${endDestTexto}\n🔗 Ver rota Loja → Cliente: ${linkLojaCli}\n🔄 Retorno: ${document.querySelector('input[name=retorno]:checked').value === 'sim' ? 'SIM (50%)' : 'NÃO'}\n💰 Quem paga: ${nomePagador}\n💵 Valor Total: ${document.getElementById('valTotal').textContent}\n💳 Pix: ${CHAVE_PIX_NUBANK}\n✅ MTZ Express — Juiz de Fora-MG`;
     window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-function avaliar(nota) {
-    avaliacaoNota = nota;
-    document.querySelectorAll('.estrela').forEach((e,i) => e.classList.toggle('ativa', i<nota));
-    const txt = ['','Péssimo','Ruim','Regular','Bom','Excelente!'];
-    document.getElementById('txtAvaliacao').textContent = txt[nota];
-    dadosGerais.somaAvaliacoes += nota; dadosGerais.qtdAvaliacoes++; salvarDados(); atualizarPainelAdmin();
+function copiarPix() {
+    navigator.clipboard.writeText(CHAVE_PIX_NUBANK)
+    .then(() => alert('✅ Chave Pix copiada com sucesso!'))
+    .catch(() => alert('❌ Erro ao copiar! Copie manualmente.'));
 }
 
-function copiarPix() {navigator.clipboard.writeText(CHAVE_PIX_NUBANK).then(() => alert('✅ Chave Pix copiada!'));}
-
-function enviarPedidoWhatsapp() {abrirWhatsApp('📤 NOVO PEDIDO GERADO');}
+function enviarPedidoWhatsapp() {
+    abrirWhatsApp('📤 NOVO PEDIDO GERADO');
+}
 
 function verificarLoginMotoboy() {
     const user = document.getElementById('usuarioMoto').value.trim().toLowerCase();
     const pass = document.getElementById('senhaMoto').value.trim();
     if(user === 'mtz2026' && pass === '1120') {
         alert('✅ Login realizado com sucesso! Bem-vindo(a) Motoboy MTZ Express!');
-        document.getElementById('erroLoginMoto').style.display='none';
+        document.getElementById('erroLoginMoto').style.display = 'none';
     } else {
-        document.getElementById('erroLoginMoto').style.display='block';
+        document.getElementById('erroLoginMoto').style.display = 'block';
     }
 }
 
@@ -602,11 +632,11 @@ function verificarLoginAdmin() {
     const user = document.getElementById('usuarioAdmin').value.trim().toLowerCase();
     const pass = document.getElementById('senhaAdmin').value.trim();
     if(user === 'mtz2026' && pass === '1120') {
-        document.getElementById('painelAdminDados').style.display='block';
-        document.getElementById('erroLoginAdmin').style.display='none';
+        document.getElementById('painelAdminDados').style.display = 'block';
+        document.getElementById('erroLoginAdmin').style.display = 'none';
         desenharGraficos();
     } else {
-        document.getElementById('erroLoginAdmin').style.display='block';
+        document.getElementById('erroLoginAdmin').style.display = 'block';
     }
 }
 
@@ -615,7 +645,7 @@ function atualizarPainelAdmin() {
     document.getElementById('valorTotalGeral').textContent = `R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdEntregues').textContent = dadosGerais.entregues;
     document.getElementById('qtdNaoEntregues').textContent = dadosGerais.naoEntregues;
-        document.getElementById('qtdLojas').textContent = dadosGerais.lojas.length;
+    document.getElementById('qtdLojas').textContent = dadosGerais.lojas.length;
     
     const media = dadosGerais.qtdAvaliacoes > 0 
         ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) 
@@ -624,7 +654,7 @@ function atualizarPainelAdmin() {
 }
 
 function desenharGraficos() {
-    if(graficoSemanal) graficoSemanal.destroy();
+        if(graficoSemanal) graficoSemanal.destroy();
     if(graficoMensal) graficoMensal.destroy();
 
     const ctxSemanal = document.getElementById('graficoSemanal').getContext('2d');
@@ -684,4 +714,4 @@ function desenharGraficos() {
 }
 </script>
 </body>
-                                                           </html>
+                    </html>
