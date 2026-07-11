@@ -445,24 +445,35 @@ function valorPorKm(km) {
     return 28.00 + ((k - 20) * 1.00);
 }
 
-// ✅ BUSCA DE COORDENADAS: NÚMERO OBRIGATÓRIO, TRATA ABREVIAÇÕES, RÁPIDA
+// ✅ BUSCA DE COORDENADAS CORRIGIDA: TENTA COM E SEM NÚMERO, MELHOR ERRO
 async function pegarCoordenadas(rua, numero, bairro) {
     let ruaOk = rua.trim().replace(/\s+/g, ' ')
         .replace(/^R\./i, 'Rua').replace(/^AV\./i, 'Avenida')
         .replace(/^AVN\./i, 'Avenida').replace(/^PC\./i, 'Praça')
         .replace(/^PR\./i, 'Praça').replace(/^EST\./i, 'Estrada');
 
-    const endereco = `${ruaOk}, ${numero.trim() || 'S/N'}, ${bairro.trim()}, Juiz de Fora, MG`;
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&city=Juiz de Fora&state=MG&country=BR&limit=1`;
+    const enderecoCompleto = `${ruaOk}, ${numero.trim() || 'S/N'}, ${bairro.trim()}, Juiz de Fora, MG`;
+    const enderecoSemNumero = `${ruaOk}, ${bairro.trim()}, Juiz de Fora, MG`;
+
+    const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoCompleto)}&city=Juiz de Fora&state=MG&country=BR&limit=1`;
+    const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoSemNumero)}&city=Juiz de Fora&state=MG&country=BR&limit=1`;
 
     try {
-        const resp = await fetch(url, {signal: AbortSignal.timeout(3500)});
-        const dados = await resp.json();
-        return dados.length ? {ok: true, lat: +dados[0].lat, lng: +dados[0].lon} : {ok: false};
-    } catch { return {ok: false}; }
+        let resp = await fetch(url1, {signal: AbortSignal.timeout(5000)});
+        let dados = await resp.json();
+        if (dados.length) return {ok: true, lat: +dados[0].lat, lng: +dados[0].lon};
+
+        resp = await fetch(url2, {signal: AbortSignal.timeout(5000)});
+        dados = await resp.json();
+        if (dados.length) return {ok: true, lat: +dados[0].lat, lng: +dados[0].lon};
+
+        return {ok: false};
+    } catch {
+        return {ok: false, erroRede: true};
+    }
 }
 
-// ✅ CÁLCULO PRINCIPAL — TUDO VALIDADO, PROTEGIDO E CORRIGIDO
+// ✅ CÁLCULO PRINCIPAL — TUDO VALIDADO E CORRIGIDO
 async function calcular() {
     if (calculando) return;
     calculando = true;
@@ -539,8 +550,8 @@ async function calcular() {
         document.getElementById('valorPix').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
         document.getElementById('distanciaRastreio').textContent = `${kmTotal} km (total)`;
 
-        const endLojaComp = `${ruaLoja}, ${numLoja}, ${bairroLoja}, Juiz de Fora, MG`;
-        const endDestComp = `${ruaDest}, ${numDest}, ${bairroDest}, Juiz de Fora, MG`;
+        const endLojaComp = montarEndereco(ruaLoja, numLoja, bairroLoja);
+        const endDestComp = montarEndereco(ruaDest, numDest, bairroDest);
         document.getElementById('linkRotaMotoLoja').href = `https://www.google.com/maps/dir/?api=1&origin=${minhaLat},${minhaLng}&destination=${encodeURIComponent(endLojaComp)}`;
         document.getElementById('linkRotaLojaCli').href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(endLojaComp)}&destination=${encodeURIComponent(endDestComp)}`;
 
@@ -553,9 +564,14 @@ async function calcular() {
         document.getElementById('avisoLocal').textContent = `✅ PRONTO! ${distMotoLoja} + ${distLojaCliente} = ${kmTotal}km`;
         document.getElementById('avisoLocal').className = 'aviso-localizacao ok';
 
-    } catch {
-        alert('❌ ERRO! Verifique internet e dados.');
-        document.getElementById('avisoLocal').textContent = '❌ Erro — tente de novo';
+    } catch (erro) {
+        if(erro && erro.erroRede) {
+            alert('📶 Internet fraca ou sem conexão!\nVerifique sua internet e tente de novo.');
+        } else {
+            alert('❌ Erro ao buscar endereço!\nConfira Rua, Número e Bairro, ou tente colocar S/N se não tiver número.');
+        }
+        document.getElementById('avisoLocal').textContent = '❌ Erro — confira dados ou internet';
+        document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
     } finally {
         calculando = false;
         if (botaoCalcular) botaoCalcular.disabled = false;
@@ -588,13 +604,10 @@ function removerBloco(botao) {
 
 function atualizarQuantidadeEntregas() {
     document.getElementById('qtdEntregas').textContent = document.querySelectorAll('.bloco-entrega').length;
-}
-
-// ✅ FUNÇÃO ENVIAR PEDIDO — 100% CORRIGIDA, NADA ALTERADO
 function enviarPedidoWhatsapp() {
     numeroPedido++; 
     dadosGerais.totalEntregas++; 
-        dadosGerais.valorTotal += valorEntregaBase;
+    dadosGerais.valorTotal += valorEntregaBase;
     dadosGerais.dadosSemana[new Date().getDay()]++;
     salvarDados(); 
     atualizarPainelAdmin();
@@ -788,4 +801,4 @@ function zerarTodosDados() {
 }
 </script>
 </body>
-                                       </html>
+    </html>
