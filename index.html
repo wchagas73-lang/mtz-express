@@ -394,6 +394,21 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
 }
 
 // ==============================================
+// ✅ FUNÇÃO TROCAR ABAS — CORRIGIDA, FUNCIONA EM TUDO!
+// ==============================================
+function mostrarAba(nomeAba) {
+    // Remove destaque de todos os botões
+    document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
+    // Destaca o botão clicado
+    event.currentTarget.classList.add('ativa');
+    
+    // Esconde todas as abas
+    document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
+    // Mostra a aba selecionada
+    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
+}
+
+// ==============================================
 // FUNÇÃO PRINCIPAL — JÁ CORRIGIDA SEM ERRO!
 // ==============================================
 async function calcular() {
@@ -642,4 +657,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+                    </html>
