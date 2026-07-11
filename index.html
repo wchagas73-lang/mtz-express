@@ -60,7 +60,8 @@
         @keyframes aparecer {from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
         
         .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
-        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 1.8;}
+        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
+        .item-resumo {padding: 6px 0; border-bottom: 1px dashed rgba(255,215,0,0.3);}
         .tabela-wrapper {max-height: 320px; overflow-y: auto; border-radius: 18px; border: 2px solid var(--dourado);}
         .tabela-valores {width:100%; border-collapse:separate; border-spacing:0;}
         .tabela-valores th {background:var(--dourado); color:#1A1A1A; padding:14px; text-align:center; font-weight:800;}
@@ -69,6 +70,7 @@
         .titulo-bloco {display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
         .aviso-auto {font-size:13px; color:var(--primaria); margin-top:-5px; margin-bottom:8px;}
+        .aviso-mesmo-loja {color: var(--primaria); font-size: 14px; font-weight: 600; margin: 0 0 15px; padding: 8px; background: rgba(0,200,150,0.08); border-radius: 10px; text-align: center;}
         .caixa-login {max-width: 450px; margin: 30px auto; padding: 25px; border: 2px solid var(--azul); border-radius: 20px; background: rgba(59,130,246,0.06);}
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
         hr {border:none; border-top:2px solid var(--dourado); margin:15px 0;}
@@ -113,7 +115,7 @@
                             <h4>📦 DADOS DA ENTREGA 1</h4>
                         </div>
 
-                        <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Obrigatório</span></h3>
+                        <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Obrigatório — preencha uma vez só</span></h3>
                         
                         <label>Nome da Loja <span>*</span></label>
                         <input type="text" class="nomeLoja" required placeholder="Nome da sua loja">
@@ -183,19 +185,18 @@
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO GOOGLE MAPS</h3>
                     
-                    <div style="background:rgba(59,130,246,0.1); border-left:4px solid var(--azul); padding:12px; border-radius:12px; margin:10px 0;">
-                        <p><strong>🏪 Loja → Cliente</strong></p>
-                        <p>Distância: <span id="distLojaCli">--</span> km | Valor: R$ <span id="valLojaCli">--</span></p>
-                    </div>
+                    <div id="listaResumoEntregas"></div>
 
-                    <p>Quantidade de Entregas: <span id="qtdEntregas">1</span></p>
-                    <p>Subtotal: R$ <span id="valSubtotal">--</span></p>
+                    <div style="background:rgba(0,200,150,0.15); border:2px solid var(--primaria); border-radius:12px; padding:12px; margin:15px 0; font-weight:700;">
+                        📏 KM TOTAL: <span id="kmTotal">--</span> km<br>
+                        💲 VALOR TOTAL DAS ENTREGAS: R$ <span id="valorTotalEntregas">--</span>
+                    </div>
                     
                     <p id="linhaRetorno" class="escondido">✅ Retorno (50%): R$ <span id="valRetorno">--</span></p>
                     <p id="linhaGorjeta" class="escondido">💸 Gorjeta: R$ <span id="valGorjetaRes">--</span></p>
                     
                     <hr>
-                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 TOTAL: R$ <span id="valTotal">--</span></p>
+                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL TOTAL: R$ <span id="valTotal">--</span></p>
                 </div>
 
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
@@ -281,6 +282,7 @@ let googleCarregado = false;
 let servicoDistancia = null;
 let historicoPedidos = [];
 let graficoFat, graficoQtd;
+let dadosEntregas = [];
 
 function buscarValorPorKm(dist) {
     dist = Math.round(dist * 10) / 10;
@@ -353,9 +355,36 @@ function adicionarEntrega() {
     modelo.id = `entrega_${contadorEntregas}`;
     modelo.querySelector('h4').textContent = `📦 DADOS DA ENTREGA ${contadorEntregas}`;
     
-    modelo.querySelectorAll('input').forEach(input => {
-        if(input.type !== 'radio') input.value = '';
-    });
+    // 🚫 REMOVE OS CAMPOS DA LOJA DA SEGUNDA ENTREGA EM DIANTE
+    const camposLoja = modelo.querySelector('h3')?.nextElementSibling;
+    if(contadorEntregas >= 2) {
+        const aviso = document.createElement('div');
+        aviso.className = 'aviso-mesmo-loja';
+        aviso.textContent = '✅ MESMA LOJA DA ENTREGA 1 — NÃO PRECISA PREENCHER NOVAMENTE';
+        modelo.innerHTML = '';
+        modelo.appendChild(document.createElement('div')).className = 'titulo-bloco';
+        modelo.querySelector('.titulo-bloco').innerHTML = `<h4>📦 DADOS DA ENTREGA ${contadorEntregas}</h4>`;
+        modelo.insertBefore(aviso, modelo.firstChild);
+        // Adiciona só os campos de cliente
+        const camposCliente = document.createElement('div');
+        camposCliente.innerHTML = `
+            <h3 style="color:var(--dourado); margin:15px 0 14px;">🏠 Dados do Cliente</h3>
+            <label>Nome do Cliente <span>*</span></label>
+            <input type="text" class="nomeDest" required placeholder="Nome completo">
+            <label>Contato do Cliente <span>*</span></label>
+            <input type="tel" class="contatoDest" required placeholder="(32) 9XXXX-XXXX">
+            <label>Endereço completo <span>*</span></label>
+            <input type="text" class="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+            <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
+            <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
+            <input type="text" class="refDest" placeholder="Perto de onde?">
+        `;
+        modelo.appendChild(camposCliente);
+    } else {
+        modelo.querySelectorAll('input').forEach(input => {
+            if(input.type !== 'radio') input.value = '';
+        });
+    }
 
     const botaoRemover = document.createElement('button');
     botaoRemover.className = 'btn btn-remover';
@@ -373,34 +402,54 @@ function adicionarEntrega() {
 
 async function calcular() {
     const blocos = document.querySelectorAll('.bloco-entrega');
-    let distTotal = 0, valorTotal = 0;
+    dadosEntregas = [];
+    let distTotalGeral = 0, valorTotalEntregas = 0;
+
+    // 📍 PEGA OS DADOS DA LOJA SÓ DA PRIMEIRA ENTREGA
+    const primeiroBloco = document.querySelector('.bloco-entrega');
+    const endLoja = primeiroBloco.querySelector('.endLoja').value.trim();
+    const nomeLoja = primeiroBloco.querySelector('.nomeLoja').value.trim();
+    const contatoLoja = primeiroBloco.querySelector('.contatoLoja').value.trim();
+    if(!endLoja || !nomeLoja || !contatoLoja) { alert("⚠️ Preencha os dados da loja na primeira entrega!"); return; }
 
     document.getElementById('resumoPedido').classList.add('escondido');
     document.getElementById('areaCalculando').classList.remove('escondido');
 
     try {
         for(const bloco of blocos) {
-            const endLoja = bloco.querySelector('.endLoja').value.trim();
             const endDest = bloco.querySelector('.endDest').value.trim();
-            if(!endLoja || !endDest) { alert("⚠️ Preencha todos os endereços!"); return; }
+            if(!endDest) { alert("⚠️ Preencha todos os endereços dos clientes!"); return; }
 
             const dist = await calcularDistanciaGoogle(endLoja, endDest);
-            distTotal += dist;
-            valorTotal += buscarValorPorKm(dist);
+            const valor = buscarValorPorKm(dist);
+            
+            dadosEntregas.push({ 
+                km: dist, 
+                valor: valor,
+                nomeDest: bloco.querySelector('.nomeDest').value.trim(),
+                contatoDest: bloco.querySelector('.contatoDest').value.trim(),
+                endDest: endDest
+            });
+            distTotalGeral += dist;
+            valorTotalEntregas += valor;
         }
 
-        const distFinal = distTotal.toFixed(1);
-        const valFinal = valorTotal.toFixed(2);
+        const listaResumo = document.getElementById('listaResumoEntregas');
+        listaResumo.innerHTML = '';
+        dadosEntregas.forEach((ent, i) => {
+            const item = document.createElement('div');
+            item.className = 'item-resumo';
+            item.innerHTML = `<strong>📦 Entrega ${i+1}:</strong> ${ent.km.toFixed(1).replace('.', ',')} km | R$ ${ent.valor.toFixed(2).replace('.', ',')}`;
+            listaResumo.appendChild(item);
+        });
 
-        document.getElementById('distLojaCli').textContent = distFinal.replace('.', ',');
-        document.getElementById('valLojaCli').textContent = "R$ "+valFinal.replace('.', ',');
-        document.getElementById('qtdEntregas').textContent = blocos.length;
-        document.getElementById('valSubtotal').textContent = "R$ "+valorTotal.toFixed(2).replace('.', ',');
+        document.getElementById('kmTotal').textContent = distTotalGeral.toFixed(1).replace('.', ',');
+        document.getElementById('valorTotalEntregas').textContent = "R$ "+valorTotalEntregas.toFixed(2).replace('.', ',');
 
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
         let valRet = 0;
         if(retorno === 'sim') {
-            valRet = (valorTotal * 0.5).toFixed(2);
+            valRet = (valorTotalEntregas * 0.5).toFixed(2);
             document.getElementById('linhaRetorno').classList.remove('escondido');
             document.getElementById('valRetorno').textContent = "R$ "+valRet.replace('.', ',');
         } else document.getElementById('linhaRetorno').classList.add('escondido');
@@ -413,7 +462,7 @@ async function calcular() {
             document.getElementById('valGorjetaRes').textContent = "R$ "+valGorj.toFixed(2).replace('.', ',');
         } else document.getElementById('linhaGorjeta').classList.add('escondido');
 
-        const totalGeral = (parseFloat(valFinal) + parseFloat(valRet) + valGorj).toFixed(2);
+        const totalGeral = (parseFloat(valorTotalEntregas) + parseFloat(valRet) + valGorj).toFixed(2);
         document.getElementById('valTotal').textContent = "R$ "+totalGeral.replace('.', ',');
 
         document.getElementById('resumoPedido').classList.remove('escondido');
@@ -423,24 +472,36 @@ async function calcular() {
 }
 
 function gerarPedido() {
-    const blocos = document.querySelectorAll('.bloco-entrega');
-    let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n══════════════════════════\n";
+    const primeiroBloco = document.querySelector('.bloco-entrega');
+    const nomeLoja = primeiroBloco.querySelector('.nomeLoja').value.trim();
+    const contatoLoja = primeiroBloco.querySelector('.contatoLoja').value.trim();
+    const endLoja = primeiroBloco.querySelector('.endLoja').value.trim();
+    const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(endLoja + ", Juiz de Fora - MG");
 
-    blocos.forEach((bloco, i) => {
-        texto += `📌 ENTREGA ${i+1}\n`;
-        texto += `🏪 Loja: ${bloco.querySelector('.nomeLoja').value.trim()}\n`;
-        texto += `📞 Loja: ${bloco.querySelector('.contatoLoja').value.trim()}\n`;
-        texto += `📍 Loja: ${bloco.querySelector('.endLoja').value.trim()}\n`;
-        texto += `👤 Cliente: ${bloco.querySelector('.nomeDest').value.trim()}\n`;
-        texto += `📞 Cliente: ${bloco.querySelector('.contatoDest').value.trim()}\n`;
-        texto += `📍 Entrega: ${bloco.querySelector('.endDest').value.trim()}\n`;
+    let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n══════════════════════════\n";
+    texto += "🏪 LOJA: " + nomeLoja + "\n";
+    texto += "📞 CONTATO: " + contatoLoja + "\n";
+    texto += "📍 ENDEREÇO: " + endLoja + "\n";
+    texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
+    texto += "══════════════════════════\n";
+
+    dadosEntregas.forEach((ent, i) => {
+        const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ent.endDest + ", Juiz de Fora - MG");
+        texto += `📦 ENTREGA ${i+1}\n`;
+        texto += `👤 Cliente: ${ent.nomeDest}\n`;
+        texto += `📞 Contato: ${ent.contatoDest}\n`;
+        texto += `📍 Endereço: ${ent.endDest}\n`;
+        texto += `🔗 MAPA CLIENTE: ${linkCliente}\n`;
+        texto += `📏 ${ent.km.toFixed(1).replace('.', ',')} km | R$ ${ent.valor.toFixed(2).replace('.', ',')}\n`;
         texto += "──────────────────────────\n";
     });
-
-    texto += `🏪 Loja → Cliente: ${document.getElementById('distLojaCli').textContent} km | ${document.getElementById('valLojaCli').textContent}\n`;
+    
+    texto += `📏 KM TOTAL: ${document.getElementById('kmTotal').textContent} km\n`;
+    texto += `💲 TOTAL ENTREGAS: ${document.getElementById('valorTotalEntregas').textContent}\n`;
+    
     if(document.querySelector('input[name="retorno"]:checked').value === 'sim') texto += "✅ Com retorno\n";
     if(document.querySelector('input[name="gorjeta"]:checked').value === 'sim') texto += `💸 Gorjeta: ${document.getElementById('valGorjetaRes').textContent}\n`;
-    texto += "══════════════════════════\n💰 TOTAL: "+document.getElementById('valTotal').textContent;
+    texto += "══════════════════════════\n💰 VALOR FINAL TOTAL: "+document.getElementById('valTotal').textContent;
 
     const dadosPedido = {
         data: new Date().toLocaleDateString('pt-BR'),
@@ -463,6 +524,7 @@ function gerarPedido() {
 function refazerPedido() {
     if(!confirm('⚠️ Apagar tudo e começar de novo?')) return;
     contadorEntregas = 1;
+    dadosEntregas = [];
     document.querySelectorAll('.bloco-entrega').forEach((b,i) => { if(i>0) b.remove(); });
     document.querySelector('#entrega_1').querySelectorAll('input').forEach(i => { if(i.type!=='radio') i.value=''; });
     document.querySelector('input[name="retorno"][value="nao"]').checked = true;
@@ -552,4 +614,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                                                                                             </html>
+</html>
