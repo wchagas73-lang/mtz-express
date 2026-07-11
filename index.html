@@ -127,8 +127,8 @@
                     <div class="grupo">
                         <label>🔄 Retorno?</label>
                         <div>
-                            <label class="opcao-radio"><input type="radio" name="retorno" value="nao"> Não</label>
-                            <label class="opcao-radio"><input type="radio" name="retorno" value="sim" checked> Sim</label>
+                            <label class="opcao-radio"><input type="radio" name="retorno" value="nao" checked> Não</label>
+                            <label class="opcao-radio"><input type="radio" name="retorno" value="sim"> Sim</label>
                         </div>
                         <p style="color:#FFD700; font-size:15px; margin-top:5px;">ℹ️ Retorno = 50% do valor da entrega</p>
                     </div>
@@ -156,6 +156,7 @@
 
             <div class="botoes">
                 <button class="btn btn-verde" onclick="calcular()">🧮 Calcular Valor</button>
+                <button class="btn btn-verde" onclick="enviarPedidoWhatsapp()">📤 Enviar WhatsApp</button>
             </div>
 
             <div class="resumo">
@@ -187,10 +188,6 @@
                     <a href="#" target="_blank" class="link-rota" id="linkRotaLojaCli">🏪 Ver rota: Loja→Cliente</a>
                 </div>
                 <p>📏 Total: <span id="distanciaRastreio">--</span></p>
-            </div>
-
-            <div class="botoes">
-                <button class="btn btn-verde" onclick="enviarPedidoWhatsapp()">📤 Enviar WhatsApp</button>
             </div>
 
             <h3 style="color:#FFD700; margin:30px 0 15px; text-align:center;">📋 Tabela de Preços</h3>
@@ -282,42 +279,61 @@ let motoboyLogado = false;
 let calculando = false;
 const PADRAO_JF = {lat: -21.7642, lng: -43.3503};
 
-let dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || JSON.stringify({
-    totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, somaAvaliacoes:0, qtdAvaliacoes:0,
-    lojas:[], dadosSemana:[0,0,0,0,0,0,0], dadosMes:[0,0,0,0,0,0]
-}));
+let dadosGerais;
+try {
+    dadosGerais = JSON.parse(localStorage.getItem('dadosMTZ') || '{}');
+} catch {
+    localStorage.removeItem('dadosMTZ');
+    dadosGerais = {};
+}
+dadosGerais = {
+    totalEntregas: dadosGerais.totalEntregas || 0,
+    valorTotal: dadosGerais.valorTotal || 0,
+    entregues: dadosGerais.entregues || 0,
+    naoEntregues: dadosGerais.naoEntregues || 0,
+    somaAvaliacoes: dadosGerais.somaAvaliacoes || 0,
+    qtdAvaliacoes: dadosGerais.qtdAvaliacoes || 0,
+    lojas: dadosGerais.lojas || [],
+    dadosSemana: dadosGerais.dadosSemana || [0,0,0,0,0,0,0],
+    dadosMes: dadosGerais.dadosMes || [0,0,0,0,0,0]
+};
 
 function salvarDados() {localStorage.setItem('dadosMTZ', JSON.stringify(dadosGerais));}
 
-// ✅ SALVAR E CARREGAR DADOS DA LOJA AUTOMATICAMENTE
 function salvarDadosLoja() {
-    const bloco = document.querySelector('.bloco-entrega');
-    const dados = {
-        nome: bloco.querySelector('.nomeLoja').value.trim(),
-        contato: bloco.querySelector('.contatoLoja').value.trim(),
-        rua: bloco.querySelector('.endLoja').value.trim(),
-        numero: bloco.querySelector('.numLoja').value.trim(),
-        bairro: bloco.querySelector('.bairroLoja').value.trim(),
-        ref: bloco.querySelector('.refLoja').value.trim()
-    };
-    localStorage.setItem('dadosLoja', JSON.stringify(dados));
+    try {
+        const bloco = document.querySelector('.bloco-entrega');
+        const dados = {
+            nome: bloco.querySelector('.nomeLoja').value.trim(),
+            contato: bloco.querySelector('.contatoLoja').value.trim(),
+            rua: bloco.querySelector('.endLoja').value.trim(),
+            numero: bloco.querySelector('.numLoja').value.trim(),
+            bairro: bloco.querySelector('.bairroLoja').value.trim(),
+            ref: bloco.querySelector('.refLoja').value.trim()
+        };
+        localStorage.setItem('dadosLoja', JSON.stringify(dados));
+    } catch {}
 }
 
 function carregarDadosLoja() {
-    const salvos = localStorage.getItem('dadosLoja');
-    if (!salvos) return;
-    const d = JSON.parse(salvos);
-    const bloco = document.querySelector('.bloco-entrega');
-    if (d.nome) bloco.querySelector('.nomeLoja').value = d.nome;
-    if (d.contato) bloco.querySelector('.contatoLoja').value = d.contato;
-    if (d.rua) bloco.querySelector('.endLoja').value = d.rua;
-    if (d.numero) bloco.querySelector('.numLoja').value = d.numero;
-    if (d.bairro) bloco.querySelector('.bairroLoja').value = d.bairro;
-    if (d.ref) bloco.querySelector('.refLoja').value = d.ref;
+    try {
+        const salvos = localStorage.getItem('dadosLoja');
+        if (!salvos) return;
+        const d = JSON.parse(salvos);
+        const bloco = document.querySelector('.bloco-entrega');
+        if (d.nome) bloco.querySelector('.nomeLoja').value = d.nome;
+        if (d.contato) bloco.querySelector('.contatoLoja').value = d.contato;
+        if (d.rua) bloco.querySelector('.endLoja').value = d.rua;
+        if (d.numero) bloco.querySelector('.numLoja').value = d.numero;
+        if (d.bairro) bloco.querySelector('.bairroLoja').value = d.bairro;
+        if (d.ref) bloco.querySelector('.refLoja').value = d.ref;
+    } catch {
+        localStorage.removeItem('dadosLoja');
+    }
 }
 
 window.onload = function() {
-    carregarDadosLoja();
+    try { carregarDadosLoja(); } catch {}
     minhaLat = PADRAO_JF.lat;
     minhaLng = PADRAO_JF.lng;
     localizacaoOk = true;
@@ -335,8 +351,11 @@ window.onload = function() {
                 document.getElementById('avisoLocal').textContent = '⚠️ Usando centro de Juiz de Fora';
                 document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
             },
-            {enableHighAccuracy: true, timeout: 6000, maximumAge: 30000}
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 30000}
         );
+    } else {
+        document.getElementById('avisoLocal').textContent = '⚠️ Usando centro de Juiz de Fora';
+        document.getElementById('avisoLocal').className = 'aviso-localizacao erro';
     }
 
     configurarMascaras();
@@ -355,14 +374,13 @@ window.onload = function() {
             document.getElementById('nomePagador').textContent = r.value === 'loja' ? '🏪 Loja' : '👤 Cliente';
         });
     });
-    atualizarPainelAdmin();
+    try { atualizarPainelAdmin(); } catch {}
 };
 
 document.addEventListener('blur', (e) => {
     if (e.target.classList.contains('dados-loja')) salvarDadosLoja();
 }, true);
 
-// ✅ MÁSCARAS DE TELEFONE CORRIGIDAS
 function configurarMascaras() {
     document.querySelectorAll('.cepLoja, .cepDest').forEach(campo => {
         campo.addEventListener('input', e => {
@@ -411,7 +429,6 @@ function montarEndereco(rua, numero, bairro) {
     return `${rua}, ${numero || 'S/N'}, ${bairro}, Juiz de Fora, MG`;
 }
 
-// ✅ CÁLCULO DE DISTÂNCIA OTIMIZADO
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -445,7 +462,6 @@ function valorPorKm(km) {
     return 28.00 + ((k - 20) * 1.00);
 }
 
-// ✅ BUSCA DE COORDENADAS CORRIGIDA: TENTA COM E SEM NÚMERO, MELHOR ERRO
 async function pegarCoordenadas(rua, numero, bairro) {
     let ruaOk = rua.trim().replace(/\s+/g, ' ')
         .replace(/^R\./i, 'Rua').replace(/^AV\./i, 'Avenida')
@@ -459,11 +475,13 @@ async function pegarCoordenadas(rua, numero, bairro) {
     const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoSemNumero)}&city=Juiz de Fora&state=MG&country=BR&limit=1`;
 
     try {
-        let resp = await fetch(url1, {signal: AbortSignal.timeout(5000)});
+        let resp = await fetch(url1, {signal: AbortSignal.timeout(3000)});
+        if (!resp.ok) throw new Error('Erro rede');
         let dados = await resp.json();
         if (dados.length) return {ok: true, lat: +dados[0].lat, lng: +dados[0].lon};
 
-        resp = await fetch(url2, {signal: AbortSignal.timeout(5000)});
+        resp = await fetch(url2, {signal: AbortSignal.timeout(3000)});
+        if (!resp.ok) throw new Error('Erro rede');
         dados = await resp.json();
         if (dados.length) return {ok: true, lat: +dados[0].lat, lng: +dados[0].lon};
 
@@ -473,7 +491,6 @@ async function pegarCoordenadas(rua, numero, bairro) {
     }
 }
 
-// ✅ CÁLCULO PRINCIPAL — TUDO VALIDADO E CORRIGIDO
 async function calcular() {
     if (calculando) return;
     calculando = true;
@@ -492,12 +509,6 @@ async function calcular() {
 
     if (!ruaLoja || !numLoja || !bairroLoja || !refLoja || !ruaDest || !numDest || !bairroDest || !refDest) {
         alert('⚠️ PREENCHA TUDO:\nRua, NÚMERO OU S/N, Bairro e Referência!\n👉 Não pode deixar vazio!');
-        calculando = false;
-        if (botaoCalcular) botaoCalcular.disabled = false;
-        return;
-    }
-    if (!localizacaoOk) {
-        alert('⏳ Aguarde carregar sua localização!');
         calculando = false;
         if (botaoCalcular) botaoCalcular.disabled = false;
         return;
@@ -586,13 +597,18 @@ function adicionarEntrega() {
     qtdEntregasCadastradas++;
     const blocoOriginal = document.querySelector('.bloco-entrega');
     const novoBloco = blocoOriginal.cloneNode(true);
+    
     novoBloco.querySelectorAll('input[type="text"], input[type="tel"]').forEach(campo => {
         if (!campo.classList.contains('dados-loja')) campo.value = '';
     });
-    novoBloco.querySelector('input[name=retorno][value=sim]').checked = true;
+    
+    novoBloco.querySelector('input[name=retorno][value=nao]').checked = true;
     novoBloco.querySelector('input[name=categoria1][value=alimentos]').checked = true;
+    
     novoBloco.insertAdjacentHTML('afterbegin', '<button class="btn-remover" onclick="removerBloco(this)">×</button>');
+    
     document.getElementById('listaEntregas').appendChild(novoBloco);
+    
     atualizarQuantidadeEntregas();
     configurarMascaras();
 }
@@ -604,61 +620,76 @@ function removerBloco(botao) {
 
 function atualizarQuantidadeEntregas() {
     document.getElementById('qtdEntregas').textContent = document.querySelectorAll('.bloco-entrega').length;
-function enviarPedidoWhatsapp() {
-    numeroPedido++; 
-    dadosGerais.totalEntregas++; 
-    dadosGerais.valorTotal += valorEntregaBase;
-    dadosGerais.dadosSemana[new Date().getDay()]++;
-    salvarDados(); 
-    atualizarPainelAdmin();
-
-    const bloco = document.querySelector('.bloco-entrega');
-    const pagNome = document.querySelector('input[name=pagador]:checked').value === 'loja' ? '🏪 A Loja' : '👤 Cliente';
-    const temRet = document.querySelector('input[name=retorno]:checked').value === 'sim';
-
-    const ruaLoja = bloco.querySelector('.endLoja').value.trim();
-    const numLoja = bloco.querySelector('.numLoja').value.trim();
-    const bairroLoja = bloco.querySelector('.bairroLoja').value.trim();
-    const endLojaCompleto = montarEndereco(ruaLoja, numLoja, bairroLoja);
-
-    const ruaDest = bloco.querySelector('.endDest').value.trim();
-    const numDest = bloco.querySelector('.numDest').value.trim();
-    const bairroDest = bloco.querySelector('.bairroDest').value.trim();
-    const endDestCompleto = montarEndereco(ruaDest, numDest, bairroDest);
-
-    const linkMotoLoja = document.getElementById('linkRotaMotoLoja').href;
-    const linkLojaCli = document.getElementById('linkRotaLojaCli').href;
-
-    const msg = `📤 NOVO PEDIDO GERADO
-📄 PEDIDO Nº: ${numeroPedido}
-🏪 Loja: ${bloco.querySelector('.nomeLoja').value || 'Não informado'}
-📲 Contato Loja: ${bloco.querySelector('.contatoLoja').value || 'Não informado'}
-📍 Origem: ${endLojaCompleto}
-👤 Cliente: ${bloco.querySelector('.nomeDest').value || 'Não informado'}
-📲 Contato Cliente: ${bloco.querySelector('.contatoDest').value || 'Não informado'}
-📍 Destino: ${endDestCompleto}
-🔗 Ver rota Moto → Loja: ${linkMotoLoja}
-🔗 Ver rota Loja → Cliente: ${linkLojaCli}
-🔄 Retorno: ${temRet?'SIM':'NÃO'}
-💰 Quem paga: ${pagNome}
-💵 Valor Total: ${document.getElementById('valTotal').textContent}
-💳 Pix: ${CHAVE_PIX_NUBANK}
-✅ MTZ Express — Juiz de Fora-MG`;
-
-    const url = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
 }
 
 function mostrarAba(nomeAba) {
     document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
-    document.querySelectorAll('.conteudo').forEach(cont => cont.classList.remove('visivel'));
+    document.querySelectorAll('.conteudo').forEach(conteudo => conteudo.classList.remove('visivel'));
     event.target.classList.add('ativa');
     document.getElementById(`aba${nomeAba}`).classList.add('visivel');
 }
 
-// 🛵 ÁREA MOTOBOY
-const USUARIO_MOTO = 'motoboy';
-const SENHA_MOTO = '123456';
+function enviarPedidoWhatsapp() {
+    const bloco = document.querySelector('.bloco-entrega');
+    const nomeLoja = bloco.querySelector('.nomeLoja').value.trim();
+    const contatoLoja = bloco.querySelector('.contatoLoja').value.trim();
+    const endLoja = montarEndereco(
+        bloco.querySelector('.endLoja').value.trim(),
+        bloco.querySelector('.numLoja').value.trim(),
+        bloco.querySelector('.bairroLoja').value.trim()
+    );
+    const refLoja = bloco.querySelector('.refLoja').value.trim();
+
+    const nomeDest = bloco.querySelector('.nomeDest').value.trim();
+    const contatoDest = bloco.querySelector('.contatoDest').value.trim();
+    const endDest = montarEndereco(
+        bloco.querySelector('.endDest').value.trim(),
+        bloco.querySelector('.numDest').value.trim(),
+        bloco.querySelector('.bairroDest').value.trim()
+    );
+    const refDest = bloco.querySelector('.refDest').value.trim();
+
+    const retorno = document.querySelector('input[name=retorno]:checked').value === 'sim' ? 'SIM' : 'NÃO';
+    const pagador = document.querySelector('input[name=pagador]:checked').value === 'loja' ? '🏪 Loja' : '👤 Cliente';
+
+    const valorTotal = document.getElementById('valTotal').textContent;
+    const kmTotal = document.getElementById('kmTotalGeral').textContent;
+    const linkMotoLoja = document.getElementById('linkRotaMotoLoja').href;
+    const linkLojaCli = document.getElementById('linkRotaLojaCli').href;
+
+    const mensagem = `📤 NOVO PEDIDO — PEDIDO Nº ${numeroPedido}
+🏪 Loja: ${nomeLoja}
+📲 Contato Loja: ${contatoLoja}
+📍 Origem: ${endLoja}
+📌 Referência: ${refLoja}
+
+👤 Cliente: ${nomeDest}
+📲 Contato Cliente: ${contatoDest}
+📍 Destino: ${endDest}
+📌 Referência: ${refDest}
+
+🔗 Rota Moto → Loja: ${linkMotoLoja}
+🔗 Rota Loja → Cliente: ${linkLojaCli}
+
+🔄 Retorno: ${retorno}
+💰 Paga por: ${pagador}
+🚀 KM Total: ${kmTotal}
+💵 Valor Total: ${valorTotal}
+
+💳 PIX: ${CHAVE_PIX_NUBANK}
+
+✅ MTZ Express — Juiz de Fora-MG`;
+
+    const url = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+
+    dadosGerais.totalEntregas++;
+    salvarDados();
+}
+
+// 🛵 LOGIN MOTOBOY
+const USUARIO_MOTO = 'mtz2026';
+const SENHA_MOTO = '1120';
 
 function verificarLoginMotoboy() {
     const usu = document.getElementById('usuarioMoto').value.trim();
@@ -688,28 +719,26 @@ function deslogarMotoboy() {
 
 function iniciarLocalizacaoTempoReal() {
     if(!navigator.geolocation) return;
-    const atualizar = () => {
+    intervaloLocalizacao = setInterval(() => {
         navigator.geolocation.getCurrentPosition(
             pos => {
-                document.getElementById('mostraLat').textContent = pos.coords.latitude.toFixed(6);
-                document.getElementById('mostraLng').textContent = pos.coords.longitude.toFixed(6);
+                minhaLat = pos.coords.latitude;
+                minhaLng = pos.coords.longitude;
+                document.getElementById('mostraLat').textContent = minhaLat.toFixed(6);
+                document.getElementById('mostraLng').textContent = minhaLng.toFixed(6);
                 const agora = new Date();
-                document.getElementById('ultimaAtualizacao').textContent = `${agora.getHours()}:${String(agora.getMinutes()).padStart(2,'0')}`;
-                document.getElementById('statusMoto').innerHTML = '🟢 Conectado — Localização ativa';
+                document.getElementById('ultimaAtualizacao').textContent = 
+                    `${agora.getHours()}:${String(agora.getMinutes()).padStart(2,'0')}`;
             },
-            () => {
-                document.getElementById('statusMoto').innerHTML = '⚠️ Sinal fraco';
-            },
-            {enableHighAccuracy: true, timeout: 7000}
+            () => {},
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 30000}
         );
-    };
-    atualizar();
-    intervaloLocalizacao = setInterval(atualizar, 15000);
+    }, 15000);
 }
 
-// ⚙️ ÁREA ADMIN
-const USUARIO_ADMIN = 'admin';
-const SENHA_ADMIN = 'mtz2026';
+// ⚙️ LOGIN ADMIN
+const USUARIO_ADMIN = 'mtz2026';
+const SENHA_ADMIN = '1120';
 
 function verificarLoginAdmin() {
     const usu = document.getElementById('usuarioAdmin').value.trim();
@@ -726,20 +755,23 @@ function verificarLoginAdmin() {
 
 function atualizarPainelAdmin() {
     document.getElementById('totalEntregas').textContent = dadosGerais.totalEntregas;
-    document.getElementById('valorTotalGeral').textContent = `R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}`;
+    document.getElementById('valorTotalGeral').textContent = 
+        `R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdEntregues').textContent = dadosGerais.entregues;
     document.getElementById('qtdNaoEntregues').textContent = dadosGerais.naoEntregues;
     document.getElementById('qtdLojas').textContent = dadosGerais.lojas.length;
-    const media = dadosGerais.qtdAvaliacoes > 0 ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) : '--';
-    document.getElementById('mediaAvaliacao').textContent = media;
+    document.getElementById('mediaAvaliacao').textContent = 
+        dadosGerais.qtdAvaliacoes > 0 
+            ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) 
+            : '--';
 }
 
 function desenharGraficos() {
     if(graficoSemanal) graficoSemanal.destroy();
     if(graficoMensal) graficoMensal.destroy();
 
-    const ctxSem = document.getElementById('graficoSemanal').getContext('2d');
-    graficoSemanal = new Chart(ctxSem, {
+    const ctxSemana = document.getElementById('graficoSemanal').getContext('2d');
+    graficoSemanal = new Chart(ctxSemana, {
         type: 'bar',
         data: {
             labels: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'],
@@ -748,51 +780,55 @@ function desenharGraficos() {
                 data: dadosGerais.dadosSemana,
                 backgroundColor: '#FFD700',
                 borderColor: '#FFA500',
-                borderWidth: 2,
-                borderRadius: 8
+                borderWidth: 2
             }]
         },
-        options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {labels: {color:'#FFD700', font:{size:14}}}}, scales: {y:{ticks:{color:'#fff'}, grid:{color:'rgba(255,255,255,.1)'}}, x:{ticks:{color:'#fff'}, grid:{display:false}}}}
+        options: {responsive: true, scales: {y: {beginAtZero: true, ticks: {color:'#fff'}}, x:{ticks:{color:'#fff'}}}}
     });
 
     const ctxMes = document.getElementById('graficoMensal').getContext('2d');
     graficoMensal = new Chart(ctxMes, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
             datasets: [{
-                label: 'Faturamento R$',
+                label: 'R$ Faturado',
                 data: dadosGerais.dadosMes,
-                borderColor: '#00C853',
-                backgroundColor: 'rgba(0,200,83,.2)',
-                fill: true,
-                tension: .4,
-                pointBackgroundColor: '#FFD700',
-                pointBorderWidth: 2
+                backgroundColor: '#00C853',
+                borderColor: '#008000',
+                borderWidth: 2
             }]
         },
-        options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {labels: {color:'#00C853', font:{size:14}}}}, scales: {y:{ticks:{color:'#fff'}, grid:{color:'rgba(255,255,255,.1)'}}, x:{ticks:{color:'#fff'}, grid:{display:false}}}}
+        options: {responsive: true, scales: {y: {beginAtZero: true, ticks: {color:'#fff'}}, x:{ticks:{color:'#fff'}}}}
     });
 }
 
 function enviarRelatorioWhatsapp() {
-    const rel = `📊 RELATÓRIO GERAL
+    const media = dadosGerais.qtdAvaliacoes > 0 
+        ? (dadosGerais.somaAvaliacoes / dadosGerais.qtdAvaliacoes).toFixed(1) 
+        : '--';
+
+    const relatorio = `📊 RELATÓRIO GERAL — MTZ EXPRESS
 📦 Total Entregas: ${dadosGerais.totalEntregas}
 💰 Valor Total: R$ ${dadosGerais.valorTotal.toFixed(2).replace('.', ',')}
 ✅ Concluídas: ${dadosGerais.entregues}
 ❌ Negadas: ${dadosGerais.naoEntregues}
 🏪 Lojas Cadastradas: ${dadosGerais.lojas.length}
-⭐ Média Avaliação: ${dadosGerais.qtdAvaliacoes>0 ? (dadosGerais.somaAvaliacoes/dadosGerais.qtdAvaliacoes).toFixed(1) : '--'}
+⭐ Média Avaliações: ${media}
 
 ✅ MTZ Express — Juiz de Fora-MG`;
-    window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(rel)}`, '_blank');
+
+    window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(relatorio)}`, '_blank');
 }
 
 function zerarTodosDados() {
-    if(confirm('⚠️ TEM CERTEZA? Vai apagar TUDO, não tem volta!')) {
+    if(confirm('⚠️ TEM CERTEZA?\nVai apagar TODOS os dados, não tem volta!')) {
         localStorage.removeItem('dadosMTZ');
-        localStorage.removeItem('dadosLoja');
-        dadosGerais = {totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, somaAvaliacoes:0, qtdAvaliacoes:0, lojas:[], dadosSemana:[0,0,0,0,0,0,0], dadosMes:[0,0,0,0,0,0]};
+        dadosGerais = {
+            totalEntregas:0, valorTotal:0, entregues:0, naoEntregues:0, 
+            somaAvaliacoes:0, qtdAvaliacoes:0, lojas:[],
+            dadosSemana:[0,0,0,0,0,0,0], dadosMes:[0,0,0,0,0,0]
+        };
         salvarDados();
         atualizarPainelAdmin();
         desenharGraficos();
@@ -801,4 +837,4 @@ function zerarTodosDados() {
 }
 </script>
 </body>
-    </html>
+                                                               </html>
