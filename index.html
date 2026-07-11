@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTZ Express | Entregas Rápidas — Juiz de Fora-MG</title>
+    <title>MTZ Express | Entregas — Juiz de Fora-MG</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;}
         :root {
             --primaria: #00C896; --primaria-escura: #008F60; 
             --dourado: #FFD700; --dourado-escuro: #E6B800;
-            --perigo: #dc3545; --fundo-escuro: #0F2B33; --fundo-card-escuro: #173842;
-            --texto-escuro: #E0F8F0; --borda-escuro: rgba(0,200,150,0.25);
-            --azul: #3B82F6; --cinza: #9CA3AF;
+            --perigo: #dc3545; --fundo-escuro: #0F2B33; --fundo-card: #173842;
+            --texto: #E0F8F0; --borda: rgba(0,200,150,0.25);
+            --azul: #3B82F6; --cinza: #9CA3AF; --roxo: #8B5CF6;
         }
-        body {background: linear-gradient(135deg, var(--fundo-escuro), #1A3F4A); min-height: 100vh; padding: 15px; color: var(--texto-escuro);}
-        .container {max-width: 720px; margin: 0 auto;}
-        .card {background: var(--fundo-card-escuro); border-radius: 28px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 2px solid var(--dourado);}
+        body {background: linear-gradient(135deg, var(--fundo-escuro), #1A3F4A); min-height: 100vh; padding: 15px; color: var(--texto);}
+        .container {max-width: 780px; margin: 0 auto;}
+        .card {background: var(--fundo-card); border-radius: 28px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 2px solid var(--dourado);}
         
         .cabecalho {text-align: center; margin-bottom: 32px; padding: 25px; background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,193,7,0.05)); border-radius: 24px; border: 2px solid var(--dourado);}
         .icone-superior {font-size: 52px; color: var(--dourado); text-shadow: 0 0 15px var(--dourado); margin-bottom: 8px;}
@@ -28,22 +29,23 @@
         .dados-rapidos strong {color: var(--dourado);}
 
         .abas {display: flex; gap: 12px; margin: 28px 0; flex-wrap: wrap;}
-        .aba {flex: 1; min-width: 115px; padding: 16px 12px; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,0.05); color: #B2DFDB; border: 1px solid var(--borda-escuro);}
+        .aba {flex: 1; min-width: 115px; padding: 16px 12px; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,0.05); color: #B2DFDB; border: 1px solid var(--borda);}
         .aba.ativa {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; box-shadow: 0 0 15px rgba(255,215,0,0.4);}
         
         label {display: block; margin: 18px 0 6px; font-weight: 700; font-size: 15px;}
         label span {color: var(--perigo);}
         label .opcional {color: var(--cinza); font-weight: 500;}
-        input, textarea {width: 100%; padding: 14px 16px; border: 2px solid var(--borda-escuro); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
-        input:focus, textarea:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
+        input {width: 100%; padding: 14px 16px; border: 2px solid var(--borda); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none;}
+        input:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
         .opcoes-linha {display: flex; gap: 15px; align-items: center; margin: 10px 0; flex-wrap: wrap;}
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
         .opcao-radio.selecionado {border-color: var(--dourado); background: rgba(255,215,0,0.1);}
         .opcao-radio input {width: auto; transform: scale(1.3);}
-        .opcao-radio span {font-size: 16px; font-weight: 600;}
 
         .escondido {display: none !important;}
+        .carregando {color: var(--dourado); font-weight: 600; animation: piscar 1s infinite;}
+        @keyframes piscar {50% {opacity: 0.5;}}
 
         .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
         .btn {width: 100%; padding: 16px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s;}
@@ -51,40 +53,37 @@
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
-        .btn-whatsapp {background: linear-gradient(90deg, #25D366, #128C7E); color: white;}
-        .btn-pequeno {width: auto; padding: 10px 16px; font-size: 15px;}
         .btn-mais {background: linear-gradient(90deg, var(--azul), #2563eb); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0;}
         .btn-remover {background: var(--perigo); color: white; padding: 8px 12px; font-size: 14px; width: auto;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
         @keyframes aparecer {from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
         
-        .caixa-retorno, .caixa-pagamento, .caixa-gorjeta, .caixa-status-entrega, .bloco-entrega {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
-        .bloco-entrega {border-color: var(--azul); background: rgba(59,130,246,0.06);}
+        .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
         .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 1.8;}
-        .opcao {display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 0;}
-        .opcao input {width: auto; transform: scale(1.4);}
         .tabela-wrapper {max-height: 320px; overflow-y: auto; border-radius: 18px; border: 2px solid var(--dourado);}
         .tabela-valores {width:100%; border-collapse:separate; border-spacing:0;}
         .tabela-valores th {background:var(--dourado); color:#1A1A1A; padding:14px; text-align:center; font-weight:800;}
-        .tabela-valores td {padding:12px; text-align:center; border-bottom:1px solid var(--borda-escuro); background:rgba(0,200,150,0.06);}
+        .tabela-valores td {padding:12px; text-align:center; border-bottom:1px solid var(--borda); background:rgba(0,200,150,0.06);}
         .destaque-percurso {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); border-radius:18px; padding:18px; margin:20px 0; font-weight:600; line-height:2;}
-        .sugestoes-gorjeta {display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;}
-        .btn-gorjeta {padding: 10px 16px; border: 2px solid var(--dourado); background: transparent; color: var(--dourado); border-radius: 12px; font-weight: 700; cursor: pointer;}
-        .btn-gorjeta.selecionado {background: var(--dourado); color: #1A1A1A;}
         .status-moto {padding: 10px; border-radius: 12px; text-align: center; font-weight: 700; margin: 15px 0;}
         .status-moto.on {background: rgba(0,200,150,0.2); color: var(--primaria); border: 2px solid var(--primaria);}
         .status-moto.off {background: rgba(220,53,69,0.2); color: var(--perigo); border: 2px solid var(--perigo);}
-
-        .area-pagamentoPIX {text-align:center; padding:24px; background:rgba(0,200,150,0.08); border:2px solid var(--primaria); border-radius:24px; margin-top:40px;}
-        .qrcode-box {background:white; padding:15px; border-radius:16px; display:inline-block; margin:10px 0; min-height:240px; min-width:240px; display:flex; align-items:center; justify-content:center;}
-        .codigo-copia {background:rgba(255,255,255,0.1); padding:12px; border-radius:12px; word-break:break-all; font-family:monospace; font-size:13px; margin:10px 0;}
         .titulo-bloco {display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
         .aviso-auto {font-size:13px; color:var(--primaria); margin-top:-5px; margin-bottom:8px;}
         .caixa-login {max-width: 450px; margin: 30px auto; padding: 25px; border: 2px solid var(--azul); border-radius: 20px; background: rgba(59,130,246,0.06);}
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
         hr {border:none; border-top:2px solid var(--dourado); margin:15px 0;}
+
+        /* PAINEL DE GESTÃO */
+        .grade-dados {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;}
+        .card-dado {background: rgba(255,215,0,0.1); border: 2px solid var(--dourado); border-radius: 16px; padding: 18px; text-align: center;}
+        .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
+        .card-dado .valor {font-size: 26px; font-weight: 900;}
+        .area-grafico {background: rgba(255,255,255,0.03); border: 2px solid var(--borda); border-radius: 20px; padding: 20px; margin: 25px 0;}
+        .lista-pedidos {max-height: 350px; overflow-y: auto; margin-top: 20px;}
+        .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
     </style>
 </head>
 <body>
@@ -104,7 +103,7 @@
             <div class="abas">
                 <button class="aba ativa" onclick="mostrarAba('loja')">🏪 Lojista</button>
                 <button class="aba" onclick="mostrarAba('motoboy')">🛵 Motoboy</button>
-                <button class="aba" onclick="mostrarAba('painel')">📊 Painel</button>
+                <button class="aba" onclick="mostrarAba('painel')">📊 Painel Gestão</button>
             </div>
 
             <!-- ABA LOJISTA -->
@@ -113,7 +112,7 @@
 
                 <div class="destaque-percurso">
                     🛵 MOTOBOY → LOJA: R$ 0,50 POR KM<br>
-                    🏪 LOJA → CLIENTE: Valor conforme tabela oficial
+                    🏪 LOJA → CLIENTE: Valor conforme tabela • Cálculo via Google Maps
                 </div>
 
                 <div id="listaEntregas">
@@ -130,27 +129,9 @@
                         <label>Contato <span>*</span></label>
                         <input type="tel" class="contatoLoja" required placeholder="(32) 9XXXX-XXXX">
                         
-                        <label>Rua / Avenida / Travessa <span>*</span></label>
-                        <input type="text" class="endLoja" required placeholder="Digite o logradouro" oninput="buscarBairro(this)">
-                        
-                        <div class="linha-dupla">
-                            <label>Número <span>*</span></label>
-                            <label>Bairro <span>*</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="numLoja" required placeholder="Número ou S/N" oninput="buscarBairro(this)">
-                            <input type="text" class="bairroLoja" required placeholder="Preenche automaticamente...">
-                        </div>
-                        <p class="aviso-auto">✅ Automático — pode alterar se precisar</p>
-
-                        <div class="linha-dupla">
-                            <label>Cidade/UF <span>*</span></label>
-                            <label>CEP <span class="opcional">(Opcional)</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="cidadeLoja" value="Juiz de Fora-MG">
-                            <input type="text" class="cepLoja" placeholder="CEP">
-                        </div>
+                        <label>Endereço completo <span>*</span></label>
+                        <input type="text" class="endLoja" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
                         
@@ -160,33 +141,12 @@
                         <label>Contato do Cliente <span>*</span></label>
                         <input type="tel" class="contatoDest" required placeholder="(32) 9XXXX-XXXX">
                         
-                        <label>Rua / Avenida / Travessa <span>*</span></label>
-                        <input type="text" class="endDest" required placeholder="Digite o logradouro" oninput="buscarBairro(this)">
-                        
-                        <div class="linha-dupla">
-                            <label>Número <span>*</span></label>
-                            <label>Bairro <span>*</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="numDest" required placeholder="Número ou S/N" oninput="buscarBairro(this)">
-                            <input type="text" class="bairroDest" required placeholder="Preenche automaticamente...">
-                        </div>
-                        <p class="aviso-auto">✅ Automático — pode alterar se precisar</p>
-
-                        <div class="linha-dupla">
-                            <label>Cidade/UF <span>*</span></label>
-                            <label>CEP <span class="opcional">(Opcional)</span></label>
-                        </div>
-                        <div class="linha-dupla">
-                            <input type="text" class="cidadeDest" value="Juiz de Fora-MG">
-                            <input type="text" class="cepDest" placeholder="CEP">
-                        </div>
+                        <label>Endereço completo <span>*</span></label>
+                        <input type="text" class="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
                         <input type="text" class="refDest" placeholder="Perto de onde?">
-
-                        <label>Observação <span class="opcional">(Opcional)</span></label>
-                        <input type="text" class="obs" placeholder="Detalhes importantes">
                     </div>
                 </div>
 
@@ -210,14 +170,16 @@
                     <p><strong>💸 Gorjeta para o Motoboy?</strong></p>
                     <div class="opcoes-linha">
                         <label class="opcao-radio selecionado">
-                            <input type="radio" name="gorjeta" value="nao" checked onclick="document.getElementById('valorGorjeta').disabled=true; document.getElementById('valorGorjeta').style.display='none'; calcular()"> Não
+                            <input type="radio" name="gorjeta" value="nao" checked onclick="document.getElementById('valorGorjeta').style.display='none'; calcular()"> Não
                         </label>
                         <label class="opcao-radio">
-                            <input type="radio" name="gorjeta" value="sim" onclick="document.getElementById('valorGorjeta').disabled=false; document.getElementById('valorGorjeta').style.display='block'; calcular()"> Sim
+                            <input type="radio" name="gorjeta" value="sim" onclick="document.getElementById('valorGorjeta').style.display='block'; calcular()"> Sim
                         </label>
                     </div>
                     <input type="number" id="valorGorjeta" min="0" step="0.01" placeholder="R$ 0,00" style="margin-top:10px; display:none" oninput="calcular()">
                 </div>
+
+                <div id="areaCalculando" class="carregando escondido">🔄 Calculando distância real com Google Maps...</div>
 
                 <div class="linha-botoes">
                     <button class="btn btn-principal" onclick="calcular()">🧮 CALCULAR VALOR TOTAL</button>
@@ -226,33 +188,31 @@
 
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
 
-                <!-- RESUMO DETALHADO -->
+                <!-- RESUMO -->
                 <div class="resumo escondido" id="resumoPedido">
-                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO DETALHADO</h3>
+                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO GOOGLE MAPS</h3>
                     
                     <div style="background:rgba(0,200,150,0.1); border-left:4px solid var(--primaria); padding:12px; border-radius:12px; margin:10px 0;">
                         <p><strong>🛵 Motoboy → Loja</strong></p>
                         <p>Distância: <span id="distMotoLoja">--</span> km | Valor: R$ <span id="valMotoLoja">--</span></p>
-                        <p style="font-size:14px; color:#9CA3AF;">R$ 0,50 por km</p>
                     </div>
 
                     <div style="background:rgba(59,130,246,0.1); border-left:4px solid var(--azul); padding:12px; border-radius:12px; margin:10px 0;">
                         <p><strong>🏪 Loja → Cliente</strong></p>
                         <p>Distância: <span id="distLojaCli">--</span> km | Valor: R$ <span id="valLojaCli">--</span></p>
-                        <p style="font-size:14px; color:#9CA3AF;">Conforme tabela oficial</p>
                     </div>
 
                     <p>Quantidade de Entregas: <span id="qtdEntregas">1</span></p>
                     <p>Subtotal: R$ <span id="valSubtotal">--</span></p>
                     
-                    <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor Loja→Cliente): R$ <span id="valRetorno">--</span></p>
+                    <p id="linhaRetorno" class="escondido">✅ Retorno (50%): R$ <span id="valRetorno">--</span></p>
                     <p id="linhaGorjeta" class="escondido">💸 Gorjeta: R$ <span id="valGorjetaRes">--</span></p>
                     
                     <hr>
-                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 TOTAL GERAL: R$ <span id="valTotal">--</span></p>
+                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 TOTAL: R$ <span id="valTotal">--</span></p>
                 </div>
 
-                <!-- TABELA EXATA IGUAL À SUA FOTO -->
+                <!-- TABELA EXATA -->
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
                 <div class="tabela-wrapper">
                     <table class="tabela-valores">
@@ -283,17 +243,17 @@
                     <button class="btn btn-principal" style="width:100%; margin-top:20px;" onclick="verificarLoginMotoboy()">ENTRAR</button>
                 </div>
                 <div class="escondido" id="conteudoMotoboy">
-                    <div class="status-moto off" id="statusOperacao">⏳ NÃO ESTÁ OPERANDO</div>
+                    <div class="status-moto off" id="statusOperacao">⏳ NÃO ESTÁ EM OPERAÇÃO</div>
                     <button class="btn btn-principal" style="width:100%; margin:15px 0;" onclick="ligarMotoboy()">🟢 INICIAR OPERAÇÃO</button>
                     <button class="btn btn-perigo escondido" style="width:100%; margin:15px 0;" id="btnDesligar" onclick="desligarMotoboy()">🔴 ENCERRAR OPERAÇÃO</button>
                     <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairMotoboy()">🚪 SAIR</button>
                 </div>
             </div>
 
-            <!-- ABA PAINEL -->
+            <!-- ABA PAINEL DE GESTÃO COMPLETO -->
             <div class="conteudo-aba" id="abaPainel">
-                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL ADMINISTRATIVO</h2>
-                <div class="caixa-login">
+                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO COMPLETO</h2>
+                <div class="caixa-login" id="loginPainel">
                     <label>Usuário</label>
                     <input type="text" id="usuarioPainel" placeholder="Digite seu usuário">
                     <label>Senha</label>
@@ -301,242 +261,81 @@
                     <p class="aviso-erro escondido" id="erroLoginPainel">❌ Usuário ou senha incorretos</p>
                     <button class="btn btn-principal" style="width:100%; margin-top:20px;" onclick="verificarLoginPainel()">ENTRAR</button>
                 </div>
+
                 <div class="escondido" id="conteudoPainel">
-                    <p style="text-align:center; font-size:18px; margin-top:50px;">✅ Bem-vindo ao Painel Administrativo</p>
-                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR</button>
+                    <!-- DADOS GERAL -->
+                    <div class="grade-dados">
+                        <div class="card-dado">
+                            <h3>💰 Faturamento Hoje</h3>
+                            <div class="valor" id="fatDia">R$ 0,00</div>
+                        </div>
+                        <div class="card-dado">
+                            <h3>📦 Entregas Hoje</h3>
+                            <div class="valor" id="qtdDia">0</div>
+                        </div>
+                        <div class="card-dado">
+                            <h3>📅 Faturamento Mês</h3>
+                            <div class="valor" id="fatMes">R$ 0,00</div>
+                        </div>
+                        <div class="card-dado">
+                            <h3>📊 Média por Entrega</h3>
+                            <div class="valor" id="mediaEntrega">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS -->
+                    <div class="area-grafico">
+                        <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📈 FATURAMENTO DOS ÚLTIMOS 7 DIAS</h3>
+                        <canvas id="graficoFaturamento"></canvas>
+                    </div>
+
+                    <div class="area-grafico">
+                        <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📊 QUANTIDADE DE ENTREGAS</h3>
+                        <canvas id="graficoQuantidade"></canvas>
+                    </div>
+
+                    <!-- SITUAÇÃO MOTOBOY -->
+                    <div class="card-dado" style="margin:20px 0;">
+                        <h3>🛵 SITUAÇÃO DO MOTOBOY</h3>
+                        <div class="valor" id="statusMotoPainel">❌ Desligado</div>
+                    </div>
+
+                    <!-- LISTA DE PEDIDOS -->
+                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 HISTÓRICO DE TODOS OS PEDIDOS</h3>
+                    <div class="lista-pedidos" id="listaHistorico">
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>
+                    </div>
+
+                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
                 </div>
             </div>
 
         </div>
     </div>
 
+<!-- ✅ CHAVE API JÁ INSERIDA E CONFIGURADA -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
+
 <script>
 // ==============================================
-// DADOS OCULTOS — NINGUÉM VÊ ESSAS LISTAS!
+// DADOS E CONFIGURAÇÕES — NOVOS DADOS DE ACESSO
 // ==============================================
-const USUARIO_MOTOBOY = "motoboy";
-const SENHA_MOTOBOY = "123456";
-const USUARIO_ADMIN = "admin";
-const SENHA_ADMIN = "admin123";
+const USUARIO_MOTOBOY = "mtz2026";
+const SENHA_MOTOBOY = "1120";
+const USUARIO_ADMIN = "mtz2026";
+const SENHA_ADMIN = "1120";
+const NUMERO_WHATSAPP = "5532999953215";
 
 let contadorEntregas = 1;
 let motoboyOperando = false;
+let googleCarregado = false;
+let servicoDistancia = null;
+let historicoPedidos = [];
+let graficoFat, graficoQtd;
 
-// 📍 BASE LOGRADOUROS + FAIXAS DE NÚMEROS → BAIRRO (OCULTA)
-const baseRuasBairros = {
-    "avenida brasil": {"0-300":"Centro","301-800":"São Vicente","801-1500":"São Pedro","1501-3000":"Mariano Procópio","3001-99999":"Nova Juiz de Fora"},
-    "rua bernardo mascarenhas": {"0-500":"Centro","501-99999":"Fábricas"},
-    "rua halfeld": {"0-99999":"Centro"},
-    "rua santo antonio": {"0-500":"Centro","501-99999":"São Vicente"},
-    "rua rio branco": {"0-99999":"Centro"},
-    "avenida rio branco": {"0-99999":"Centro"},
-    "rua getulio vargas": {"0-99999":"Centro"},
-    "praca da bandeira": {"0-99999":"Centro"},
-    "rua oswaldo cruz": {"0-500":"Centro","501-99999":"São Pedro"},
-    "avenida itamaraty": {"0-99999":"São Vicente"},
-    "rua general osorio": {"0-99999":"Centro"},
-    "rua padre machado": {"0-99999":"Centro"},
-    "rua chile": {"0-99999":"Centro"},
-    "rua parana": {"0-99999":"Centro"},
-    "rua minas gerais": {"0-99999":"Centro"},
-    "rua sao paulo": {"0-99999":"Centro"},
-    "rua pernambuco": {"0-99999":"Centro"},
-    "rua bahia": {"0-99999":"Centro"},
-    "rua goias": {"0-99999":"Centro"},
-    "rua paranagua": {"0-99999":"Fábricas"},
-    "avenida presidente costa e silva": {"0-99999":"Fábricas"},
-    "rua mario reis": {"0-99999":"Fábricas"},
-    "rua vitorino braga": {"0-99999":"São Vicente"},
-    "rua barão de cataguases": {"0-99999":"São Vicente"},
-    "rua major mendes": {"0-99999":"São Vicente"},
-    "rua dr. constantino palmer": {"0-99999":"São Pedro"},
-    "rua silviano brandao": {"0-99999":"São Pedro"},
-    "rua joao pimentel": {"0-99999":"São Pedro"},
-    "rua alfredo noronha": {"0-99999":"Mariano Procópio"},
-    "avenida luiz perez": {"0-99999":"Mariano Procópio"},
-    "rua euclides da cunha": {"0-99999":"Mariano Procópio"},
-    "rua candido de abreu": {"0-99999":"Nova Juiz de Fora"},
-    "avenida jk": {"0-99999":"Nova Juiz de Fora"},
-    "rua jose lage": {"0-99999":"Nova Juiz de Fora"},
-    "rua antonio lage": {"0-99999":"Nova Juiz de Fora"},
-    "rua celso furtado": {"0-99999":"Grajaú"},
-    "avenida francisco alves": {"0-99999":"Grajaú"},
-    "rua vigario luiz": {"0-99999":"São Dimas"},
-    "rua dom joao vi": {"0-99999":"Dom Bosco"},
-    "rua dom pedro ii": {"0-99999":"Dom Bosco"},
-    "rua lourdes": {"0-99999":"Lourdes"},
-    "rua cascata": {"0-99999":"Cascata"},
-    "rua santa helena": {"0-99999":"Santa Helena"}
-};
-
-// 📍 TODOS OS BAIRROS DE JUIZ DE FORA + COORDENADAS (OCULTA)
-const bairrosCoordenadas = {
-    "centro": {x:0,y:0},
-    "são vicente": {x:-0.8,y:0.3},
-    "são pedro": {x:0.5,y:-0.6},
-    "mariano procópio": {x:2.2,y:0.1},
-    "nova juiz de fora": {x:3.2,y:-0.5},
-    "fábricas": {x:1.2,y:-0.8},
-    "grajaú": {x:1.0,y:-0.3},
-    "são dimas": {x:-2.5,y:2.0},
-    "dom bosco": {x:-2.2,y:0.0},
-    "lourdes": {x:-1.5,y:-1.0},
-    "cascata": {x:-0.5,y:-2.0},
-    "santa helena": {x:-1.2,y:-2.5},
-    "vale do ipiranga": {x:0.3,y:-3.0},
-    "vila ideal": {x:-1.8,y:1.5},
-    "jardim esperança": {x:1.5,y:2.2},
-    "teixeiras": {x:-3.0,y:-0.5},
-    "bom pastor": {x:-1.2,y:0.8},
-    "parque guanabara": {x:3.8,y:0.8},
-    "alto dos passos": {x:-0.3,y:0.6},
-    "alto são vicente": {x:-1.0,y:0.5},
-    "arraial do meio": {x:-2.0,y:-1.5},
-    "bairro das flores": {x:2.8,y:0.3},
-    "barbosa lage": {x:3.0,y:1.2},
-    "boa vista": {x:-1.5,y:1.2},
-    "cidade jardim": {x:2.5,y:-1.8},
-    "colina": {x:0.8,y:1.8},
-    "concórdia": {x:-2.8,y:1.0},
-    "coroado": {x:1.8,y:-2.2},
-    "distrito industrial": {x:4.0,y:-1.0},
-    "dom pedro ii": {x:-2.0,y:-0.3},
-    "esplanada": {x:1.5,y:0.5},
-    "estácio": {x:-0.6,y:-1.2},
-    "floresta": {x:-1.0,y:1.8},
-    "fortaleza": {x:2.0,y:1.5},
-    "goiabal": {x:-3.2,y:0.5},
-    "guaraní": {x:0.0,y:-2.2},
-    "ipiranga": {x:0.5,y:-2.8},
-    "jardim botânico": {x:3.5,y:0.0},
-    "jardim cachoeira": {x:-0.8,y:-2.8},
-    "jardim da serra": {x:-2.5,y:-2.0},
-    "jardim vitória": {x:1.2,y:2.5},
-    "mata do junco": {x:-3.5,y:-1.0},
-    "morro da glória": {x:0.2,y:1.0},
-    "morro do gavião": {x:-1.5,y:2.2},
-    "nossa senhora da conceição": {x:-2.2,y:-1.2},
-    "nossa senhora de fátima": {x:2.2,y:-1.5},
-    "nossa senhora do rosário": {x:-1.8,y:-2.2},
-    "parque das árvores": {x:3.0,y:1.8},
-    "parque industrial": {x:4.2,y:0.0},
-    "pedregulho": {x:-3.8,y:0.0},
-    "paineiras": {x:1.8,y:-1.2},
-    "ponta da areia": {x:-0.2,y:-1.8},
-    "porto seguro": {x:2.5,y:2.0},
-    "progresso": {x:-2.8,y:-2.0},
-    "ramos": {x:0.8,y:2.0},
-    "recanto dos pássaros": {x:3.5,y:1.5},
-    "santa cruz": {x:-3.0,y:1.5},
-    "santa luzia": {x:1.5,y:-2.5},
-    "santa maria": {x:-1.0,y:2.5},
-    "santa tereza": {x:0.0,y:1.5},
-    "são francisco": {x:-2.5,y:-0.8},
-    "são josé": {x:1.0,y:1.2},
-    "são sebastião": {x:-1.5,y:-1.8},
-    "serra verde": {x:-3.5,y:-2.5},
-    "tiradentes": {x:2.0,y:0.8},
-    "triângulo": {x:0.5,y:0.8},
-    "universitário": {x:1.8,y:-0.5},
-    "vila dos remédios": {x:-2.2,y:1.8},
-    "vila furtado": {x:2.8,y:-2.0},
-    "vila mariana": {x:-0.5,y:2.2},
-    "vila operária": {x:3.0,y:-1.2},
-    "vila progresso": {x:-2.5,y:2.5},
-    "vista alegre": {x:1.5,y:1.8},
-    "vista bela": {x:-1.8,y:0.8},
-    "vista verde": {x:3.2,y:2.2}
-};
-
-// ==============================================
-// FUNÇÃO BUSCA BAIRRO AUTOMÁTICO — LISTA OCULTA
-// ==============================================
-function buscarBairro(campo) {
-    const bloco = campo.closest('.bloco-entrega');
-    if(!bloco) return;
-
-    let rua = "", numero = "", campoBairro = null;
-
-    if(campo.classList.contains('endLoja') || campo.classList.contains('numLoja')) {
-        rua = bloco.querySelector('.endLoja').value.trim();
-        numero = bloco.querySelector('.numLoja').value.trim();
-        campoBairro = bloco.querySelector('.bairroLoja');
-    } else {
-        rua = bloco.querySelector('.endDest').value.trim();
-        numero = bloco.querySelector('.numDest').value.trim();
-        campoBairro = bloco.querySelector('.bairroDest');
-    }
-
-    if(!rua || !numero || !campoBairro) return;
-
-    const ruaNormalizada = rua.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const num = parseInt(numero.replace(/\D/g, '')) || 0;
-
-    let bairroEncontrado = null;
-    for(const chave in baseRuasBairros) {
-        if(ruaNormalizada.includes(chave)) {
-            const faixas = baseRuasBairros[chave];
-            for(const faixa in faixas) {
-                const [inicio, fim] = faixa.split("-").map(Number);
-                if(num >= inicio && num <= fim) {
-                    bairroEncontrado = faixas[faixa];
-                    break;
-                }
-            }
-            break;
-        }
-    }
-
-    if(bairroEncontrado) campoBairro.value = bairroEncontrado;
-}
-
-// ==============================================
-// FUNÇÕES DE NAVEGAÇÃO E SISTEMA
-// ==============================================
-function mostrarAba(nomeAba) {
-    document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
-    event.target.classList.add('ativa');
-    document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
-    document.getElementById('aba'+nomeAba.charAt(0).toUpperCase()+nomeAba.slice(1)).classList.add('visivel');
-}
-
-function adicionarEntrega() {
-    contadorEntregas++;
-    const lista = document.getElementById('listaEntregas');
-    const ultimo = lista.lastElementChild;
-    const novo = ultimo.cloneNode(true);
-    
-    novo.id = "entrega_"+contadorEntregas;
-    novo.querySelector('.titulo-bloco h4').textContent = "📦 DADOS DA ENTREGA "+contadorEntregas;
-    
-    novo.querySelectorAll('input').forEach(inp => {
-        if(!inp.classList.contains('cidadeLoja') && !inp.classList.contains('cidadeDest')) inp.value = "";
-    });
-
-    const botaoRemover = document.createElement('button');
-    botaoRemover.className = "btn btn-remover";
-    botaoRemover.textContent = "🗑️ REMOVER";
-    botaoRemover.onclick = function() { this.closest('.bloco-entrega').remove(); calcular(); };
-    novo.querySelector('.titulo-bloco').appendChild(botaoRemover);
-
-    lista.appendChild(novo);
-    calcular();
-}
-
-function calcularDistancia(bairro1, bairro2) {
-    const b1 = bairro1.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    const b2 = bairro2.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    
-    const c1 = bairrosCoordenadas[b1] || {x:1.5, y:1.5};
-    const c2 = bairrosCoordenadas[b2] || {x:0, y:0};
-    
-    const dx = c1.x - c2.x;
-    const dy = c1.y - c2.y;
-    return Math.sqrt(dx*dx + dy*dy);
-}
-
-// 🧮 CÁLCULO EXATO — IGUAL À TABELA DA FOTO
+// 🧮 CÁLCULO DE VALOR CONFORME TABELA
 function buscarValorPorKm(dist) {
+    dist = Math.round(dist * 10) / 10;
     if (dist <= 1) return 9.00;
     if (dist <= 2) return 10.00;
     if (dist <= 3) return 11.00;
@@ -560,135 +359,286 @@ function buscarValorPorKm(dist) {
     return 28.00;
 }
 
-function calcular() {
-    let distTotalLojaCli = 0;
-    let valorTotalLojaCli = 0;
-    const blocos = document.querySelectorAll('.bloco-entrega');
-
-    blocos.forEach(bloco => {
-        const bairroLoja = bloco.querySelector('.bairroLoja').value.trim();
-        const bairroDest = bloco.querySelector('.bairroDest').value.trim();
-        if(!bairroLoja || !bairroDest) return;
-
-        const dist = calcularDistancia(bairroLoja, bairroDest);
-        distTotalLojaCli += dist;
-        valorTotalLojaCli += buscarValorPorKm(dist);
-    });
-
-    const distMotoLoja = (distTotalLojaCli * 0.7).toFixed(1);
-    const valMotoLoja = (parseFloat(distMotoLoja) * 0.5).toFixed(2);
-    const distLojaCli = distTotalLojaCli.toFixed(1);
-    const valLojaCli = valorTotalLojaCli.toFixed(2);
-
-    document.getElementById('distMotoLoja').textContent = distMotoLoja.replace('.', ',');
-    document.getElementById('valMotoLoja').textContent = "R$ "+valMotoLoja.replace('.', ',');
-    document.getElementById('distLojaCli').textContent = distLojaCli.replace('.', ',');
-    document.getElementById('valLojaCli').textContent = "R$ "+valLojaCli.replace('.', ',');
-    document.getElementById('qtdEntregas').textContent = blocos.length;
-    
-    const subtotal = (parseFloat(valMotoLoja) + parseFloat(valLojaCli)).toFixed(2);
-    document.getElementById('valSubtotal').textContent = "R$ "+subtotal.replace('.', ',');
-
-    const retorno = document.querySelector('input[name="retorno"]:checked').value;
-    let valRet = 0;
-    if(retorno === 'sim') {
-        valRet = (valorTotalLojaCli * 0.5).toFixed(2);
-        document.getElementById('linhaRetorno').classList.remove('escondido');
-        document.getElementById('valRetorno').textContent = "R$ "+valRet.replace('.', ',');
-    } else {
-        document.getElementById('linhaRetorno').classList.add('escondido');
-    }
-
-    const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
-let valGorj = 0;
-if(gorjeta === 'sim') {
-    valGorj = parseFloat(document.getElementById('valorGorjeta').value) || 0;
-    document.getElementById('linhaGorjeta').classList.remove('escondido');
-    document.getElementById('valGorjetaRes').textContent = "R$ "+valGorj.toFixed(2).replace('.', ',');
-} else {
-    document.getElementById('linhaGorjeta').classList.add('escondido');
+// ==============================================
+// GOOGLE MAPS — CÁLCULO DE DISTÂNCIA REAL
+// ==============================================
+function iniciarGoogle() {
+    googleCarregado = true;
+    servicoDistancia = new google.maps.DistanceMatrixService();
+    console.log("✅ Google Maps carregado com sucesso!");
 }
 
-const totalGeral = (parseFloat(valMotoLoja) + parseFloat(valLojaCli) + parseFloat(valRet) + valGorj).toFixed(2);
-document.getElementById('valTotal').textContent = "R$ "+totalGeral.replace('.', ',');
-document.getElementById('resumoPedido').classList.remove('escondido');
-document.getElementById('btnGerarPedido').disabled = !motoboyOperando;
+function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
+    return new Promise((sucesso, erro) => {
+        if (!googleCarregado || !servicoDistancia) {
+            erro("Google Maps carregando — aguarde...");
+            return;
+        }
+        const origem = enderecoOrigem + ", Juiz de Fora - MG, Brasil";
+        const destino = enderecoDestino + ", Juiz de Fora - MG, Brasil";
+
+        servicoDistancia.getDistanceMatrix({
+            origins: [origem],
+            destinations: [destino],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        }, function(resposta, status) {
+            if (status === "OK" && resposta.rows[0].elements[0].status === "OK") {
+                const km = resposta.rows[0].elements[0].distance.value / 1000;
+                sucesso(Math.round(km * 10) / 10);
+            } else {
+                erro("❌ Endereço não encontrado! Verifique.");
+            }
+        });
+    });
+}
+
+// ==============================================
+// FUNÇÕES PRINCIPAIS
+// ==============================================
+function mostrarAba(nomeAba) {
+    document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
+    event.target.classList.add('ativa');
+    document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
+    document.getElementById('aba'+nomeAba.charAt(0).toUpperCase()+nomeAba.slice(1)).classList.add('visivel');
+}
+
+function adicionarEntrega() {
+    contadorEntregas++;
+    const lista = document.getElementById('listaEntregas');
+    const ultimo = lista.lastElementChild;
+    const novo = ultimo.cloneNode(true);
+    novo.id = "entrega_"+contadorEntregas;
+    novo.querySelector('.titulo-bloco h4').textContent = "📦 ENTREGA "+contadorEntregas;
+    novo.querySelectorAll('input').forEach(i => i.value = "");
+    const btnRemover = document.createElement('button');
+    btnRemover.className = "btn btn-remover";
+    btnRemover.textContent = "🗑️ REMOVER";
+    btnRemover.onclick = () => { novo.remove(); calcular(); };
+    novo.querySelector('.titulo-bloco').appendChild(btnRemover);
+    lista.appendChild(novo);
+}
+
+async function calcular() {
+    const blocos = document.querySelectorAll('.bloco-entrega');
+    let distTotal = 0, valorTotal = 0;
+
+    document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('areaCalculando').classList.remove('escondido');
+    document.getElementById('btnGerarPedido').disabled = true;
+
+    try {
+        for(const bloco of blocos) {
+            const endLoja = bloco.querySelector('.endLoja').value.trim();
+            const endDest = bloco.querySelector('.endDest').value.trim();
+            if(!endLoja || !endDest) { alert("⚠️ Preencha todos os endereços!"); return; }
+
+            const dist = await calcularDistanciaGoogle(endLoja, endDest);
+            distTotal += dist;
+            valorTotal += buscarValorPorKm(dist);
+        }
+
+        const distMoto = (distTotal * 0.7).toFixed(1);
+        const valMoto = (parseFloat(distMoto) * 0.5).toFixed(2);
+        const distFinal = distTotal.toFixed(1);
+        const valFinal = valorTotal.toFixed(2);
+
+        document.getElementById('distMotoLoja').textContent = distMoto.replace('.', ',');
+        document.getElementById('valMotoLoja').textContent = "R$ "+valMoto.replace('.', ',');
+        document.getElementById('distLojaCli').textContent = distFinal.replace('.', ',');
+        document.getElementById('valLojaCli').textContent = "R$ "+valFinal.replace('.', ',');
+        document.getElementById('qtdEntregas').textContent = blocos.length;
+        document.getElementById('valSubtotal').textContent = "R$ "+(parseFloat(valMoto)+parseFloat(valFinal)).toFixed(2).replace('.', ',');
+
+        const retorno = document.querySelector('input[name="retorno"]:checked').value;
+        let valRet = 0;
+        if(retorno === 'sim') {
+            valRet = (valorTotal * 0.5).toFixed(2);
+            document.getElementById('linhaRetorno').classList.remove('escondido');
+            document.getElementById('valRetorno').textContent = "R$ "+valRet.replace('.', ',');
+        } else document.getElementById('linhaRetorno').classList.add('escondido');
+
+        const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
+        let valGorj = 0;
+        if(gorjeta === 'sim') {
+            valGorj = parseFloat(document.getElementById('valorGorjeta').value) || 0;
+            document.getElementById('linhaGorjeta').classList.remove('escondido');
+            document.getElementById('valGorjetaRes').textContent = "R$ "+valGorj.toFixed(2).replace('.', ',');
+        } else document.getElementById('linhaGorjeta').classList.add('escondido');
+
+        const totalGeral = (parseFloat(valMoto)+parseFloat(valFinal)+parseFloat(valRet)+valGorj).toFixed(2);
+        document.getElementById('valTotal').textContent = "R$ "+totalGeral.replace('.', ',');
+
+        document.getElementById('resumoPedido').classList.remove('escondido');
+        document.getElementById('btnGerarPedido').disabled = !motoboyOperando;
+
+    } catch(erro) { alert(erro); }
+    finally { document.getElementById('areaCalculando').classList.add('escondido'); }
+}
+
+function gerarPedido() {
+    if(!motoboyOperando) { alert('⚠️ Motoboy não está em operação!'); return; }
+
+    const blocos = document.querySelectorAll('.bloco-entrega');
+    let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n══════════════════════════\n";
+
+    blocos.forEach((bloco, i) => {
+        texto += `📌 ENTREGA ${i+1}\n`;
+        texto += `🏪 Loja: ${bloco.querySelector('.nomeLoja').value.trim()}\n`;
+        texto += `📞 Loja: ${bloco.querySelector('.contatoLoja').value.trim()}\n`;
+        texto += `📍 Loja: ${bloco.querySelector('.endLoja').value.trim()}\n`;
+        texto += `👤 Cliente: ${bloco.querySelector('.nomeDest').value.trim()}\n`;
+        texto += `📞 Cliente: ${bloco.querySelector('.contatoDest').value.trim()}\n`;
+        texto += `📍 Entrega: ${bloco.querySelector('.endDest').value.trim()}\n`;
+        texto += "──────────────────────────\n";
+    });
+
+    texto += `🛵 Moto → Loja: ${document.getElementById('distMotoLoja').textContent} km | ${document.getElementById('valMotoLoja').textContent}\n`;
+    texto += `🏪 Loja → Cliente: ${document.getElementById('distLojaCli').textContent} km | ${document.getElementById('valLojaCli').textContent}\n`;
+    if(document.querySelector('input[name="retorno"]:checked').value === 'sim') texto += "✅ Com retorno\n";
+    if(document.querySelector('input[name="gorjeta"]:checked').value === 'sim') texto += `💸 Gorjeta: ${document.getElementById('valGorjetaRes').textContent}\n`;
+    texto += "══════════════════════════\n💰 TOTAL: "+document.getElementById('valTotal').textContent;
+
+    // SALVA NO HISTÓRICO DO PAINEL
+    const dadosPedido = {
+        data: new Date().toLocaleDateString('pt-BR'),
+        hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+        total: document.getElementById('valTotal').textContent,
+        texto: texto
+    };
+    historicoPedidos.unshift(dadosPedido);
+    atualizarPainel();
+
+    // ABRE WHATSAPP
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`, '_blank');
+    alert('✅ Pedido gerado! Abrindo WhatsApp...');
 }
 
 function refazerPedido() {
-    if(!confirm('⚠️ Tem certeza que quer apagar tudo e começar de novo?')) return;
+    if(!confirm('⚠️ Apagar tudo e começar de novo?')) return;
     contadorEntregas = 1;
-    document.querySelectorAll('.bloco-entrega').forEach((b, i) => { if(i>0) b.remove(); });
-    
-    const primeiro = document.querySelector('#entrega_1');
-    primeiro.querySelectorAll('input').forEach(inp => {
-        if(inp.type === 'radio') inp.checked = inp.value === 'nao';
-        else if(!inp.classList.contains('cidadeLoja') && !inp.classList.contains('cidadeDest')) inp.value = '';
-    });
+    document.querySelectorAll('.bloco-entrega').forEach((b,i) => { if(i>0) b.remove(); });
+    document.querySelector('#entrega_1').querySelectorAll('input').forEach(i => { if(i.type!=='radio') i.value=''; });
+    document.querySelector('input[name="retorno"][value="nao"]').checked = true;
     document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
     document.getElementById('valorGorjeta').style.display = 'none';
-    document.getElementById('valorGorjeta').disabled = true;
     document.getElementById('resumoPedido').classList.add('escondido');
     document.getElementById('btnGerarPedido').disabled = true;
 }
 
-function gerarPedido() {
-    alert('✅ Pedido gerado com sucesso! Entregador será avisado.');
-}
-
-// ÁREA MOTOBOY
+// ==============================================
+// LOGIN E CONTROLE MOTOBOY
+// ==============================================
 function verificarLoginMotoboy() {
-    const user = document.getElementById('usuarioMotoboy').value.trim();
-    const pass = document.getElementById('senhaMotoboy').value.trim();
-    if(user === USUARIO_MOTOBOY && pass === SENHA_MOTOBOY) {
-        document.querySelector('.caixa-login').classList.add('escondido');
+    const u = document.getElementById('usuarioMotoboy').value.trim();
+    const s = document.getElementById('senhaMotoboy').value.trim();
+    if(u === USUARIO_MOTOBOY && s === SENHA_MOTOBOY) {
+        document.querySelector('#abaMotoboy .caixa-login').classList.add('escondido');
         document.getElementById('conteudoMotoboy').classList.remove('escondido');
-    } else {
-        document.getElementById('erroLoginMotoboy').classList.remove('escondido');
-    }
+    } else document.getElementById('erroLoginMotoboy').classList.remove('escondido');
 }
 
 function ligarMotoboy() {
     motoboyOperando = true;
     document.getElementById('statusOperacao').textContent = '🟢 EM OPERAÇÃO';
-    document.getElementById('statusOperacao').classList.remove('off');
     document.getElementById('statusOperacao').classList.add('on');
-    document.getElementById('btnDesligar').classList.remove('escondido');
-    document.getElementById('avisoMoto').textContent = '🟢 Motoboy disponível — pedido pode ser gerado!';
-    document.getElementById('avisoMoto').classList.remove('off');
+    document.getElementById('avisoMoto').textContent = '🟢 Motoboy DISPONÍVEL — pode gerar pedidos!';
     document.getElementById('avisoMoto').classList.add('on');
+    document.getElementById('btnDesligar').classList.remove('escondido');
     calcular();
+    atualizarPainel();
 }
 
 function desligarMotoboy() {
     motoboyOperando = false;
-    document.getElementById('statusOperacao').textContent = '⏳ NÃO ESTÁ OPERANDO';
+    document.getElementById('statusOperacao').textContent = '⏳ NÃO ESTÁ EM OPERAÇÃO';
     document.getElementById('statusOperacao').classList.remove('on');
-    document.getElementById('statusOperacao').classList.add('off');
-    document.getElementById('btnDesligar').classList.add('escondido');
     document.getElementById('avisoMoto').textContent = '⏳ Aguardando motoboy iniciar operação...';
     document.getElementById('avisoMoto').classList.remove('on');
-    document.getElementById('avisoMoto').classList.add('off');
+    document.getElementById('btnDesligar').classList.add('escondido');
     calcular();
+    atualizarPainel();
 }
 
 function sairMotoboy() {
     document.getElementById('usuarioMotoboy').value = '';
     document.getElementById('senhaMotoboy').value = '';
     document.getElementById('erroLoginMotoboy').classList.add('escondido');
-    document.querySelector('.caixa-login').classList.remove('escondido');
+    document.querySelector('#abaMotoboy .caixa-login').classList.remove('escondido');
     document.getElementById('conteudoMotoboy').classList.add('escondido');
 }
 
-// ÁREA ADMINISTRATIVO
+// ==============================================
+// PAINEL DE GESTÃO COMPLETO
+// ==============================================
 function verificarLoginPainel() {
-    const user = document.getElementById('usuarioPainel').value.trim();
-    const pass = document.getElementById('senhaPainel').value.trim();
-    if(user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
-        document.querySelector('#abaPainel .caixa-login').classList.add('escondido');
+    const u = document.getElementById('usuarioPainel').value.trim();
+    const s = document.getElementById('senhaPainel').value.trim();
+    if(u === USUARIO_ADMIN && s === SENHA_ADMIN) {
+        document.getElementById('loginPainel').classList.add('escondido');
         document.getElementById('conteudoPainel').classList.remove('escondido');
+        inicializarGraficos();
+        atualizarPainel();
+    } else document.getElementById('erroLoginPainel').classList.remove('escondido');
+}
+
+function inicializarGraficos() {
+    const ctx1 = document.getElementById('graficoFaturamento').getContext('2d');
+    const ctx2 = document.getElementById('graficoQuantidade').getContext('2d');
+    
+    graficoFat = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Hoje','Ontem','2 dias','3 dias','4 dias','5 dias','6 dias'],
+            datasets: [{ label: 'R$ Faturado', data: [0,0,0,0,0,0,0], backgroundColor: '#FFD700', borderRadius: 8 }]
+        }, options: { responsive: true, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { display: false } } } }
+    });
+
+    graficoQtd = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['Hoje','Ontem','2 dias','3 dias','4 dias','5 dias','6 dias'],
+            datasets: [{ label: 'Qtd Entregas', data: [0,0,0,0,0,0,0], borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,0.2)', tension: 0.4, fill: true }]
+        }, options: { responsive: true, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { display: false } } } }
+    });
+}
+
+function atualizarPainel() {
+    // Atualiza status motoboy
+    document.getElementById('statusMotoPainel').innerHTML = motoboyOperando ? "🟢 LIGADO / OPERANDO" : "❌ DESLIGADO";
+
+    // Calcula valores
+    const valorDia = historicoPedidos.reduce((total, p) => {
+        const val = parseFloat(p.total.replace('R$ ','').replace(',','.'));
+        return total + val;
+    }, 0);
+    const qtdDia = historicoPedidos.length;
+    const media = qtdDia > 0 ? valorDia / qtdDia : 0;
+
+    document.getElementById('fatDia').textContent = "R$ "+valorDia.toFixed(2).replace('.',',');
+    document.getElementById('qtdDia').textContent = qtdDia;
+    document.getElementById('fatMes').textContent = "R$ "+(valorDia * 22).toFixed(2).replace('.',',');
+    document.getElementById('mediaEntrega').textContent = "R$ "+media.toFixed(2).replace('.',',');
+
+    // Atualiza lista histórico
+    const lista = document.getElementById('listaHistorico');
+    if(historicoPedidos.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>';
     } else {
-        document.getElementById('erroLoginPainel').classList.remove('escondido');
+        lista.innerHTML = historicoPedidos.map(p => `
+            <div class="item-pedido">
+                <strong>📅 ${p.data} ${p.hora}</strong><br>
+                💰 Valor Total: ${p.total}
+            </div>
+        `).join('');
+    }
+
+    // Atualiza gráficos
+    if(graficoFat && graficoQtd) {
+        graficoFat.data.datasets[0].data[0] = valorDia;
+        graficoQtd.data.datasets[0].data[0] = qtdDia;
+        graficoFat.update();
+        graficoQtd.update();
     }
 }
 
@@ -696,9 +646,17 @@ function sairPainel() {
     document.getElementById('usuarioPainel').value = '';
     document.getElementById('senhaPainel').value = '';
     document.getElementById('erroLoginPainel').classList.add('escondido');
-    document.querySelector('#abaPainel .caixa-login').classList.remove('escondido');
+    document.getElementById('loginPainel').classList.remove('escondido');
     document.getElementById('conteudoPainel').classList.add('escondido');
 }
+
+// SELECIONA OPÇÕES DE RADIO AO CLICAR
+document.addEventListener('click', e => {
+    if(e.target.closest('.opcao-radio')) {
+        document.querySelectorAll('.opcao-radio').forEach(el => el.classList.remove('selecionado'));
+        e.target.closest('.opcao-radio').classList.add('selecionado');
+    }
+});
 </script>
 </body>
-                                                                                    </html>
+    </html>
