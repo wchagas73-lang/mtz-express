@@ -76,7 +76,6 @@
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
         hr {border:none; border-top:2px solid var(--dourado); margin:15px 0;}
 
-        /* PAINEL DE GESTÃO */
         .grade-dados {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;}
         .card-dado {background: rgba(255,215,0,0.1); border: 2px solid var(--dourado); border-radius: 16px; padding: 18px; text-align: center;}
         .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
@@ -94,7 +93,7 @@
                 <div class="logo-texto"><span class="nome-marca">MTZ EXPRESS</span></div>
                 <p class="slogan">ENTREGAS RÁPIDAS • JUIZ DE FORA-MG</p>
                 <div class="dados-rapidos">
-                    📲 Contato: <strong>(32) 9 9995-3215</strong><br>
+                    📲 Contato: <strong>(32) 9 99995-3215</strong><br>
                     ⏰ Seg-Sex: 08h às 20h | Sáb: 08h às 16h<br>
                     💸 <strong>SEM TAXA, SEM MENSALIDADE</strong> 💸
                 </div>
@@ -106,7 +105,6 @@
                 <button class="aba" onclick="mostrarAba('painel')">📊 Painel Gestão</button>
             </div>
 
-            <!-- ABA LOJISTA -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
 
@@ -188,7 +186,6 @@
 
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
 
-                <!-- RESUMO -->
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO GOOGLE MAPS</h3>
                     
@@ -212,7 +209,6 @@
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 TOTAL: R$ <span id="valTotal">--</span></p>
                 </div>
 
-                <!-- TABELA EXATA -->
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
                 <div class="tabela-wrapper">
                     <table class="tabela-valores">
@@ -231,7 +227,6 @@
                 </div>
             </div>
 
-            <!-- ABA MOTOBOY -->
             <div class="conteudo-aba" id="abaMotoboy">
                 <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 ÁREA DO MOTOBOY</h2>
                 <div class="caixa-login">
@@ -250,7 +245,6 @@
                 </div>
             </div>
 
-            <!-- ABA PAINEL DE GESTÃO COMPLETO -->
             <div class="conteudo-aba" id="abaPainel">
                 <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO COMPLETO</h2>
                 <div class="caixa-login" id="loginPainel">
@@ -263,7 +257,6 @@
                 </div>
 
                 <div class="escondido" id="conteudoPainel">
-                    <!-- DADOS GERAL -->
                     <div class="grade-dados">
                         <div class="card-dado">
                             <h3>💰 Faturamento Hoje</h3>
@@ -283,7 +276,6 @@
                         </div>
                     </div>
 
-                    <!-- GRÁFICOS -->
                     <div class="area-grafico">
                         <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📈 FATURAMENTO DOS ÚLTIMOS 7 DIAS</h3>
                         <canvas id="graficoFaturamento"></canvas>
@@ -294,13 +286,11 @@
                         <canvas id="graficoQuantidade"></canvas>
                     </div>
 
-                    <!-- SITUAÇÃO MOTOBOY -->
                     <div class="card-dado" style="margin:20px 0;">
                         <h3>🛵 SITUAÇÃO DO MOTOBOY</h3>
                         <div class="valor" id="statusMotoPainel">❌ Desligado</div>
                     </div>
 
-                    <!-- LISTA DE PEDIDOS -->
                     <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 HISTÓRICO DE TODOS OS PEDIDOS</h3>
                     <div class="lista-pedidos" id="listaHistorico">
                         <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>
@@ -313,13 +303,9 @@
         </div>
     </div>
 
-<!-- ✅ CHAVE API JÁ INSERIDA E CONFIGURADA -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
 
 <script>
-// ==============================================
-// DADOS E CONFIGURAÇÕES — NOVOS DADOS DE ACESSO
-// ==============================================
 const USUARIO_MOTOBOY = "mtz2026";
 const SENHA_MOTOBOY = "1120";
 const USUARIO_ADMIN = "mtz2026";
@@ -333,7 +319,6 @@ let servicoDistancia = null;
 let historicoPedidos = [];
 let graficoFat, graficoQtd;
 
-// 🧮 CÁLCULO DE VALOR CONFORME TABELA
 function buscarValorPorKm(dist) {
     dist = Math.round(dist * 10) / 10;
     if (dist <= 1) return 9.00;
@@ -359,13 +344,10 @@ function buscarValorPorKm(dist) {
     return 28.00;
 }
 
-// ==============================================
-// GOOGLE MAPS — CÁLCULO DE DISTÂNCIA REAL
-// ==============================================
 function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
-    console.log("✅ Google Maps carregado com sucesso!");
+    console.log("✅ Google Maps carregado!");
 }
 
 function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
@@ -393,24 +375,39 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
     });
 }
 
-// ==============================================
-// ✅ FUNÇÃO TROCAR ABAS — CORRIGIDA, FUNCIONA EM TUDO!
-// ==============================================
 function mostrarAba(nomeAba) {
-    // Remove destaque de todos os botões
     document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
-    // Destaca o botão clicado
     event.currentTarget.classList.add('ativa');
-    
-    // Esconde todas as abas
     document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
-    // Mostra a aba selecionada
     document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
 }
 
-// ==============================================
-// FUNÇÃO PRINCIPAL — JÁ CORRIGIDA SEM ERRO!
-// ==============================================
+function adicionarEntrega() {
+    contadorEntregas++;
+    const lista = document.getElementById('listaEntregas');
+    const modelo = document.getElementById('entrega_1').cloneNode(true);
+    
+    modelo.id = `entrega_${contadorEntregas}`;
+    modelo.querySelector('h4').textContent = `📦 DADOS DA ENTREGA ${contadorEntregas}`;
+    
+    modelo.querySelectorAll('input').forEach(input => {
+        if(input.type !== 'radio') input.value = '';
+    });
+
+    const botaoRemover = document.createElement('button');
+    botaoRemover.className = 'btn btn-remover';
+    botaoRemover.style.marginTop = '10px';
+    botaoRemover.textContent = '🗑️ REMOVER ESSA ENTREGA';
+    botaoRemover.onclick = function() {
+        modelo.remove();
+        calcular();
+    };
+    modelo.appendChild(botaoRemover);
+
+    lista.appendChild(modelo);
+    calcular();
+}
+
 async function calcular() {
     const blocos = document.querySelectorAll('.bloco-entrega');
     let distTotal = 0, valorTotal = 0;
@@ -430,12 +427,11 @@ async function calcular() {
             valorTotal += buscarValorPorKm(dist);
         }
 
-        // ✅ CÁLCULO DO MOTOBY 100% CORRIGIDO — SEM ERRO!
         let distMoto;
         if (distTotal <= 0.2) {
-            distMoto = 0.0; // MESMO LOCAL / ATÉ 200m → ZERADO!
+            distMoto = 0.0;
         } else {
-            distMoto = distTotal * 0.7; // Continua sendo NÚMERO, não texto!
+            distMoto = distTotal * 0.7;
         }
         const valMoto = (distMoto * 0.5).toFixed(2);
         const distFinal = distTotal.toFixed(1);
@@ -475,7 +471,10 @@ async function calcular() {
 }
 
 function gerarPedido() {
-    if(!motoboyOperando) { alert('⚠️ Motoboy não está em operação!'); return; }
+    if(!motoboyOperando) { 
+        alert('⚠️ Motoboy não está em operação!'); 
+        return; 
+    }
 
     const blocos = document.querySelectorAll('.bloco-entrega');
     let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n══════════════════════════\n";
@@ -497,7 +496,6 @@ function gerarPedido() {
     if(document.querySelector('input[name="gorjeta"]:checked').value === 'sim') texto += `💸 Gorjeta: ${document.getElementById('valGorjetaRes').textContent}\n`;
     texto += "══════════════════════════\n💰 TOTAL: "+document.getElementById('valTotal').textContent;
 
-    // SALVA NO HISTÓRICO DO PAINEL
     const dadosPedido = {
         data: new Date().toLocaleDateString('pt-BR'),
         hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
@@ -507,9 +505,13 @@ function gerarPedido() {
     historicoPedidos.unshift(dadosPedido);
     atualizarPainel();
 
-    // ABRE WHATSAPP
-    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`, '_blank');
-    alert('✅ Pedido gerado! Abrindo WhatsApp...');
+    const linkWhatsApp = "https://wa.me/5532999953215?text=" + encodeURIComponent(texto);
+    const novaJanela = window.open(linkWhatsApp, '_blank');
+    if (!novaJanela || novaJanela.closed) {
+        alert('✅ Pedido gerado! Copie e abra no WhatsApp:\n' + linkWhatsApp);
+    } else {
+        alert('✅ Pedido gerado! Abrindo SEU WhatsApp agora...');
+    }
 }
 
 function refazerPedido() {
@@ -524,9 +526,6 @@ function refazerPedido() {
     document.getElementById('btnGerarPedido').disabled = true;
 }
 
-// ==============================================
-// LOGIN E CONTROLE MOTOBOY
-// ==============================================
 function verificarLoginMotoboy() {
     const u = document.getElementById('usuarioMotoboy').value.trim();
     const s = document.getElementById('senhaMotoboy').value.trim();
@@ -566,9 +565,6 @@ function sairMotoboy() {
     document.getElementById('conteudoMotoboy').classList.add('escondido');
 }
 
-// ==============================================
-// PAINEL DE GESTÃO COMPLETO
-// ==============================================
 function verificarLoginPainel() {
     const u = document.getElementById('usuarioPainel').value.trim();
     const s = document.getElementById('senhaPainel').value.trim();
@@ -602,10 +598,8 @@ function inicializarGraficos() {
 }
 
 function atualizarPainel() {
-    // Atualiza status motoboy
     document.getElementById('statusMotoPainel').innerHTML = motoboyOperando ? "🟢 LIGADO / OPERANDO" : "❌ DESLIGADO";
 
-    // Calcula valores
     const valorDia = historicoPedidos.reduce((total, p) => {
         const val = parseFloat(p.total.replace('R$ ','').replace(',','.'));
         return total + val;
@@ -618,7 +612,6 @@ function atualizarPainel() {
     document.getElementById('fatMes').textContent = "R$ "+(valorDia * 22).toFixed(2).replace('.',',');
     document.getElementById('mediaEntrega').textContent = "R$ "+media.toFixed(2).replace('.',',');
 
-    // Atualiza lista histórico
     const lista = document.getElementById('listaHistorico');
     if(historicoPedidos.length === 0) {
         lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>';
@@ -631,7 +624,6 @@ function atualizarPainel() {
         `).join('');
     }
 
-    // Atualiza gráficos
     if(graficoFat && graficoQtd) {
         graficoFat.data.datasets[0].data[0] = valorDia;
         graficoQtd.data.datasets[0].data[0] = qtdDia;
@@ -648,7 +640,6 @@ function sairPainel() {
     document.getElementById('conteudoPainel').classList.add('escondido');
 }
 
-// SELECIONA OPÇÕES DE RADIO AO CLICAR
 document.addEventListener('click', e => {
     if(e.target.closest('.opcao-radio')) {
         document.querySelectorAll('.opcao-radio').forEach(el => el.classList.remove('selecionado'));
@@ -657,4 +648,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                    </html>
+    </html>
