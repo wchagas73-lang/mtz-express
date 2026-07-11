@@ -111,7 +111,7 @@
                 <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
 
                 <div class="destaque-percurso">
-                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM<br>
+                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM • NO LOCAL/ATÉ 200m = GRÁTIS<br>
                     🏪 LOJA → CLIENTE: Valor conforme tabela • Cálculo via Google Maps
                 </div>
 
@@ -394,7 +394,7 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
 }
 
 // ==============================================
-// FUNÇÕES PRINCIPAIS
+// FUNÇÕES PRINCIPAIS — JÁ COM A CORREÇÃO!
 // ==============================================
 function mostrarAba(nomeAba) {
     document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
@@ -438,12 +438,18 @@ async function calcular() {
             valorTotal += buscarValorPorKm(dist);
         }
 
-        const distMoto = (distTotal * 0.7).toFixed(1);
+        // ✅ AQUI ESTÁ A CORREÇÃO PRINCIPAL!
+        let distMoto;
+        if (distTotal <= 0.2) {
+            distMoto = 0.0; // MESMO LOCAL / ATÉ 200m → ZERADO!
+        } else {
+            distMoto = (distTotal * 0.7).toFixed(1);
+        }
         const valMoto = (parseFloat(distMoto) * 0.5).toFixed(2);
         const distFinal = distTotal.toFixed(1);
         const valFinal = valorTotal.toFixed(2);
 
-        document.getElementById('distMotoLoja').textContent = distMoto.replace('.', ',');
+        document.getElementById('distMotoLoja').textContent = distMoto.toFixed(1).replace('.', ',');
         document.getElementById('valMotoLoja').textContent = "R$ "+valMoto.replace('.', ',');
         document.getElementById('distLojaCli').textContent = distFinal.replace('.', ',');
         document.getElementById('valLojaCli').textContent = "R$ "+valFinal.replace('.', ',');
@@ -659,4 +665,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+                                                                        </html>
