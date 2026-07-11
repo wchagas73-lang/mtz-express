@@ -89,7 +89,6 @@
         .rastreio-box {background: linear-gradient(135deg, rgba(0,200,150,0.1), rgba(59,130,246,0.08)); border: 2px solid var(--primaria); border-radius:20px; padding:25px; margin-top:20px; text-align:center;}
         .status-rastreio {font-size:20px; font-weight:700; margin:15px 0;}
         .atualizacao-info {font-size:14px; color:#9CA3AF; margin-top:10px;}
-        .cep-automatico {font-size:13px; color:var(--primaria); margin-top:5px;}
     </style>
 </head>
 <body>
@@ -132,25 +131,24 @@
                         <label>Contato da Loja <span>*</span></label>
                         <input type="tel" class="contatoLoja" placeholder="(32) 9XXXX-XXXX" required>
                         <label>Rua / Endereço <span>*</span></label>
-                        <input type="text" class="endLoja" id="endLoja_1" placeholder="Digite o nome da rua" onblur="buscarCepLoja(this)">
+                        <input type="text" class="endLoja" placeholder="Digite o nome da rua">
                         <div class="linha-dupla">
                             <label>Número <span>*</span></label>
                             <label>Bairro <span>*</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="numLoja" required placeholder="Número ou S/N" onblur="buscarCepLoja(this)">
-                            <input type="text" class="bairroLoja" id="bairroLoja_1" placeholder="Digite o bairro" onblur="buscarCepLoja(this)">
+                            <input type="text" class="numLoja" required placeholder="Número ou S/N">
+                            <input type="text" class="bairroLoja" placeholder="Digite o bairro">
                         </div>
                         <div class="linha-dupla">
                             <label>Cidade/UF <span>*</span></label>
-                            <label>CEP <span>*</span></label>
+                            <label>CEP <span class="opcional">(Opcional)</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="cidadeLoja" id="cidadeLoja_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
-                            <input type="text" class="cepLoja" id="cepLoja_1" placeholder="✅ Preenchido automaticamente" readonly>
+                            <input type="text" class="cidadeLoja" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cepLoja" placeholder="Digite o CEP">
                         </div>
-                        <p class="cep-automatico" id="avisoCepLoja_1"></p>
-                        <label>Ponto de Referência <span>*</span></label>
+                        <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
                         <input type="text" class="refLoja" placeholder="Próximo a qual lugar?">
 
                         <h3 style="color:var(--dourado); margin:36px 0 14px;">📦 Dados da Entrega</h3>
@@ -159,26 +157,25 @@
                         <label>Contato do Destinatário <span>*</span></label>
                         <input type="tel" class="contatoDest" placeholder="(32) 9XXXX-XXXX" required>
                         <label>Rua / Endereço <span>*</span></label>
-                        <input type="text" class="endDest" id="endDest_1" placeholder="Digite o nome da rua" onblur="buscarCepDest(this)">
+                        <input type="text" class="endDest" placeholder="Digite o nome da rua">
                         <div class="linha-dupla">
                             <label>Número <span>*</span></label>
                             <label>Bairro <span>*</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="numDest" required placeholder="Número ou S/N" onblur="buscarCepDest(this)">
-                            <input type="text" class="bairroDest" id="bairroDest_1" placeholder="Digite o bairro" onblur="buscarCepDest(this)">
+                            <input type="text" class="numDest" required placeholder="Número ou S/N">
+                            <input type="text" class="bairroDest" placeholder="Digite o bairro">
                         </div>
                         <div class="linha-dupla">
                             <label>Cidade/UF <span>*</span></label>
-                            <label>CEP <span>*</span></label>
+                            <label>CEP <span class="opcional">(Opcional)</span></label>
                         </div>
                         <div class="linha-dupla">
-                            <input type="text" class="cidadeDest" id="cidadeDest_1" value="Juiz de Fora-MG" placeholder="Cidade/UF">
-                            <input type="text" class="cepDest" id="cepDest_1" placeholder="✅ Preenchido automaticamente" readonly>
+                            <input type="text" class="cidadeDest" value="Juiz de Fora-MG" placeholder="Cidade/UF">
+                            <input type="text" class="cepDest" placeholder="Digite o CEP">
                         </div>
-                        <p class="cep-automatico" id="avisoCepDest_1"></p>
-                        <label>Ponto de Referência <span>*</span></label>
-                        <input type="text" class="refDest" required placeholder="Próximo a qual lugar?">
+                        <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
+                        <input type="text" class="refDest" placeholder="Próximo a qual lugar?">
 
                         <label style="margin-top:25px;">📂 Categoria do Item <span>*</span></label>
                         <div class="opcoes-linha">
@@ -412,6 +409,7 @@
         let numeroPedido = 0;
         let intervaloRastreio = null;
         let statusRastreio = 'aguardando';
+        let motoboyOperando = false;
 
         window.onload = function() {
             setTimeout(() => {
@@ -498,7 +496,7 @@
             const totalGeral = valTotalEntregas + valRet + valGorj + valorRetornoImprevisto;
             document.getElementById('valTotal').textContent = `R$ ${totalGeral.toFixed(2).replace('.',',')}`;
             document.getElementById('resumoPedido').classList.remove('escondido');
-            document.getElementById('btnGerarPedido').disabled = false;
+            document.getElementById('btnGerarPedido').disabled = !motoboyOperando;
         }
 
         function alternarGorjeta() {
@@ -588,7 +586,10 @@ MTZ EXPRESS — Juiz de Fora-MG`;
             const motivo = document.getElementById('motivoImprevisto').value.trim() || 'Motivo não informado';
             const telefoneLojista = document.querySelector('.contatoLoja').value.replace(/\D/g, '');
 
-            const mensagemFalha = `❌ AVISO: ENTREGA NÃO REALIZADA ⚠️
+                        valorRetornoImprevisto = valorEntregaBase * 0.5;
+            calcular();
+
+            const mensagemFalha = `⚠️ AVISO: ENTREGA NÃO REALIZADA!
 
 📄 Pedido Nº: ${numeroPedido}
 🏪 Lojista: ${document.querySelector('.nomeLoja').value}
@@ -596,121 +597,125 @@ MTZ EXPRESS — Juiz de Fora-MG`;
 
 📝 Motivo: ${motivo}
 
-✅ MTZ EXPRESS — Juiz de Fora-MG`;
+💸 Valor do retorno por imprevisto: R$ ${valorRetornoImprevisto.toFixed(2).replace('.',',')}
+
+✅ Serviço
+MTZ EXPRESS — Juiz de Fora-MG`;
 
             window.open(`https://wa.me/${telefoneLojista}?text=${encodeURIComponent(mensagemFalha)}`, '_blank');
         }
 
-        function calcularRetornoImprevisto() {
-            const acao = document.querySelector('input[name="acaoImprevisto"]:checked').value;
-            valorRetornoImprevisto = acao === 'retornar' ? valorEntregaBase * 0.5 : 0;
-            if(valorRetornoImprevisto > 0) {
-                document.getElementById('linhaRetornoImprevisto').classList.remove('escondido');
-                document.getElementById('valRetornoImp').textContent = `R$ ${valorRetornoImprevisto.toFixed(2).replace('.',',')}`;
-            } else {
-                document.getElementById('linhaRetornoImprevisto').classList.add('escondido');
-            }
-            calcular();
+        function enviarPedidoWhatsapp() {
+            let textoPedido = `📋 NOVO PEDIDO DE ENTREGA — Nº ${numeroPedido}
+
+🏪 DADOS DA LOJA
+Nome: ${document.querySelector('.nomeLoja').value}
+Contato: ${document.querySelector('.contatoLoja').value}
+Endereço: ${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value}
+Bairro: ${document.querySelector('.bairroLoja').value}
+Cidade/UF: ${document.querySelector('.cidadeLoja').value}
+CEP: ${document.querySelector('.cepLoja').value || 'Não informado'}
+Referência: ${document.querySelector('.refLoja').value || 'Não informado'}
+
+📦 DADOS DA ENTREGA
+Nome: ${document.querySelector('.nomeDest').value}
+Contato: ${document.querySelector('.contatoDest').value}
+Endereço: ${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value}
+Bairro: ${document.querySelector('.bairroDest').value}
+Cidade/UF: ${document.querySelector('.cidadeDest').value}
+CEP: ${document.querySelector('.cepDest').value || 'Não informado'}
+Referência: ${document.querySelector('.refDest').value || 'Não informado'}
+Observação: ${document.querySelector('.obs').value || 'Nenhuma'}
+
+📊 RESUMO DO VALOR
+Valor Total: ${document.getElementById('valTotal').textContent}
+
+✅ Serviço
+MTZ EXPRESS — Juiz de Fora-MG`;
+
+            window.open(`https://wa.me/${telefoneSistema}?text=${encodeURIComponent(textoPedido)}`, '_blank');
         }
 
-        function enviarPedidoWhatsapp() {
-            const nomeLoja = document.querySelector('.nomeLoja').value;
-            const contatoLoja = document.querySelector('.contatoLoja').value;
-            const endLoja = `${document.querySelector('.endLoja').value}, ${document.querySelector('.numLoja').value} - ${document.querySelector('.bairroLoja').value}`;
-            const cepLoja = document.querySelector('.cepLoja').value;
-            const nomeDest = document.querySelector('.nomeDest').value;
-            const contatoDest = document.querySelector('.contatoDest').value;
-            const endDest = `${document.querySelector('.endDest').value}, ${document.querySelector('.numDest').value} - ${document.querySelector('.bairroDest').value}`;
-            const cepDest = document.querySelector('.cepDest').value;
-            const total = document.getElementById('valTotal').textContent;
+        function copiarCodigoPIX() {
+            const codigo = document.getElementById('codigoPIX').textContent.trim();
+            navigator.clipboard.writeText(codigo).then(() => {
+                alert('✅ Código PIX copiado com sucesso!');
+            }).catch(() => {
+                alert('❌ Erro ao copiar!');
+            });
+        }
 
-            const texto = `📦 NOVO PEDIDO MTZ EXPRESS 📦
-
-📄 Pedido Nº: ${numeroPedido}
-📅 Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}
-
-🏪 LOJA:
-▫️ Nome: ${nomeLoja}
-▫️ Contato: ${contatoLoja}
-▫️ Endereço: ${endLoja}
-▫️ CEP: ${cepLoja}
-
-📦 ENTREGA:
-▫️ Destinatário: ${nomeDest}
-▫️ Contato: ${contatoDest}
-▫️ Endereço: ${endDest}
-▫️ CEP: ${cepDest}
-
-🗺️ ROTAS:
-🛵 Motoboy → Loja: ${document.getElementById('linkRotaMotoLoja').href}
-🏪 Loja → Cliente: ${document.getElementById('linkRotaLojaCli').href}
-
-💰 TOTAL: ${total}
-
-✅ MTZ EXPRESS — Juiz de Fora-MG`;
-
-            window.open(`https://wa.me/${telefoneSistema}?text=${encodeURIComponent(texto)}`, '_blank');
+        function copiarLink() {
+            navigator.clipboard.writeText(linkNubank).then(() => {
+                alert('✅ Link copiado com sucesso!');
+            }).catch(() => {
+                alert('❌ Erro ao copiar!');
+            });
         }
 
         function verificarLoginMotoboy() {
-            const user = document.getElementById('usuarioMoto').value.trim().toLowerCase();
+            const usuario = document.getElementById('usuarioMoto').value.trim();
             const senha = document.getElementById('senhaMoto').value.trim();
-            if(user === USUARIO_SISTEMA && senha === SENHA_SISTEMA) {
+            
+            if(usuario === USUARIO_SISTEMA && senha === SENHA_SISTEMA) {
                 document.getElementById('areaLoginMoto').classList.add('escondido');
                 document.getElementById('conteudoMoto').classList.remove('escondido');
             } else {
                 document.getElementById('erroLoginMoto').classList.remove('escondido');
             }
         }
+
+        function ligarMotoboy() {
+            motoboyOperando = true;
+            document.getElementById('statusOperacao').classList.remove('off');
+            document.getElementById('statusOperacao').classList.add('on');
+            document.getElementById('statusOperacao').innerHTML = '🟢 OPERANDO';
+            document.querySelector('#abaLoja .status-moto').classList.remove('off');
+            document.querySelector('#abaLoja .status-moto').classList.add('on');
+            document.querySelector('#abaLoja .status-moto').innerHTML = '🟢 MOTOBOY DISPONÍVEL — FAÇA SEU PEDIDO!';
+            document.getElementById('btnDesligar').classList.remove('escondido');
+            document.getElementById('btnGerarPedido').disabled = false;
+        }
+
+        function desligarMotoboy() {
+            motoboyOperando = false;
+            document.getElementById('statusOperacao').classList.remove('on');
+            document.getElementById('statusOperacao').classList.add('off');
+            document.getElementById('statusOperacao').innerHTML = '⏳ Não está operando';
+            document.querySelector('#abaLoja .status-moto').classList.remove('on');
+            document.querySelector('#abaLoja .status-moto').classList.add('off');
+            document.querySelector('#abaLoja .status-moto').innerHTML = '⏳ Aguardando motoboy iniciar operação...';
+            document.getElementById('btnDesligar').classList.add('escondido');
+            document.getElementById('btnGerarPedido').disabled = true;
+        }
+
         function sairMotoboy() {
-            document.getElementById('conteudoMoto').classList.add('escondido');
-            document.getElementById('areaLoginMoto').classList.remove('escondido');
             document.getElementById('usuarioMoto').value = '';
             document.getElementById('senhaMoto').value = '';
             document.getElementById('erroLoginMoto').classList.add('escondido');
+            document.getElementById('conteudoMoto').classList.add('escondido');
+            document.getElementById('areaLoginMoto').classList.remove('escondido');
         }
 
         function verificarLoginPainel() {
-            const user = document.getElementById('usuarioPainel').value.trim().toLowerCase();
+            const usuario = document.getElementById('usuarioPainel').value.trim();
             const senha = document.getElementById('senhaPainel').value.trim();
-            if(user === USUARIO_SISTEMA && senha === SENHA_SISTEMA) {
+            
+            if(usuario === USUARIO_SISTEMA && senha === SENHA_SISTEMA) {
                 document.getElementById('areaLoginPainel').classList.add('escondido');
                 document.getElementById('conteudoPainel').classList.remove('escondido');
             } else {
                 document.getElementById('erroLoginPainel').classList.remove('escondido');
             }
         }
+
         function sairPainel() {
-            document.getElementById('conteudoPainel').classList.add('escondido');
-            document.getElementById('areaLoginPainel').classList.remove('escondido');
             document.getElementById('usuarioPainel').value = '';
             document.getElementById('senhaPainel').value = '';
             document.getElementById('erroLoginPainel').classList.add('escondido');
+            document.getElementById('conteudoPainel').classList.add('escondido');
+            document.getElementById('areaLoginPainel').classList.remove('escondido');
         }
-
-        function ligarMotoboy() {
-            document.getElementById('statusOperacao').classList.remove('off');
-            document.getElementById('statusOperacao').classList.add('on');
-            document.getElementById('statusOperacao').innerHTML = '🟢 EM OPERAÇÃO';
-            document.getElementById('btnDesligar').classList.remove('escondido');
-            document.getElementById('avisoMoto').classList.remove('off');
-            document.getElementById('avisoMoto').classList.add('on');
-            document.getElementById('avisoMoto').innerHTML = '🟢 Motoboy em operação!';
-        }
-
-        function desligarMotoboy() {
-            document.getElementById('statusOperacao').classList.remove('on');
-            document.getElementById('statusOperacao').classList.add('off');
-            document.getElementById('statusOperacao').innerHTML = '⏳ Não está operando';
-            document.getElementById('btnDesligar').classList.add('escondido');
-            document.getElementById('avisoMoto').classList.remove('on');
-            document.getElementById('avisoMoto').classList.add('off');
-            document.getElementById('avisoMoto').innerHTML = '⏳ Aguardando motoboy...';
-            if(intervaloRastreio) clearInterval(intervaloRastreio);
-        }
-
-        function copiarCodigoPIX() { navigator.clipboard.writeText(dadosPIX).then(() => alert('✅ Código copiado!')); }
-        function copiarLink() { navigator.clipboard.writeText(linkNubank).then(() => alert('✅ Link copiado!')); }
     </script>
 </body>
-                        </html>
+    </html>
