@@ -65,10 +65,7 @@
         .tabela-valores {width:100%; border-collapse:separate; border-spacing:0;}
         .tabela-valores th {background:var(--dourado); color:#1A1A1A; padding:14px; text-align:center; font-weight:800;}
         .tabela-valores td {padding:12px; text-align:center; border-bottom:1px solid var(--borda); background:rgba(0,200,150,0.06);}
-        .destaque-percurso {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); border-radius:18px; padding:18px; margin:20px 0; font-weight:600; line-height:2;}
-        .status-moto {padding: 10px; border-radius: 12px; text-align: center; font-weight: 700; margin: 15px 0;}
-        .status-moto.on {background: rgba(0,200,150,0.2); color: var(--primaria); border: 2px solid var(--primaria);}
-        .status-moto.off {background: rgba(220,53,69,0.2); color: var(--perigo); border: 2px solid var(--perigo);}
+        .destaque-percurso {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); border-radius:18px; padding:18px; margin:20px 0; font-weight:600; line-height:2; text-align:center;}
         .titulo-bloco {display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
         .aviso-auto {font-size:13px; color:var(--primaria); margin-top:-5px; margin-bottom:8px;}
@@ -101,16 +98,13 @@
 
             <div class="abas">
                 <button class="aba ativa" onclick="mostrarAba('loja')">🏪 Lojista</button>
-                <button class="aba" onclick="mostrarAba('motoboy')">🛵 Motoboy</button>
                 <button class="aba" onclick="mostrarAba('painel')">📊 Painel Gestão</button>
             </div>
 
             <div class="conteudo-aba visivel" id="abaLoja">
-                <div class="status-moto off" id="avisoMoto">⏳ Aguardando motoboy iniciar operação...</div>
-
                 <div class="destaque-percurso">
-                    🛵 MOTOBOY → LOJA: R$ 0,50 POR KM • NO LOCAL/ATÉ 200m = GRÁTIS<br>
-                    🏪 LOJA → CLIENTE: Valor conforme tabela • Cálculo via Google Maps
+                    🏪 VALOR CALCULADO SOMENTE: LOJA → CLIENTE<br>
+                    📍 Distância real via Google Maps
                 </div>
 
                 <div id="listaEntregas">
@@ -181,7 +175,7 @@
 
                 <div class="linha-botoes">
                     <button class="btn btn-principal" onclick="calcular()">🧮 CALCULAR VALOR TOTAL</button>
-                    <button class="btn btn-secundario" id="btnGerarPedido" onclick="gerarPedido()" disabled>✅ GERAR PEDIDO</button>
+                    <button class="btn btn-secundario" id="btnGerarPedido" onclick="gerarPedido()">✅ GERAR PEDIDO</button>
                 </div>
 
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
@@ -189,11 +183,6 @@
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO GOOGLE MAPS</h3>
                     
-                    <div style="background:rgba(0,200,150,0.1); border-left:4px solid var(--primaria); padding:12px; border-radius:12px; margin:10px 0;">
-                        <p><strong>🛵 Motoboy → Loja</strong></p>
-                        <p>Distância: <span id="distMotoLoja">--</span> km | Valor: R$ <span id="valMotoLoja">--</span></p>
-                    </div>
-
                     <div style="background:rgba(59,130,246,0.1); border-left:4px solid var(--azul); padding:12px; border-radius:12px; margin:10px 0;">
                         <p><strong>🏪 Loja → Cliente</strong></p>
                         <p>Distância: <span id="distLojaCli">--</span> km | Valor: R$ <span id="valLojaCli">--</span></p>
@@ -224,24 +213,6 @@
                         <tr><td>9 km</td><td>R$ 17,00</td><td>19 km</td><td>R$ 26,00</td></tr>
                         <tr><td>10 km</td><td>R$ 18,00</td><td>Acima de 20 km</td><td>R$ 28,00</td></tr>
                     </table>
-                </div>
-            </div>
-
-            <div class="conteudo-aba" id="abaMotoboy">
-                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 ÁREA DO MOTOBOY</h2>
-                <div class="caixa-login">
-                    <label>Usuário</label>
-                    <input type="text" id="usuarioMotoboy" placeholder="Digite seu usuário">
-                    <label>Senha</label>
-                    <input type="password" id="senhaMotoboy" placeholder="Digite sua senha">
-                    <p class="aviso-erro escondido" id="erroLoginMotoboy">❌ Usuário ou senha incorretos</p>
-                    <button class="btn btn-principal" style="width:100%; margin-top:20px;" onclick="verificarLoginMotoboy()">ENTRAR</button>
-                </div>
-                <div class="escondido" id="conteudoMotoboy">
-                    <div class="status-moto off" id="statusOperacao">⏳ NÃO ESTÁ EM OPERAÇÃO</div>
-                    <button class="btn btn-principal" style="width:100%; margin:15px 0;" onclick="ligarMotoboy()">🟢 INICIAR OPERAÇÃO</button>
-                    <button class="btn btn-perigo escondido" style="width:100%; margin:15px 0;" id="btnDesligar" onclick="desligarMotoboy()">🔴 ENCERRAR OPERAÇÃO</button>
-                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairMotoboy()">🚪 SAIR</button>
                 </div>
             </div>
 
@@ -286,11 +257,6 @@
                         <canvas id="graficoQuantidade"></canvas>
                     </div>
 
-                    <div class="card-dado" style="margin:20px 0;">
-                        <h3>🛵 SITUAÇÃO DO MOTOBOY</h3>
-                        <div class="valor" id="statusMotoPainel">❌ Desligado</div>
-                    </div>
-
                     <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 HISTÓRICO DE TODOS OS PEDIDOS</h3>
                     <div class="lista-pedidos" id="listaHistorico">
                         <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>
@@ -306,14 +272,11 @@
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
 
 <script>
-const USUARIO_MOTOBOY = "mtz2026";
-const SENHA_MOTOBOY = "1120";
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
 
 let contadorEntregas = 1;
-let motoboyOperando = false;
 let googleCarregado = false;
 let servicoDistancia = null;
 let historicoPedidos = [];
@@ -414,7 +377,6 @@ async function calcular() {
 
     document.getElementById('resumoPedido').classList.add('escondido');
     document.getElementById('areaCalculando').classList.remove('escondido');
-    document.getElementById('btnGerarPedido').disabled = true;
 
     try {
         for(const bloco of blocos) {
@@ -427,22 +389,13 @@ async function calcular() {
             valorTotal += buscarValorPorKm(dist);
         }
 
-        let distMoto;
-        if (distTotal <= 0.2) {
-            distMoto = 0.0;
-        } else {
-            distMoto = distTotal * 0.7;
-        }
-        const valMoto = (distMoto * 0.5).toFixed(2);
         const distFinal = distTotal.toFixed(1);
         const valFinal = valorTotal.toFixed(2);
 
-        document.getElementById('distMotoLoja').textContent = distMoto.toFixed(1).replace('.', ',');
-        document.getElementById('valMotoLoja').textContent = "R$ "+valMoto.replace('.', ',');
         document.getElementById('distLojaCli').textContent = distFinal.replace('.', ',');
         document.getElementById('valLojaCli').textContent = "R$ "+valFinal.replace('.', ',');
         document.getElementById('qtdEntregas').textContent = blocos.length;
-        document.getElementById('valSubtotal').textContent = "R$ "+(distMoto + valorTotal).toFixed(2).replace('.', ',');
+        document.getElementById('valSubtotal').textContent = "R$ "+valorTotal.toFixed(2).replace('.', ',');
 
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
         let valRet = 0;
@@ -460,22 +413,16 @@ async function calcular() {
             document.getElementById('valGorjetaRes').textContent = "R$ "+valGorj.toFixed(2).replace('.', ',');
         } else document.getElementById('linhaGorjeta').classList.add('escondido');
 
-        const totalGeral = (parseFloat(valMoto) + parseFloat(valFinal) + parseFloat(valRet) + valGorj).toFixed(2);
+        const totalGeral = (parseFloat(valFinal) + parseFloat(valRet) + valGorj).toFixed(2);
         document.getElementById('valTotal').textContent = "R$ "+totalGeral.replace('.', ',');
 
         document.getElementById('resumoPedido').classList.remove('escondido');
-        document.getElementById('btnGerarPedido').disabled = !motoboyOperando;
 
     } catch(erro) { alert(erro); }
     finally { document.getElementById('areaCalculando').classList.add('escondido'); }
 }
 
 function gerarPedido() {
-    if(!motoboyOperando) { 
-        alert('⚠️ Motoboy não está em operação!'); 
-        return; 
-    }
-
     const blocos = document.querySelectorAll('.bloco-entrega');
     let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n══════════════════════════\n";
 
@@ -490,7 +437,6 @@ function gerarPedido() {
         texto += "──────────────────────────\n";
     });
 
-    texto += `🛵 Moto → Loja: ${document.getElementById('distMotoLoja').textContent} km | ${document.getElementById('valMotoLoja').textContent}\n`;
     texto += `🏪 Loja → Cliente: ${document.getElementById('distLojaCli').textContent} km | ${document.getElementById('valLojaCli').textContent}\n`;
     if(document.querySelector('input[name="retorno"]:checked').value === 'sim') texto += "✅ Com retorno\n";
     if(document.querySelector('input[name="gorjeta"]:checked').value === 'sim') texto += `💸 Gorjeta: ${document.getElementById('valGorjetaRes').textContent}\n`;
@@ -506,11 +452,11 @@ function gerarPedido() {
     atualizarPainel();
 
     const linkWhatsApp = "https://wa.me/5532999953215?text=" + encodeURIComponent(texto);
-    const novaJanela = window.open(linkWhatsApp, '_blank');
-    if (!novaJanela || novaJanela.closed) {
-        alert('✅ Pedido gerado! Copie e abra no WhatsApp:\n' + linkWhatsApp);
+    const janela = window.open(linkWhatsApp, '_blank');
+    if (!janela || janela.closed) {
+        alert('✅ PEDIDO GERADO COM SUCESSO!\n\nClique abaixo para abrir seu WhatsApp:\n\n' + linkWhatsApp);
     } else {
-        alert('✅ Pedido gerado! Abrindo SEU WhatsApp agora...');
+        alert('✅ PEDIDO GERADO! ABRINDO SEU WHATSAPP AGORA...');
     }
 }
 
@@ -523,46 +469,6 @@ function refazerPedido() {
     document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
     document.getElementById('valorGorjeta').style.display = 'none';
     document.getElementById('resumoPedido').classList.add('escondido');
-    document.getElementById('btnGerarPedido').disabled = true;
-}
-
-function verificarLoginMotoboy() {
-    const u = document.getElementById('usuarioMotoboy').value.trim();
-    const s = document.getElementById('senhaMotoboy').value.trim();
-    if(u === USUARIO_MOTOBOY && s === SENHA_MOTOBOY) {
-        document.querySelector('#abaMotoboy .caixa-login').classList.add('escondido');
-        document.getElementById('conteudoMotoboy').classList.remove('escondido');
-    } else document.getElementById('erroLoginMotoboy').classList.remove('escondido');
-}
-
-function ligarMotoboy() {
-    motoboyOperando = true;
-    document.getElementById('statusOperacao').textContent = '🟢 EM OPERAÇÃO';
-    document.getElementById('statusOperacao').classList.add('on');
-    document.getElementById('avisoMoto').textContent = '🟢 Motoboy DISPONÍVEL — pode gerar pedidos!';
-    document.getElementById('avisoMoto').classList.add('on');
-    document.getElementById('btnDesligar').classList.remove('escondido');
-    calcular();
-    atualizarPainel();
-}
-
-function desligarMotoboy() {
-    motoboyOperando = false;
-    document.getElementById('statusOperacao').textContent = '⏳ NÃO ESTÁ EM OPERAÇÃO';
-    document.getElementById('statusOperacao').classList.remove('on');
-    document.getElementById('avisoMoto').textContent = '⏳ Aguardando motoboy iniciar operação...';
-    document.getElementById('avisoMoto').classList.remove('on');
-    document.getElementById('btnDesligar').classList.add('escondido');
-    calcular();
-    atualizarPainel();
-}
-
-function sairMotoboy() {
-    document.getElementById('usuarioMotoboy').value = '';
-    document.getElementById('senhaMotoboy').value = '';
-    document.getElementById('erroLoginMotoboy').classList.add('escondido');
-    document.querySelector('#abaMotoboy .caixa-login').classList.remove('escondido');
-    document.getElementById('conteudoMotoboy').classList.add('escondido');
 }
 
 function verificarLoginPainel() {
@@ -598,8 +504,6 @@ function inicializarGraficos() {
 }
 
 function atualizarPainel() {
-    document.getElementById('statusMotoPainel').innerHTML = motoboyOperando ? "🟢 LIGADO / OPERANDO" : "❌ DESLIGADO";
-
     const valorDia = historicoPedidos.reduce((total, p) => {
         const val = parseFloat(p.total.replace('R$ ','').replace(',','.'));
         return total + val;
@@ -648,4 +552,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+                                                                                             </html>
