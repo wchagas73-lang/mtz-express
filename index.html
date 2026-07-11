@@ -6,7 +6,6 @@
     <title>MTZ Express | Entregas Rápidas — Juiz de Fora-MG</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;}
         :root {
@@ -47,9 +46,6 @@
         .escondido {display: none !important;}
 
         .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
-        .aviso {padding: 18px; border-radius: 18px; border-left: 5px solid; margin: 20px 0; font-weight: 600;}
-        .aviso.sucesso {background: rgba(0,200,150,0.15); border-left-color: var(--primaria); color: #E0F8F0;}
-        .aviso.destaque {background: rgba(255,215,0,0.1); border-left-color: var(--dourado); color: #FFF8C1;}
         .btn {width: 100%; padding: 16px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s;}
         .btn:hover {transform: translateY(-2px);}
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
@@ -86,7 +82,6 @@
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
         .caixa-login {max-width: 450px; margin: 30px auto; padding: 25px; border: 2px solid var(--azul); border-radius: 20px; background: rgba(59,130,246,0.06);}
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
-        .impressao-via {padding: 15px; border-bottom: 2px dashed #ccc; margin-bottom: 15px;}
 
         .area-rotas {background: rgba(59,130,246,0.08); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0;}
         .link-rota {display:block; padding:12px; margin:8px 0; background:rgba(255,255,255,0.08); border-radius:12px; color:#90CAF9; font-weight:600; text-decoration:none; transition:all 0.2s;}
@@ -290,29 +285,20 @@
 
                     <div class="linha-botoes" style="margin-top:25px;">
                         <button class="btn btn-whatsapp" onclick="enviarPedidoWhatsapp()">📤 ENVIAR PEDIDO COMPLETO NO WHATSAPP</button>
-                        <button class="btn btn-principal" onclick="gerarPDF()">📄 BAIXAR 2 VIAS EM PDF</button>
                     </div>
                 </div>
 
                 <div class="caixa-status-entrega escondido" id="areaStatusEntrega">
-                    <h3 style="color:var(--dourado); text-align:center; margin-bottom:20px;">📝 STATUS DA ENTREGA</h3>
+                    <h3 style="color:var(--dourado); text-align:center; margin-bottom:20px;">📝 CONFIRMAR SITUAÇÃO DA ENTREGA — CLIQUE ABAIXO:</h3>
                     <div class="linha-botoes">
-                        <button class="btn btn-principal" onclick="entregaRealizada()">✅ ENTREGA REALIZADA</button>
+                        <button class="btn btn-principal" onclick="entregaRealizada()">✅ ENTREGA REALIZADA COM SUCESSO</button>
                         <button class="btn btn-perigo" onclick="mostrarImprevisto()">❌ ENTREGA NÃO REALIZADA</button>
                     </div>
                     <div class="escondido" id="areaImprevisto">
                         <label style="margin-top:20px;">📝 Justificativa / Motivo:</label>
                         <textarea id="motivoImprevisto" rows="3" placeholder="Ex: Cliente ausente, ninguém para receber..."></textarea>
-                        <h4 style="color:var(--dourado); margin:20px 0 10px;">O que fazer com a mercadoria?</h4>
-                        <label class="opcao-radio">
-                            <input type="radio" name="acaoImprevisto" value="retornar" onchange="calcularRetornoImprevisto()">
-                            ⏪ Retornar com mercadoria para Loja
-                        </label>
-                        <label class="opcao-radio">
-                            <input type="radio" name="acaoImprevisto" value="aguardar" checked onchange="calcularRetornoImprevisto()">
-                            ⏳ Aguardar novo contato com o cliente
-                        </label>
-                        <button class="btn btn-whatsapp" style="margin-top:20px;" onclick="enviarImprevistoWhatsapp()">📤 ENVIAR PARA LOJISTA NO WHATSAPP</button>
+                        <h4 style="color:var(--dourado); margin:20px 0 10px;">Confirme para enviar para o Lojista:</h4>
+                        <button class="btn btn-whatsapp" style="margin-top:10px;" onclick="enviarFalhaParaLojista()">📤 ENVIAR AVISO DE NÃO REALIZAÇÃO</button>
                     </div>
                 </div>
 
@@ -405,35 +391,13 @@
         </div>
     </div>
 
-    <div class="escondido" id="conteudoPDF">
-        <div class="impressao-via">
-            <h2 style="text-align:center; color:#FFD700;">📄 VIA CLIENTE / LOJISTA — MTZ EXPRESS</h2>
-            <p>Data: <span id="pdfDataCli"></span></p>
-            <p>Pedido Nº: <span id="pdfNumCli"></span></p>
-            <p>Quantidade Entregas: <span id="pdfQtdCli"></span></p>
-            <p>Valor Total: <span id="pdfValCli"></span></p>
-            <br>
-            <p style="text-align:center;">✅ Obrigado pela preferência!</p>
-        </div>
-        <div class="impressao-via">
-            <h2 style="text-align:center; color:#FFD700;">📄 VIA MOTOBOY — MTZ EXPRESS</h2>
-            <p>Data: <span id="pdfDataLoja"></span></p>
-            <p>Pedido Nº: <span id="pdfNumLoja"></span></p>
-            <p>Quantidade Entregas: <span id="pdfQtdLoja"></span></p>
-            <p>Valor Total: <span id="pdfValLoja"></span></p>
-            <p>Detalhes: <span id="pdfDetalhes"></span></p>
-            <br>
-            <p style="text-align:center;">✅ Controle Interno MTZ Express</p>
-        </div>
-    </div>
-
     <script>
         const USUARIO_SISTEMA = "mtz2026";
         const SENHA_SISTEMA = "1120";
 
         const dadosPIX = `00020126580014br.gov.bcb.pix0114+55329999532150212MTZEXPRESS5204000053039865802BR5925Wellington Chagas Aleixo6014Juiz de Fora62070503YlHwcSq7496304E596`;
         const linkNubank = `https://nubank.com.br/cobrar/4vx6y/6a50c3f2-6720-4e46-9ca4-f21198288be7`;
-        const telefoneLoja = '5532999953215';
+        const telefoneSistema = '5532999953215';
         const tabelaValores = [
             {km:1, valor:9.00}, {km:2, valor:10.00}, {km:3, valor:11.00}, {km:4, valor:12.00},
             {km:5, valor:13.00}, {km:6, valor:14.00}, {km:7, valor:15.00}, {km:8, valor:16.00},
@@ -462,86 +426,9 @@
             }, 150);
         };
 
-        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — LOJA
-        function buscarCepLoja(campo) {
-            const bloco = campo.closest('.bloco-entrega');
-            const rua = bloco.querySelector('.endLoja').value.trim();
-            const bairro = bloco.querySelector('.bairroLoja').value.trim();
-            const numero = bloco.querySelector('.numLoja').value.trim();
-            const cidade = 'Juiz de Fora';
-            const uf = 'MG';
-            const cepEl = bloco.querySelector('.cepLoja');
-            const avisoEl = bloco.querySelector('[id^="avisoCepLoja"]');
-
-            if(rua.length < 5 || bairro.length < 3 || !numero) {
-                cepEl.value = '';
-                avisoEl.textContent = '';
-                return;
-            }
-
-            avisoEl.textContent = '🔍 Buscando CEP...';
-            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
-            .then(res => res.json())
-            .then(dados => {
-                if(dados && dados.length > 0) {
-                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
-                    cepEl.value = endereco.cep;
-                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
-                    avisoEl.style.color = 'var(--primaria)';
-                } else {
-                    cepEl.value = '';
-                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
-                    avisoEl.style.color = 'var(--perigo)';
-                }
-            })
-            .catch(() => {
-                avisoEl.textContent = '❌ Erro ao buscar CEP';
-                avisoEl.style.color = 'var(--perigo)';
-            });
-        }
-
-        // ✅ FUNÇÃO QUE BUSCA SOMENTE O CEP — DESTINATÁRIO
-        function buscarCepDest(campo) {
-            const bloco = campo.closest('.bloco-entrega');
-            const rua = bloco.querySelector('.endDest').value.trim();
-            const bairro = bloco.querySelector('.bairroDest').value.trim();
-            const numero = bloco.querySelector('.numDest').value.trim();
-            const cidade = 'Juiz de Fora';
-            const uf = 'MG';
-            const cepEl = bloco.querySelector('.cepDest');
-            const avisoEl = bloco.querySelector('[id^="avisoCepDest"]');
-
-            if(rua.length < 5 || bairro.length < 3 || !numero) {
-                cepEl.value = '';
-                avisoEl.textContent = '';
-                return;
-            }
-
-            avisoEl.textContent = '🔍 Buscando CEP...';
-            fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}/json/`)
-            .then(res => res.json())
-            .then(dados => {
-                if(dados && dados.length > 0) {
-                    const endereco = dados.find(e => e.bairro.toLowerCase() === bairro.toLowerCase()) || dados[0];
-                    cepEl.value = endereco.cep;
-                    avisoEl.textContent = '✅ CEP preenchido automaticamente!';
-                    avisoEl.style.color = 'var(--primaria)';
-                } else {
-                    cepEl.value = '';
-                    avisoEl.textContent = '⚠️ Não encontrei — verifique os dados';
-                    avisoEl.style.color = 'var(--perigo)';
-                }
-            })
-            .catch(() => {
-                avisoEl.textContent = '❌ Erro ao buscar CEP';
-                avisoEl.style.color = 'var(--perigo)';
-            });
-        }
-
         function mostrarAba(nome) {
             document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
-           
             event.target.classList.add('ativa');
             document.getElementById(`aba${nome.charAt(0).toUpperCase() + nome.slice(1)}`).classList.add('visivel');
         }
@@ -679,11 +566,39 @@
         function entregaRealizada() {
             statusRastreio = 'entregue';
             atualizarStatusRastreio();
-            alert('✅ Entrega confirmada!');
+            
+            const telefoneLojista = document.querySelector('.contatoLoja').value.replace(/\D/g, '');
+            const mensagemSucesso = `✅ ENTREGA REALIZADA COM SUCESSO! 🎉
+
+📄 Pedido Nº: ${numeroPedido}
+🏪 Lojista: ${document.querySelector('.nomeLoja').value}
+👤 Destinatário: ${document.querySelector('.nomeDest').value}
+
+✅ Serviço
+MTZ EXPRESS — Juiz de Fora-MG`;
+
+            window.open(`https://wa.me/${telefoneLojista}?text=${encodeURIComponent(mensagemSucesso)}`, '_blank');
         }
 
         function mostrarImprevisto() {
             document.getElementById('areaImprevisto').classList.remove('escondido');
+        }
+
+        function enviarFalhaParaLojista() {
+            const motivo = document.getElementById('motivoImprevisto').value.trim() || 'Motivo não informado';
+            const telefoneLojista = document.querySelector('.contatoLoja').value.replace(/\D/g, '');
+
+            const mensagemFalha = `❌ AVISO: ENTREGA NÃO REALIZADA ⚠️
+
+📄 Pedido Nº: ${numeroPedido}
+🏪 Lojista: ${document.querySelector('.nomeLoja').value}
+👤 Destinatário: ${document.querySelector('.nomeDest').value}
+
+📝 Motivo: ${motivo}
+
+✅ MTZ EXPRESS — Juiz de Fora-MG`;
+
+            window.open(`https://wa.me/${telefoneLojista}?text=${encodeURIComponent(mensagemFalha)}`, '_blank');
         }
 
         function calcularRetornoImprevisto() {
@@ -734,47 +649,7 @@
 
 ✅ MTZ EXPRESS — Juiz de Fora-MG`;
 
-            window.open(`https://wa.me/${telefoneLoja}?text=${encodeURIComponent(texto)}`, '_blank');
-        }
-
-        function enviarImprevistoWhatsapp() {
-            const motivo = document.getElementById('motivoImprevisto').value;
-            const acao = document.querySelector('input[name="acaoImprevisto"]:checked').value === 'retornar' ? '⏪ Volta para Loja' : '⏳ Aguardando';
-            const texto = `❌ AVISO DE IMPREVISTO ❌
-
-Pedido Nº: ${numeroPedido}
-Motivo: ${motivo}
-Ação: ${acao}
-
-✅ MTZ EXPRESS`;
-            window.open(`https://wa.me/${telefoneLoja}?text=${encodeURIComponent(texto)}`, '_blank');
-        }
-
-        function gerarPDF() {
-            const data = new Date().toLocaleDateString('pt-BR');
-            const numero = numeroPedido;
-            const qtd = document.getElementById('qtdEntregas').textContent;
-            const total = document.getElementById('valTotal').textContent;
-
-            document.getElementById('pdfDataCli').textContent = data;
-            document.getElementById('pdfNumCli').textContent = numero;
-            document.getElementById('pdfQtdCli').textContent = qtd;
-            document.getElementById('pdfValCli').textContent = total;
-
-            document.getElementById('pdfDataLoja').textContent = data;
-            document.getElementById('pdfNumLoja').textContent = numero;
-            document.getElementById('pdfQtdLoja').textContent = qtd;
-            document.getElementById('pdfValLoja').textContent = total;
-            document.getElementById('pdfDetalhes').textContent = `Retorno: ${document.querySelector('input[name="retorno"]:checked').value === 'sim' ? 'Sim' : 'Não'}`;
-
-            const elemento = document.getElementById('conteudoPDF');
-            html2pdf().from(elemento).set({
-                margin: 10,
-                filename: `MTZ_Pedido_${numero}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save();
+            window.open(`https://wa.me/${telefoneSistema}?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         function verificarLoginMotoboy() {
@@ -838,4 +713,4 @@ Ação: ${acao}
         function copiarLink() { navigator.clipboard.writeText(linkNubank).then(() => alert('✅ Link copiado!')); }
     </script>
 </body>
-    </html>
+                        </html>
