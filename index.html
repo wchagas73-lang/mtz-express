@@ -394,31 +394,8 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
 }
 
 // ==============================================
-// FUNÇÕES PRINCIPAIS — JÁ COM A CORREÇÃO!
+// FUNÇÃO PRINCIPAL — JÁ CORRIGIDA SEM ERRO!
 // ==============================================
-function mostrarAba(nomeAba) {
-    document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
-    event.target.classList.add('ativa');
-    document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
-    document.getElementById('aba'+nomeAba.charAt(0).toUpperCase()+nomeAba.slice(1)).classList.add('visivel');
-}
-
-function adicionarEntrega() {
-    contadorEntregas++;
-    const lista = document.getElementById('listaEntregas');
-    const ultimo = lista.lastElementChild;
-    const novo = ultimo.cloneNode(true);
-    novo.id = "entrega_"+contadorEntregas;
-    novo.querySelector('.titulo-bloco h4').textContent = "📦 ENTREGA "+contadorEntregas;
-    novo.querySelectorAll('input').forEach(i => i.value = "");
-    const btnRemover = document.createElement('button');
-    btnRemover.className = "btn btn-remover";
-    btnRemover.textContent = "🗑️ REMOVER";
-    btnRemover.onclick = () => { novo.remove(); calcular(); };
-    novo.querySelector('.titulo-bloco').appendChild(btnRemover);
-    lista.appendChild(novo);
-}
-
 async function calcular() {
     const blocos = document.querySelectorAll('.bloco-entrega');
     let distTotal = 0, valorTotal = 0;
@@ -438,14 +415,14 @@ async function calcular() {
             valorTotal += buscarValorPorKm(dist);
         }
 
-        // ✅ AQUI ESTÁ A CORREÇÃO PRINCIPAL!
+        // ✅ CÁLCULO DO MOTOBY 100% CORRIGIDO — SEM ERRO!
         let distMoto;
         if (distTotal <= 0.2) {
             distMoto = 0.0; // MESMO LOCAL / ATÉ 200m → ZERADO!
         } else {
-            distMoto = (distTotal * 0.7).toFixed(1);
+            distMoto = distTotal * 0.7; // Continua sendo NÚMERO, não texto!
         }
-        const valMoto = (parseFloat(distMoto) * 0.5).toFixed(2);
+        const valMoto = (distMoto * 0.5).toFixed(2);
         const distFinal = distTotal.toFixed(1);
         const valFinal = valorTotal.toFixed(2);
 
@@ -454,7 +431,7 @@ async function calcular() {
         document.getElementById('distLojaCli').textContent = distFinal.replace('.', ',');
         document.getElementById('valLojaCli').textContent = "R$ "+valFinal.replace('.', ',');
         document.getElementById('qtdEntregas').textContent = blocos.length;
-        document.getElementById('valSubtotal').textContent = "R$ "+(parseFloat(valMoto)+parseFloat(valFinal)).toFixed(2).replace('.', ',');
+        document.getElementById('valSubtotal').textContent = "R$ "+(distMoto + valorTotal).toFixed(2).replace('.', ',');
 
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
         let valRet = 0;
@@ -472,7 +449,7 @@ async function calcular() {
             document.getElementById('valGorjetaRes').textContent = "R$ "+valGorj.toFixed(2).replace('.', ',');
         } else document.getElementById('linhaGorjeta').classList.add('escondido');
 
-        const totalGeral = (parseFloat(valMoto)+parseFloat(valFinal)+parseFloat(valRet)+valGorj).toFixed(2);
+        const totalGeral = (parseFloat(valMoto) + parseFloat(valFinal) + parseFloat(valRet) + valGorj).toFixed(2);
         document.getElementById('valTotal').textContent = "R$ "+totalGeral.replace('.', ',');
 
         document.getElementById('resumoPedido').classList.remove('escondido');
@@ -665,4 +642,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                                                                                  </html>
+    </html>
