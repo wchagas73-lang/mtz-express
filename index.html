@@ -104,8 +104,8 @@
 
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="destaque-percurso">
-                    🏪 VALOR CALCULADO: LOJA → CLIENTE<br>
-                    📍 Km arredonda PARA CIMA • Valor pela tabela
+                    🏪 VALOR CALCULADO PERCURSO TOTAL<br>
+                    📍 SOMA TODOS OS KM • ARREDONDA PARA CIMA • VALOR ÚNICO
                 </div>
 
                 <div id="listaEntregas">
@@ -172,7 +172,7 @@
                     <input type="number" id="valorGorjeta" min="0" step="0.01" placeholder="R$ 0,00" style="margin-top:10px; display:none" oninput="calcular()">
                 </div>
 
-                <div id="areaCalculando" class="carregando escondido">🔄 Calculando distância real com Google Maps...</div>
+                <div id="areaCalculando" class="carregando escondido">🔄 Calculando distância total com Google Maps...</div>
 
                 <div class="linha-botoes">
                     <button class="btn btn-principal" onclick="calcular()">🧮 CALCULAR VALOR TOTAL</button>
@@ -182,16 +182,17 @@
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
 
                 <div class="resumo escondido" id="resumoPedido">
-                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO GOOGLE MAPS</h3>
+                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO TOTAL</h3>
                     
                     <div id="listaResumoEntregas"></div>
 
                     <div style="background:rgba(0,200,150,0.15); border:2px solid var(--primaria); border-radius:12px; padding:12px; margin:15px 0; font-weight:700;">
-                        📏 KM TOTAL: <span id="kmTotal">--</span> km<br>
-                        💲 VALOR TOTAL DAS ENTREGAS: <span id="valorTotalEntregas">--</span>
+                        📏 KM TOTAL SOMADO: <span id="kmTotal">--</span> km<br>
+                        📏 KM TOTAL ARREDONDADO: <span id="kmTotalArred">--</span> km<br>
+                        💲 VALOR TOTAL ÚNICO: <span id="valorTotalEntregas">--</span>
                     </div>
                     
-                    <p id="linhaRetorno" class="escondido">✅ Retorno (50%): <span id="valRetorno">--</span></p>
+                    <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor total): <span id="valRetorno">--</span></p>
                     <p id="linhaGorjeta" class="escondido">💸 Gorjeta: <span id="valGorjetaRes">--</span></p>
                     
                     <hr>
@@ -331,8 +332,7 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
         }, function(resposta, status) {
             if (status === "OK" && resposta.rows[0].elements[0].status === "OK") {
                 const km = resposta.rows[0].elements[0].distance.value / 1000;
-                const kmArredondado = Math.ceil(km); // ✅ ARREDONDA SEMPRE PARA CIMA
-                sucesso({ kmReal: km, kmArredondado: kmArredondado });
+                sucesso(km);
             } else {
                 erro("❌ Endereço não encontrado! Verifique.");
             }
@@ -365,7 +365,7 @@ function adicionarEntrega() {
         
         const aviso = document.createElement('div');
         aviso.className = 'aviso-mesmo-loja';
-        aviso.textContent = '✅ MESMA LOJA DA ENTREGA 1 — NÃO PRECISA PREENCHER NOVAMENTE';
+        aviso.textContent = '✅ MESMA LOJA — DADOS SOMADOS NO VALOR TOTAL';
         modelo.appendChild(aviso);
         
         const camposCliente = document.createElement('div');
@@ -400,7 +400,6 @@ function adicionarEntrega() {
 async function calcular() {
     const blocos = document.querySelectorAll('.bloco-entrega');
     dadosEntregas = [];
-    let valorTotal = 0;
     let kmTotalGeral = 0;
 
     // 📍 PEGA DADOS DA LOJA SÓ DA PRIMEIRA
@@ -428,21 +427,20 @@ async function calcular() {
                 return;
             }
 
-            const dadosKm = await calcularDistanciaGoogle(endLoja, endDest);
-            const valorEntrega = buscarValorPorKm(dadosKm.kmArredondado);
+            const kmIndividual = await calcularDistanciaGoogle(endLoja, endDest);
+            kmTotalGeral += kmIndividual;
             
             dadosEntregas.push({
-                kmReal: dadosKm.kmReal,
-                kmArredondado: dadosKm.kmArredondado,
-                valor: valorEntrega,
+                kmReal: kmIndividual,
                 nomeDest: nomeDest,
                 contatoDest: contatoDest,
                 endDest: endDest
             });
-
-            kmTotalGeral += dadosKm.kmReal;
-            valorTotal += valorEntrega;
         }
+
+        // ✅ CALCULA VALOR ÚNICO PELO TOTAL GERAL
+        const kmTotalArredondado = Math.ceil(kmTotalGeral);
+        const valorTotalEntregas = buscarValorPorKm(kmTotalArredondado);
 
         // 📝 MONTA O RESUMO
         const listaResumo = document.getElementById('listaResumoEntregas');
@@ -450,18 +448,19 @@ async function calcular() {
         dadosEntregas.forEach((ent, i) => {
             const item = document.createElement('div');
             item.className = 'item-resumo';
-            item.innerHTML = `📦 Entrega ${i+1}: ${ent.kmReal.toFixed(1).replace('.', ',')} km → arredonda para ${ent.kmArredondado} km | R$ ${ent.valor.toFixed(2).replace('.', ',')}`;
+            item.innerHTML = `📦 Entrega ${i+1}: ${ent.kmReal.toFixed(1).replace('.', ',')} km | ${ent.nomeDest}`;
             listaResumo.appendChild(item);
         });
 
         document.getElementById('kmTotal').textContent = kmTotalGeral.toFixed(1).replace('.', ',');
-        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('kmTotalArred').textContent = kmTotalArredondado;
+        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorTotalEntregas.toFixed(2).replace('.', ',')}`;
 
         // ➕ ADICIONA RETORNO SE SIM
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
         let valorRetorno = 0;
         if (retorno === 'sim') {
-            valorRetorno = valorTotal * 0.5;
+            valorRetorno = valorTotalEntregas * 0.5;
             document.getElementById('linhaRetorno').classList.remove('escondido');
             document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
         } else {
@@ -480,7 +479,7 @@ async function calcular() {
         }
 
         // 💰 VALOR FINAL TOTAL
-        const valorFinal = valorTotal + valorRetorno + valorGorjeta;
+        const valorFinal = valorTotalEntregas + valorRetorno + valorGorjeta;
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
 
         document.getElementById('resumoPedido').classList.remove('escondido');
@@ -519,17 +518,21 @@ function gerarPedido() {
         texto += `📞 Contato: ${ent.contatoDest}\n`;
         texto += `📍 Endereço: ${ent.endDest}\n`;
         texto += `🔗 MAPA CLIENTE: ${linkCliente}\n`;
-        texto += `📏 ${ent.kmReal.toFixed(1).replace('.', ',')} km → ${ent.kmArredondado} km | R$ ${ent.valor.toFixed(2).replace('.', ',')}\n`;
+        texto += `📏 ${ent.kmReal.toFixed(1).replace('.', ',')} km\n`;
         texto += "──────────────────────────\n";
     });
 
-    const valorTotalEntregas = parseFloat(document.getElementById('valorTotalEntregas').textContent.replace('R$ ', '').replace(',', '.'));
-    texto += `📏 KM TOTAL: ${document.getElementById('kmTotal').textContent} km\n`;
-    texto += `💲 TOTAL ENTREGAS: R$ ${valorTotalEntregas.toFixed(2).replace('.', ',')}\n`;
+    const kmTotal = document.getElementById('kmTotal').textContent;
+    const kmArred = document.getElementById('kmTotalArred').textContent;
+    const valorTotal = parseFloat(document.getElementById('valorTotalEntregas').textContent.replace('R$ ', '').replace(',', '.'));
+    
+    texto += `📏 KM TOTAL SOMADO: ${kmTotal} km\n`;
+    texto += `📏 KM TOTAL ARREDONDADO: ${kmArred} km\n`;
+    texto += `💲 VALOR ÚNICO: R$ ${valorTotal.toFixed(2).replace('.', ',')}\n`;
 
     const retorno = document.querySelector('input[name="retorno"]:checked').value;
     if (retorno === 'sim') {
-        const valRet = valorTotalEntregas * 0.5;
+        const valRet = valorTotal * 0.5;
         texto += `✅ Retorno: R$ ${valRet.toFixed(2).replace('.', ',')}\n`;
     }
     const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
@@ -663,4 +666,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-</html>
+                                </html>
