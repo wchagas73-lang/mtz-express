@@ -91,8 +91,8 @@
                 <div class="logo-texto">MTZ EXPRESS</div>
                 <p class="slogan">ENTREGAS RÁPIDAS • JUIZ DE FORA-MG</p>
                 <div class="dados-rapidos">
-                    📲 Contato: <strong>(32) 9 99995-3215</strong><br>
-                    ⏰ Seg-Sex: 08h às 20h | Sáb: 08h às 16h<br>
+                    📲 Contato: <strong>(32) 9 99953215</strong><br>
+                    ⏰ Todos os dias: 08h às 22h (Domingo a Domingo)<br>
                     💸 <strong>SEM TAXA, SEM MENSALIDADE</strong> 💸
                 </div>
             </div>
@@ -203,16 +203,17 @@
                 <div class="tabela-wrapper">
                     <table class="tabela-valores">
                         <tr><th>Distância</th><th>Valor</th><th>Distância</th><th>Valor</th></tr>
-                        <tr><td>Até 1 km</td><td>R$ 9,00</td><td>11 km</td><td>R$ 18,00</td></tr>
-                        <tr><td>2 km</td><td>R$ 10,00</td><td>12 km</td><td>R$ 19,00</td></tr>
-                        <tr><td>3 km</td><td>R$ 11,00</td><td>13 km</td><td>R$ 20,00</td></tr>
-                        <tr><td>4 km</td><td>R$ 12,00</td><td>14 km</td><td>R$ 21,00</td></tr>
-                        <tr><td>5 km</td><td>R$ 13,00</td><td>15 km</td><td>R$ 22,00</td></tr>
-                        <tr><td>6 km</td><td>R$ 14,00</td><td>16 km</td><td>R$ 23,00</td></tr>
-                        <tr><td>7 km</td><td>R$ 15,00</td><td>17 km</td><td>R$ 24,00</td></tr>
-                        <tr><td>8 km</td><td>R$ 16,00</td><td>18 km</td><td>R$ 25,00</td></tr>
-                        <tr><td>9 km</td><td>R$ 17,00</td><td>19 km</td><td>R$ 26,00</td></tr>
-                        <tr><td>10 km</td><td>R$ 18,00</td><td>Acima de 20 km</td><td>R$ 28,00</td></tr>
+                        <tr><td>Até 1 km</td><td>R$ 9,00</td><td>11 km</td><td>R$ 19,00</td></tr>
+                        <tr><td>Até 2 km</td><td>R$ 10,00</td><td>12 km</td><td>R$ 20,00</td></tr>
+                        <tr><td>Até 3 km</td><td>R$ 11,00</td><td>13 km</td><td>R$ 21,00</td></tr>
+                        <tr><td>Até 4 km</td><td>R$ 12,00</td><td>14 km</td><td>R$ 22,00</td></tr>
+                        <tr><td>Até 5 km</td><td>R$ 13,00</td><td>15 km</td><td>R$ 23,00</td></tr>
+                        <tr><td>Até 6 km</td><td>R$ 14,00</td><td>16 km</td><td>R$ 24,00</td></tr>
+                        <tr><td>Até 7 km</td><td>R$ 15,00</td><td>17 km</td><td>R$ 25,00</td></tr>
+                        <tr><td>Até 8 km</td><td>R$ 16,00</td><td>18 km</td><td>R$ 26,00</td></tr>
+                        <tr><td>Até 9 km</td><td>R$ 17,00</td><td>19 km</td><td>R$ 27,00</td></tr>
+                        <tr><td>Até 10 km</td><td>R$ 18,00</td><td>20 km</td><td>R$ 28,00</td></tr>
+                        <tr><td colspan="4" style="text-align:center; font-weight:700;">✅ Acima de 20 km: + R$ 1,00 para cada km adicional</td></tr>
                     </table>
                 </div>
             </div>
@@ -275,7 +276,7 @@
 <script>
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
-const NUMERO_WHATSAPP = "5532999953215";
+const NUMERO_WHATSAPP = "553299953215";
 
 let contadorEntregas = 1;
 let googleCarregado = false;
@@ -284,29 +285,9 @@ let historicoPedidos = [];
 let graficoFat, graficoQtd;
 let dadosEntregas = [];
 
-// ✅ TABELA DE VALORES EXATA
+// ✅ TABELA DE VALORES CRESCENTE, SEM TETO
 function buscarValorPorKm(kmArredondado) {
-    if (kmArredondado <= 1) return 9.00;
-    if (kmArredondado === 2) return 10.00;
-    if (kmArredondado === 3) return 11.00;
-    if (kmArredondado === 4) return 12.00;
-    if (kmArredondado === 5) return 13.00;
-    if (kmArredondado === 6) return 14.00;
-    if (kmArredondado === 7) return 15.00;
-    if (kmArredondado === 8) return 16.00;
-    if (kmArredondado === 9) return 17.00;
-    if (kmArredondado === 10) return 18.00;
-    if (kmArredondado === 11) return 18.00;
-    if (kmArredondado === 12) return 19.00;
-    if (kmArredondado === 13) return 20.00;
-    if (kmArredondado === 14) return 21.00;
-    if (kmArredondado === 15) return 22.00;
-    if (kmArredondado === 16) return 23.00;
-    if (kmArredondado === 17) return 24.00;
-    if (kmArredondado === 18) return 25.00;
-    if (kmArredondado === 19) return 26.00;
-    if (kmArredondado === 20) return 26.00;
-    return 28.00; // Acima de 20 km
+    return 8.00 + kmArredondado * 1.00;
 }
 
 function iniciarGoogle() {
@@ -438,7 +419,7 @@ async function calcular() {
             });
         }
 
-        // ✅ CALCULA VALOR ÚNICO PELO TOTAL GERAL
+        // ✅ CALCULA VALOR ÚNICO PELO TOTAL GERAL, ARREDONDANDO PARA CIMA
         const kmTotalArredondado = Math.ceil(kmTotalGeral);
         const valorTotalEntregas = buscarValorPorKm(kmTotalArredondado);
 
@@ -666,4 +647,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                                </html>
+                                                                    </html>
