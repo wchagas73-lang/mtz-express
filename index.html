@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;}
         :root {
@@ -52,7 +54,6 @@
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
-        .btn-mais {background: linear-gradient(90deg, var(--azul), #2563eb); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0;}
         .btn-remover {background: var(--perigo); color: white; padding: 8px 12px; font-size: 14px; width: auto;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
@@ -81,6 +82,8 @@
         .area-grafico {background: rgba(255,255,255,0.03); border: 2px solid var(--borda); border-radius: 20px; padding: 20px; margin: 25px 0;}
         .lista-pedidos {max-height: 350px; overflow-y: auto; margin-top: 20px;}
         .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
+        .status-pendente {color: #FFD700; font-weight: bold;}
+        .status-concluido {color: #00C896; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -91,7 +94,7 @@
                 <div class="logo-texto">MTZ EXPRESS</div>
                 <p class="slogan">ENTREGAS RÁPIDAS • JUIZ DE FORA-MG</p>
                 <div class="dados-rapidos">
-                    📲 Contato: <strong>(32) 9 99953215</strong><br>
+                    📲 Contato: <strong>(32) 9 9995-3215</strong><br>
                     ⏰ Todos os dias: 08h às 22h (Domingo a Domingo)<br>
                     💸 <strong>SEM TAXA, SEM MENSALIDADE</strong> 💸
                 </div>
@@ -111,35 +114,35 @@
                 <div id="listaEntregas">
                     <div class="bloco-entrega" id="entrega_1">
                         <div class="titulo-bloco">
-                            <h4>📦 DADOS DA ENTREGA 1</h4>
+                            <h4>📦 DADOS DA ENTREGA</h4>
                         </div>
 
                         <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez só</span></h3>
                         
                         <label>Nome da Loja <span>*</span></label>
-                        <input type="text" class="nomeLoja" required placeholder="Nome da sua loja">
+                        <input type="text" id="nomeLoja" required placeholder="Nome da sua loja">
                         
                         <label>Contato <span>*</span></label>
-                        <input type="tel" class="contatoLoja" required placeholder="(32) 9XXXX-XXXX">
+                        <input type="tel" id="contatoLoja" required placeholder="(32) 9XXXX-XXXX">
                         
                         <label>Endereço completo <span>*</span></label>
-                        <input type="text" class="endLoja" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <input type="text" id="endLoja" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
                         <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
                         
                         <label>Nome do Cliente <span>*</span></label>
-                        <input type="text" class="nomeDest" required placeholder="Nome completo">
+                        <input type="text" id="nomeDest" required placeholder="Nome completo">
                         
                         <label>Contato do Cliente <span>*</span></label>
-                        <input type="tel" class="contatoDest" required placeholder="(32) 9XXXX-XXXX">
+                        <input type="tel" id="contatoDest" required placeholder="(32) 9XXXX-XXXX">
                         
                         <label>Endereço completo <span>*</span></label>
-                        <input type="text" class="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <input type="text" id="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
                         <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
-                        <input type="text" class="refDest" placeholder="Perto de onde?">
+                        <input type="text" id="refDest" placeholder="Perto de onde?">
                     </div>
                 </div>
 
@@ -182,19 +185,17 @@
                 <div class="resumo escondido" id="resumoPedido">
                     <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO TOTAL</h3>
                     
-                    <div id="listaResumoEntregas"></div>
-
                     <div style="background:rgba(0,200,150,0.15); border:2px solid var(--primaria); border-radius:12px; padding:12px; margin:15px 0; font-weight:700;">
-                        📏 KM TOTAL SOMADO: <span id="kmTotal">--</span> km<br>
-                        📏 KM TOTAL ARREDONDADO: <span id="kmTotalArred">--</span> km<br>
-                        💲 VALOR TOTAL ÚNICO: <span id="valorTotalEntregas">--</span>
+                        📏 KM TOTAL: <span id="kmTotal">--</span> km<br>
+                        📏 KM ARREDONDADO: <span id="kmTotalArred">--</span> km<br>
+                        💲 VALOR ÚNICO: <span id="valorTotalEntregas">--</span>
                     </div>
                     
                     <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor total): <span id="valRetorno">--</span></p>
                     <p id="linhaGorjeta" class="escondido">💸 Gorjeta: <span id="valGorjetaRes">--</span></p>
                     
                     <hr>
-                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL TOTAL: <span id="valTotal">--</span></p>
+                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
                 </div>
 
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
@@ -217,7 +218,7 @@
             </div>
 
             <div class="conteudo-aba" id="abaPainel">
-                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO COMPLETO</h2>
+                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO (SEU ACESSO EXCLUSIVO)</h2>
                 <div class="caixa-login" id="loginPainel">
                     <label>Usuário</label>
                     <input type="text" id="usuarioPainel" placeholder="Digite seu usuário">
@@ -247,19 +248,9 @@
                         </div>
                     </div>
 
-                    <div class="area-grafico">
-                        <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📈 FATURAMENTO DOS ÚLTIMOS 7 DIAS</h3>
-                        <canvas id="graficoFaturamento"></canvas>
-                    </div>
-
-                    <div class="area-grafico">
-                        <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📊 QUANTIDADE DE ENTREGAS</h3>
-                        <canvas id="graficoQuantidade"></canvas>
-                    </div>
-
-                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 HISTÓRICO DE TODOS OS PEDIDOS</h3>
+                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 TODOS OS PEDIDOS (ATUALIZA AUTOMÁTICO)</h3>
                     <div class="lista-pedidos" id="listaHistorico">
-                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos dos lojistas...</p>
                     </div>
 
                     <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
@@ -272,18 +263,28 @@
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E***********",
+  authDomain: "mtz-express-fcd0b.firebaseapp.com",
+  databaseURL: "https://mtz-express-fcd0b-default-rtdb.firebaseio.com",
+  projectId: "mtz-express-fcd0b",
+  storageBucket: "mtz-express-fcd0b.appspot.com",
+  messagingSenderId: "437748664314",
+  appId: "1:437748664314:web:371375ef8*********"
+};
+
+firebase.initializeApp(firebaseConfig);
+const banco = firebase.database();
+const referenciaPedidos = banco.ref('pedidos');
+
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "553299953215";
 
-let contadorEntregas = 1;
 let googleCarregado = false;
 let servicoDistancia = null;
-let historicoPedidos = [];
-let graficoFat, graficoQtd;
-let dadosEntregas = [];
+let dadosPedidoAtual = null;
 
-// ✅ TABELA DE VALORES CRESCENTE, SEM TETO
 function buscarValorPorKm(kmArredondado) {
     return 8.00 + kmArredondado * 1.00;
 }
@@ -291,7 +292,6 @@ function buscarValorPorKm(kmArredondado) {
 function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
-    console.log("✅ Google Maps carregado!");
 }
 
 function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
@@ -327,18 +327,15 @@ function mostrarAba(nomeAba) {
 }
 
 async function calcular() {
-    const blocos = document.querySelectorAll('.bloco-entrega');
-    dadosEntregas = [];
-    let kmTotalGeral = 0;
+    const nomeLoja = document.getElementById('nomeLoja').value.trim();
+    const contatoLoja = document.getElementById('contatoLoja').value.trim();
+    const endLoja = document.getElementById('endLoja').value.trim();
+    const nomeDest = document.getElementById('nomeDest').value.trim();
+    const contatoDest = document.getElementById('contatoDest').value.trim();
+    const endDest = document.getElementById('endDest').value.trim();
 
-    // 📍 PEGA DADOS DA LOJA SÓ DA PRIMEIRA
-    const primeiroBloco = document.querySelector('.bloco-entrega');
-    const endLoja = primeiroBloco.querySelector('.endLoja')?.value.trim();
-    const nomeLoja = primeiroBloco.querySelector('.nomeLoja')?.value.trim();
-    const contatoLoja = primeiroBloco.querySelector('.contatoLoja')?.value.trim();
-    
-    if (!endLoja || !nomeLoja || !contatoLoja) {
-        alert("⚠️ Preencha os dados da loja na ENTREGA 1!");
+    if (!nomeLoja || !contatoLoja || !endLoja || !nomeDest || !contatoDest || !endDest) {
+        alert("⚠️ Preencha todos os campos obrigatórios!");
         return;
     }
 
@@ -346,71 +343,39 @@ async function calcular() {
     document.getElementById('areaCalculando').classList.remove('escondido');
 
     try {
-        for (const bloco of blocos) {
-            const endDest = bloco.querySelector('.endDest')?.value.trim();
-            const nomeDest = bloco.querySelector('.nomeDest')?.value.trim();
-            const contatoDest = bloco.querySelector('.contatoDest')?.value.trim();
-            
-            if (!endDest || !nomeDest || !contatoDest) {
-                alert("⚠️ Preencha nome, telefone e endereço de TODOS os clientes!");
-                return;
-            }
+        const kmReal = await calcularDistanciaGoogle(endLoja, endDest);
+        const kmArredondado = Math.ceil(kmReal);
+        const valorBase = buscarValorPorKm(kmArredondado);
 
-            const kmIndividual = await calcularDistanciaGoogle(endLoja, endDest);
-            kmTotalGeral += kmIndividual;
-            
-            dadosEntregas.push({
-                kmReal: kmIndividual,
-                nomeDest: nomeDest,
-                contatoDest: contatoDest,
-                endDest: endDest
-            });
-        }
-
-        // ✅ CALCULA VALOR ÚNICO PELO TOTAL GERAL, ARREDONDANDO PARA CIMA
-        const kmTotalArredondado = Math.ceil(kmTotalGeral);
-        const valorTotalEntregas = buscarValorPorKm(kmTotalArredondado);
-
-        // 📝 MONTA O RESUMO
-        const listaResumo = document.getElementById('listaResumoEntregas');
-        listaResumo.innerHTML = '';
-        dadosEntregas.forEach((ent, i) => {
-            const item = document.createElement('div');
-            item.className = 'item-resumo';
-            item.innerHTML = `📦 Entrega ${i+1}: ${ent.kmReal.toFixed(1).replace('.', ',')} km | ${ent.nomeDest}`;
-            listaResumo.appendChild(item);
-        });
-
-        document.getElementById('kmTotal').textContent = kmTotalGeral.toFixed(1).replace('.', ',');
-        document.getElementById('kmTotalArred').textContent = kmTotalArredondado;
-        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorTotalEntregas.toFixed(2).replace('.', ',')}`;
-
-        // ➕ ADICIONA RETORNO SE SIM
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
-        let valorRetorno = 0;
-        if (retorno === 'sim') {
-            valorRetorno = valorTotalEntregas * 0.5;
-            document.getElementById('linhaRetorno').classList.remove('escondido');
-            document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
-        } else {
-            document.getElementById('linhaRetorno').classList.add('escondido');
-        }
-
-        // ➕ ADICIONA GORJETA SE SIM
+        let valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
+        
         const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
-        let valorGorjeta = 0;
-        if (gorjeta === 'sim') {
-            valorGorjeta = parseFloat(document.getElementById('valorGorjeta').value) || 0;
-            document.getElementById('linhaGorjeta').classList.remove('escondido');
-            document.getElementById('valGorjetaRes').textContent = `R$ ${valorGorjeta.toFixed(2).replace('.', ',')}`;
-        } else {
-            document.getElementById('linhaGorjeta').classList.add('escondido');
-        }
+        const valorGorjeta = gorjeta === 'sim' ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
+        
+        const valorFinal = valorBase + valorRetorno + valorGorjeta;
 
-        // 💰 VALOR FINAL TOTAL
-        const valorFinal = valorTotalEntregas + valorRetorno + valorGorjeta;
+        dadosPedidoAtual = {
+            nomeLoja, contatoLoja, endLoja,
+            nomeDest, contatoDest, endDest,
+            refDest: document.getElementById('refDest').value.trim(),
+            kmReal, kmArredondado, valorBase, valorRetorno, valorGorjeta, valorFinal,
+            data: new Date().toLocaleDateString('pt-BR'),
+            hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+            status: "Pendente"
+        };
+
+        document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
+        document.getElementById('kmTotalArred').textContent = kmArredondado;
+        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+        
+        document.getElementById('linhaRetorno').classList.toggle('escondido', retorno !== 'sim');
+        document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
+        
+        document.getElementById('linhaGorjeta').classList.toggle('escondido', gorjeta !== 'sim');
+        document.getElementById('valGorjetaRes').textContent = `R$ ${valorGorjeta.toFixed(2).replace('.', ',')}`;
+        
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-
         document.getElementById('resumoPedido').classList.remove('escondido');
 
     } catch (erro) {
@@ -420,106 +385,57 @@ async function calcular() {
     }
 }
 
-function gerarPedido() {
-    if (dadosEntregas.length === 0) {
-        alert("⚠️ Primeiro calcule o valor do pedido!");
+async function gerarPedido() {
+    if (!dadosPedidoAtual) {
+        alert("⚠️ Primeiro calcule o valor!");
         return;
     }
 
-    const primeiroBloco = document.querySelector('.bloco-entrega');
-    const nomeLoja = primeiroBloco.querySelector('.nomeLoja').value.trim();
-    const contatoLoja = primeiroBloco.querySelector('.contatoLoja').value.trim();
-    const endLoja = primeiroBloco.querySelector('.endLoja').value.trim();
-    const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(endLoja + ", Juiz de Fora - MG");
+    try {
+        await referenciaPedidos.push(dadosPedidoAtual);
+        
+        const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
+        const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
+        
+        let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
+        texto += "══════════════════════════\n";
+        texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
+        texto += "📞 CONTATO: " + dadosPedidoAtual.contatoLoja + "\n";
+        texto += "📍 ENDEREÇO: " + dadosPedidoAtual.endLoja + "\n";
+        texto += "🔗 MAPA: " + linkLoja + "\n";
+        texto += "══════════════════════════\n";
+        texto += "👤 CLIENTE: " + dadosPedidoAtual.nomeDest + "\n";
+        texto += "📞 CONTATO: " + dadosPedidoAtual.contatoDest + "\n";
+        texto += "📍 ENDEREÇO: " + dadosPedidoAtual.endDest + "\n";
+        texto += "🔗 MAPA: " + linkCliente + "\n";
+        texto += "📏 DISTÂNCIA: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
+        texto += "══════════════════════════\n";
+        texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',');
 
-    let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
-    texto += "══════════════════════════\n";
-    texto += "🏪 LOJA: " + nomeLoja + "\n";
-    texto += "📞 CONTATO: " + contatoLoja + "\n";
-    texto += "📍 ENDEREÇO: " + endLoja + "\n";
-    texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
-    texto += "══════════════════════════\n";
+        const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
+        window.open(linkWpp, '_blank');
+        alert("✅ Pedido enviado! Já aparece no seu painel automaticamente.");
+        refazerPedido();
 
-    dadosEntregas.forEach((ent, i) => {
-        const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ent.endDest + ", Juiz de Fora - MG");
-        texto += `📦 ENTREGA ${i+1}\n`;
-        texto += `👤 Cliente: ${ent.nomeDest}\n`;
-        texto += `📞 Contato: ${ent.contatoDest}\n`;
-        texto += `📍 Endereço: ${ent.endDest}\n`;
-        texto += `🔗 MAPA CLIENTE: ${linkCliente}\n`;
-        texto += `📏 ${ent.kmReal.toFixed(1).replace('.', ',')} km\n`;
-        texto += "──────────────────────────\n";
-    });
-
-    const kmTotal = document.getElementById('kmTotal').textContent;
-    const kmArred = document.getElementById('kmTotalArred').textContent;
-    const valorTotal = parseFloat(document.getElementById('valorTotalEntregas').textContent.replace('R$ ', '').replace(',', '.'));
-    
-    texto += `📏 KM TOTAL SOMADO: ${kmTotal} km\n`;
-    texto += `📏 KM TOTAL ARREDONDADO: ${kmArred} km\n`;
-    texto += `💲 VALOR ÚNICO: R$ ${valorTotal.toFixed(2).replace('.', ',')}\n`;
-
-    const retorno = document.querySelector('input[name="retorno"]:checked').value;
-    if (retorno === 'sim') {
-        const valRet = valorTotal * 0.5;
-        texto += `✅ Retorno: R$ ${valRet.toFixed(2).replace('.', ',')}\n`;
+    } catch (erro) {
+        alert("❌ Erro ao salvar pedido: " + erro);
     }
-    const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
-    if (gorjeta === 'sim') {
-        const valGor = parseFloat(document.getElementById('valorGorjeta').value) || 0;
-        texto += `💸 Gorjeta: R$ ${valGor.toFixed(2).replace('.', ',')}\n`;
-    }
-
-    texto += "══════════════════════════\n";
-    texto += `💰 VALOR FINAL TOTAL: ${document.getElementById('valTotal').textContent}`;
-
-    // SALVA NO HISTÓRICO
-    historicoPedidos.push({
-        data: new Date().toLocaleDateString('pt-BR'),
-        hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
-        valor: parseFloat(document.getElementById('valTotal').textContent.replace('R$ ', '').replace(',', '.'))
-    });
-    atualizarPainel();
-
-    // ABRE WHATSAPP
-    const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
-    window.open(linkWpp, '_blank');
-    alert("✅ Pedido enviado para o WhatsApp!");
 }
 
 function refazerPedido() {
-    if (!confirm("⚠️ Apagar tudo e começar de novo?")) return;
-    contadorEntregas = 1;
-    dadosEntregas = [];
-    document.getElementById('listaEntregas').innerHTML = '';
-    document.getElementById('listaEntregas').innerHTML = `
-        <div class="bloco-entrega" id="entrega_1">
-            <div class="titulo-bloco"><h4>📦 DADOS DA ENTREGA 1</h4></div>
-            <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez só</span></h3>
-            <label>Nome da Loja <span>*</span></label>
-            <input type="text" class="nomeLoja" required placeholder="Nome da sua loja">
-            <label>Contato <span>*</span></label>
-            <input type="tel" class="contatoLoja" required placeholder="(32) 9XXXX-XXXX">
-            <label>Endereço completo <span>*</span></label>
-            <input type="text" class="endLoja" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
-            <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
-            <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
-            <label>Nome do Cliente <span>*</span></label>
-            <input type="text" class="nomeDest" required placeholder="Nome completo">
-            <label>Contato do Cliente <span>*</span></label>
-            <input type="tel" class="contatoDest" required placeholder="(32) 9XXXX-XXXX">
-            <label>Endereço completo <span>*</span></label>
-            <input type="text" class="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
-            <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
-            <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
-            <input type="text" class="refDest" placeholder="Perto de onde?">
-        </div>
-    `;
+    document.getElementById('nomeLoja').value = '';
+    document.getElementById('contatoLoja').value = '';
+    document.getElementById('endLoja').value = '';
+    document.getElementById('nomeDest').value = '';
+    document.getElementById('contatoDest').value = '';
+    document.getElementById('endDest').value = '';
+    document.getElementById('refDest').value = '';
     document.querySelector('input[name="retorno"][value="nao"]').checked = true;
     document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
     document.getElementById('valorGorjeta').value = '';
     document.getElementById('valorGorjeta').style.display = 'none';
     document.getElementById('resumoPedido').classList.add('escondido');
+    dadosPedidoAtual = null;
 }
 
 function verificarLoginPainel() {
@@ -528,55 +444,63 @@ function verificarLoginPainel() {
     if (user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
         document.getElementById('loginPainel').classList.add('escondido');
         document.getElementById('conteudoPainel').classList.remove('escondido');
-        inicializarGraficos();
-        atualizarPainel();
+        carregarPedidosPainel();
     } else {
         document.getElementById('erroLoginPainel').classList.remove('escondido');
     }
 }
 
-function inicializarGraficos() {
-    const ctx1 = document.getElementById('graficoFaturamento').getContext('2d');
-    const ctx2 = document.getElementById('graficoQuantidade').getContext('2d');
-    
-    graficoFat = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-            datasets: [{ label: 'R$ Faturado', data: [0,0,0,0,0,0,0], backgroundColor: '#FFD700', borderRadius: 8 }]
-        }, options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
+function carregarPedidosPainel() {
+    referenciaPedidos.on('value', (snapshot) => {
+        const todosPedidos = snapshot.val() || {};
+        const lista = document.getElementById('listaHistorico');
+        let totalDia = 0, qtdDia = 0, totalMes = 0;
+        const hoje = new Date().toLocaleDateString('pt-BR');
 
-    graficoQtd = new Chart(ctx2, {
-        type: 'line',
-        data: {
-            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-            datasets: [{ label: 'Qtd Entregas', data: [0,0,0,0,0,0,0], borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,0.2)', tension: 0.4, fill: true }]
-        }, options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        lista.innerHTML = '';
+        Object.values(todosPedidos).reverse().forEach(pedido => {
+            if (pedido.data === hoje && pedido.status === "Concluído") {
+                totalDia += pedido.valorFinal;
+                qtdDia++;
+            }
+            if (pedido.status === "Concluído") totalMes += pedido.valorFinal;
+
+            const item = document.createElement('div');
+            item.className = 'item-pedido';
+            item.innerHTML = `
+                <strong>📅 ${pedido.data} ${pedido.hora} | ${pedido.nomeLoja}</strong><br>
+                👤 Cliente: ${pedido.nomeDest}<br>
+                📍 ${pedido.endDest}<br>
+                📏 ${pedido.kmArredondado} km<br>
+                💰 Valor: R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')}<br>
+                <span class="${pedido.status === 'Concluído' ? 'status-concluido' : 'status-pendente'}">📌 ${pedido.status}</span>
+                <button class="btn btn-principal" style="padding:8px; font-size:13px; margin-top:8px;" onclick="marcarConcluido('${pedido.data}-${pedido.hora}')">Marcar Entregue</button>
+            `;
+            lista.appendChild(item);
+        });
+
+        document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
+        document.getElementById('qtdDia').textContent = qtdDia;
+        document.getElementById('fatMes').textContent = `R$ ${(totalMes).toFixed(2).replace('.', ',')}`;
+        document.getElementById('mediaEntrega').textContent = qtdDia > 0 ? `R$ ${(totalDia / qtdDia).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+
+        if (Object.keys(todosPedidos).length === 0) {
+            lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos dos lojistas...</p>';
+        }
     });
 }
 
-function atualizarPainel() {
-    const valorTotal = historicoPedidos.reduce((soma, p) => soma + p.valor, 0);
-    const qtdTotal = historicoPedidos.length;
-    const media = qtdTotal > 0 ? valorTotal / qtdTotal : 0;
-
-    document.getElementById('fatDia').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
-    document.getElementById('qtdDia').textContent = qtdTotal;
-    document.getElementById('fatMes').textContent = `R$ ${(valorTotal * 22).toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaEntrega').textContent = `R$ ${media.toFixed(2).replace('.', ',')}`;
-
-    const lista = document.getElementById('listaHistorico');
-    if (qtdTotal === 0) {
-        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido registrado ainda.</p>';
-    } else {
-        lista.innerHTML = historicoPedidos.map(p => `
-            <div class="item-pedido">
-                <strong>📅 ${p.data} ${p.hora}</strong><br>
-                💰 Valor: R$ ${p.valor.toFixed(2).replace('.', ',')}
-            </div>
-        `).reverse().join('');
-    }
+async function marcarConcluido(id) {
+    if (!confirm("Marcar esta entrega como concluída? Apenas pedidos concluídos entram nos cálculos.")) return;
+    await referenciaPedidos.once('value').then(snapshot => {
+        const dados = snapshot.val();
+        for (const chave in dados) {
+            if (`${dados[chave].data}-${dados[chave].hora}` === id) {
+                referenciaPedidos.child(chave).update({status: "Concluído"});
+                break;
+            }
+        }
+    });
 }
 
 function sairPainel() {
@@ -595,4 +519,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                    </html>
+                                                                                                </html>
