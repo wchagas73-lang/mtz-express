@@ -143,8 +143,6 @@
                     </div>
                 </div>
 
-                <button class="btn btn-mais" onclick="adicionarEntrega()">➕ ADICIONAR MAIS ENTREGA</button>
-
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">⚙️ Opções Adicionais</h3>
                 
                 <div class="caixa-retorno">
@@ -326,56 +324,6 @@ function mostrarAba(nomeAba) {
     event.currentTarget.classList.add('ativa');
     document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
     document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
-}
-
-function adicionarEntrega() {
-    contadorEntregas++;
-    const lista = document.getElementById('listaEntregas');
-    const modelo = document.getElementById('entrega_1').cloneNode(true);
-    
-    modelo.id = `entrega_${contadorEntregas}`;
-    modelo.querySelector('h4').textContent = `📦 DADOS DA ENTREGA ${contadorEntregas}`;
-    
-    // 🚫 SEGUNDA ENTREGA EM DIANTE: SÓ DADOS DO CLIENTE
-    if (contadorEntregas >= 2) {
-        modelo.innerHTML = '';
-        const titulo = document.createElement('div');
-        titulo.className = 'titulo-bloco';
-        titulo.innerHTML = `<h4>📦 DADOS DA ENTREGA ${contadorEntregas}</h4>`;
-        modelo.appendChild(titulo);
-        
-        const aviso = document.createElement('div');
-        aviso.className = 'aviso-mesmo-loja';
-        aviso.textContent = '✅ MESMA LOJA — DADOS SOMADOS NO VALOR TOTAL';
-        modelo.appendChild(aviso);
-        
-        const camposCliente = document.createElement('div');
-        camposCliente.innerHTML = `
-            <h3 style="color:var(--dourado); margin:15px 0 14px;">🏠 Dados do Cliente</h3>
-            <label>Nome do Cliente <span>*</span></label>
-            <input type="text" class="nomeDest" required placeholder="Nome completo">
-            <label>Contato do Cliente <span>*</span></label>
-            <input type="tel" class="contatoDest" required placeholder="(32) 9XXXX-XXXX">
-            <label>Endereço completo <span>*</span></label>
-            <input type="text" class="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
-            <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
-            <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
-            <input type="text" class="refDest" placeholder="Perto de onde?">
-        `;
-        modelo.appendChild(camposCliente);
-    }
-
-    const botaoRemover = document.createElement('button');
-    botaoRemover.className = 'btn btn-remover';
-    botaoRemover.style.marginTop = '10px';
-    botaoRemover.textContent = '🗑️ REMOVER ESSA ENTREGA';
-    botaoRemover.onclick = function() {
-        modelo.remove();
-        calcular();
-    };
-    modelo.appendChild(botaoRemover);
-
-    lista.appendChild(modelo);
 }
 
 async function calcular() {
@@ -647,4 +595,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+                    </html>
