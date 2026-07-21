@@ -280,9 +280,10 @@ firebase.initializeApp(firebaseConfig);
 const banco = firebase.database();
 const referenciaPedidos = banco.ref('pedidos');
 
+// ✅ SEU NÚMERO EXCLUSIVO — NENHUM OUTRO SERÁ USADO
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
-const NUMERO_WHATSAPP = "553299953215";
+const NUMERO_WHATSAPP = "5532999953215"; // (32) 9 9995-3215 — CORRETO E EXATO
 
 let googleCarregado = false;
 let servicoDistancia = null;
@@ -397,31 +398,37 @@ async function gerarPedido() {
     try {
         await referenciaPedidos.push(dadosPedidoAtual);
         
+        // ✅ LINKS DO GOOGLE MAPS — LOJA E CLIENTE, TODOS CORRETOS
         const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
         const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
         
+        // ✅ MENSAGEM COMPLETA COM TODOS OS DADOS
         let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
         texto += "══════════════════════════\n";
         texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
-        texto += "📞 CONTATO: " + dadosPedidoAtual.contatoLoja + "\n";
-        texto += "📍 ENDEREÇO: " + dadosPedidoAtual.endLoja + "\n";
-        texto += "🔗 MAPA: " + linkLoja + "\n";
+        texto += "📞 CONTATO LOJA: " + dadosPedidoAtual.contatoLoja + "\n";
+        texto += "📍 ENDEREÇO LOJA: " + dadosPedidoAtual.endLoja + "\n";
+        texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
         texto += "══════════════════════════\n";
         texto += "👤 CLIENTE: " + dadosPedidoAtual.nomeDest + "\n";
-        texto += "📞 CONTATO: " + dadosPedidoAtual.contatoDest + "\n";
-        texto += "📍 ENDEREÇO: " + dadosPedidoAtual.endDest + "\n";
-        texto += "🔗 MAPA: " + linkCliente + "\n";
-        texto += "📏 DISTÂNCIA: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
+        texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
+        texto += "📍 ENDEREÇO CLIENTE: " + dadosPedidoAtual.endDest + "\n";
+        texto += "🔗 MAPA CLIENTE: " + linkCliente + "\n";
+        if (dadosPedidoAtual.refDest) texto += "📍 PONTO DE REFERÊNCIA: " + dadosPedidoAtual.refDest + "\n";
         texto += "══════════════════════════\n";
+        texto += "📏 DISTÂNCIA REAL: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
+        texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
         texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',');
 
+        // ✅ ENVIO EXCLUSIVO PARA O SEU WHATSAPP — NENHUM OUTRO
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
         window.open(linkWpp, '_blank');
-        alert("✅ Pedido enviado! Já aparece no seu painel automaticamente.");
+        
+        alert("✅ Pedido enviado com sucesso! A mensagem abre direto no seu WhatsApp (32) 9 9995-3215.");
         refazerPedido();
 
     } catch (erro) {
-        alert("❌ Erro ao salvar pedido: " + erro);
+        alert("❌ Erro ao enviar pedido: " + erro);
     }
 }
 
@@ -539,4 +546,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                                            </html>
+</html>
