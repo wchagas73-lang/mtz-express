@@ -54,6 +54,7 @@
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
+        .btn-cancelar {background: linear-gradient(90deg, #f87171, #ef4444); color: white; padding: 10px; font-size: 14px; margin-top: 8px;}
         .btn-remover {background: var(--perigo); color: white; padding: 8px 12px; font-size: 14px; width: auto;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
@@ -84,6 +85,8 @@
         .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
+        .status-cancelado {color: #ef4444; font-weight: bold;}
+        .botoes-pedido {display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;}
     </style>
 </head>
 <body>
@@ -458,12 +461,25 @@ function carregarPedidosPainel() {
         const hoje = new Date().toLocaleDateString('pt-BR');
 
         lista.innerHTML = '';
-        Object.values(todosPedidos).reverse().forEach(pedido => {
+        Object.entries(todosPedidos).reverse().forEach(([chave, pedido]) => {
+            // SÓ SOMA SE FOR CONCLUÍDO — PENDENTE E CANCELADO NÃO ALTERAM NADA
             if (pedido.data === hoje && pedido.status === "Concluído") {
                 totalDia += pedido.valorFinal;
                 qtdDia++;
             }
             if (pedido.status === "Concluído") totalMes += pedido.valorFinal;
+
+            // Define a cor do status
+            let classeStatus = "status-pendente";
+            let textoStatus = "📌 Pendente";
+            if (pedido.status === "Concluído") {
+                classeStatus = "status-concluido";
+                textoStatus = "✅ Concluído";
+            }
+            if (pedido.status === "Cancelado") {
+                classeStatus = "status-cancelado";
+                textoStatus = "❌ Cancelado";
+            }
 
             const item = document.createElement('div');
             item.className = 'item-pedido';
@@ -473,8 +489,13 @@ function carregarPedidosPainel() {
                 📍 ${pedido.endDest}<br>
                 📏 ${pedido.kmArredondado} km<br>
                 💰 Valor: R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')}<br>
-                <span class="${pedido.status === 'Concluído' ? 'status-concluido' : 'status-pendente'}">📌 ${pedido.status}</span>
-                <button class="btn btn-principal" style="padding:8px; font-size:13px; margin-top:8px;" onclick="marcarConcluido('${pedido.data}-${pedido.hora}')">Marcar Entregue</button>
+                <span class="${classeStatus}">${textoStatus}</span>
+                <div class="botoes-pedido">
+                    ${pedido.status === "Pendente" ? `
+                        <button class="btn btn-principal" style="padding:8px; font-size:13px;" onclick="marcarConcluido('${chave}')">Marcar Entregue</button>
+                        <button class="btn btn-cancelar" style="padding:8px; font-size:13px;" onclick="marcarCancelado('${chave}')">Cancelar/Não Entregue</button>
+                    ` : ''}
+                </div>
             `;
             lista.appendChild(item);
         });
@@ -490,17 +511,16 @@ function carregarPedidosPainel() {
     });
 }
 
-async function marcarConcluido(id) {
-    if (!confirm("Marcar esta entrega como concluída? Apenas pedidos concluídos entram nos cálculos.")) return;
-    await referenciaPedidos.once('value').then(snapshot => {
-        const dados = snapshot.val();
-        for (const chave in dados) {
-            if (`${dados[chave].data}-${dados[chave].hora}` === id) {
-                referenciaPedidos.child(chave).update({status: "Concluído"});
-                break;
-            }
-        }
-    });
+async function marcarConcluido(chavePedido) {
+    if (!confirm("✅ Marcar esta entrega como REALIZADA? Apenas essa vai contar no faturamento.")) return;
+    await referenciaPedidos.child(chavePedido).update({status: "Concluído"});
+    alert("✅ Entrega confirmada! Já entra nos seus cálculos.");
+}
+
+async function marcarCancelado(chavePedido) {
+    if (!confirm("❌ Cancelar este pedido? Ele NÃO vai contar no faturamento, só fica salvo no histórico.")) return;
+    await referenciaPedidos.child(chavePedido).update({status: "Cancelado"});
+    alert("❌ Pedido cancelado! Não altera seus valores.");
 }
 
 function sairPainel() {
@@ -519,4 +539,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                                                                                                </html>
+                                            </html>
