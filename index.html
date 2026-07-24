@@ -26,7 +26,7 @@
         .icone-superior {font-size: 52px; color: var(--dourado); text-shadow: 0 0 15px var(--dourado); margin-bottom: 8px;}
         .logo-texto {font-size: 46px; font-weight: 900; text-align: center; margin-bottom: 10px; color: var(--dourado); text-shadow: 0 0 10px var(--dourado);}
         .slogan {font-size: 19px; color: #FFF8C1; margin-bottom: 18px; font-weight: 600;}
-        .dados-rapidos {padding: 18px; background: rgba(255,215,0,0.1); border-radius: 20px; border-left: 5px solid var(--dourado); font-size: 16px; line-height: 2; margin-bottom:10px;}
+        .dados-rapidos {padding: 18px; background: rgba(255,215,0,0.1); border-radius: 20px border-left: 5px solid var(--dourado); font-size: 16px; line-height: 2; margin-bottom:10px;}
         .dados-rapidos strong {color: var(--dourado);}
 
         .abas {display: flex; gap: 12px; margin: 28px 0; flex-wrap: wrap;}
@@ -120,28 +120,28 @@
                             <h4>📦 DADOS DA ENTREGA</h4>
                         </div>
 
-                        <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez só</span></h3>
+                        <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez, fica salvo</span></h3>
                         
                         <label>Nome da Loja <span>*</span></label>
-                        <input type="text" id="nomeLoja" required placeholder="Nome da sua loja">
+                        <input type="text" id="nomeLoja" placeholder="Nome da sua loja">
                         
-                        <label>Contato <span>*</span></label>
-                        <input type="tel" id="contatoLoja" required placeholder="(32) 9XXXX-XXXX">
+                        <label>Contato <span class="opcional">(Opcional)</span></label>
+                        <input type="tel" id="contatoLoja" placeholder="(32) 9XXXX-XXXX">
                         
                         <label>Endereço completo <span>*</span></label>
-                        <input type="text" id="endLoja" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <input type="text" id="endLoja" placeholder="Rua, número, bairro — Juiz de Fora-MG">
                         <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
                         
                         <label>Nome do Cliente <span>*</span></label>
-                        <input type="text" id="nomeDest" required placeholder="Nome completo">
+                        <input type="text" id="nomeDest" placeholder="Nome completo">
                         
-                        <label>Contato do Cliente <span>*</span></label>
-                        <input type="tel" id="contatoDest" required placeholder="(32) 9XXXX-XXXX">
+                        <label>Contato do Cliente <span class="opcional">(Opcional)</span></label>
+                        <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX">
                         
                         <label>Endereço completo <span>*</span></label>
-                        <input type="text" id="endDest" required placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                        <input type="text" id="endDest" placeholder="Rua, número, bairro — Juiz de Fora-MG">
                         <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                         <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
@@ -289,6 +289,29 @@ let googleCarregado = false;
 let servicoDistancia = null;
 let dadosPedidoAtual = null;
 
+// ✅ SALVAMENTO AUTOMÁTICO DOS DADOS DA LOJA (LocalStorage)
+function carregarDadosLojaSalvos() {
+    const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
+    if (dadosSalvos) {
+        const loja = JSON.parse(dadosSalvos);
+        document.getElementById('nomeLoja').value = loja.nome || '';
+        document.getElementById('contatoLoja').value = loja.contato || '';
+        document.getElementById('endLoja').value = loja.endereco || '';
+    }
+}
+function salvarDadosLojaAutomatico() {
+    const dados = {
+        nome: document.getElementById('nomeLoja').value.trim(),
+        contato: document.getElementById('contatoLoja').value.trim(),
+        endereco: document.getElementById('endLoja').value.trim()
+    };
+    localStorage.setItem('dadosLojaMTZ', JSON.stringify(dados));
+}
+// Dispara ao digitar nos campos da loja
+document.addEventListener('input', (e) => {
+    if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
+});
+
 function buscarValorPorKm(kmArredondado) {
     return 8.00 + kmArredondado * 1.00;
 }
@@ -296,6 +319,7 @@ function buscarValorPorKm(kmArredondado) {
 function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
+    carregarDadosLojaSalvos(); // ✅ Ao abrir, carrega dados salvos da loja
 }
 
 function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
@@ -338,8 +362,9 @@ async function calcular() {
     const contatoDest = document.getElementById('contatoDest').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
 
-    if (!nomeLoja || !contatoLoja || !endLoja || !nomeDest || !contatoDest || !endDest) {
-        alert("⚠️ Preencha todos os campos obrigatórios!");
+    // ✅ AGORA SÓ NOME E ENDEREÇOS SÃO OBRIGATÓRIOS — CONTATOS OPCIONAIS
+    if (!nomeLoja || !endLoja || !nomeDest || !endDest) {
+        alert("⚠️ Preencha: Nome e Endereço da Loja + Nome e Endereço do Cliente!");
         return;
     }
 
@@ -402,16 +427,16 @@ async function gerarPedido() {
         const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
         const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
         
-        // ✅ MENSAGEM COMPLETA COM TODOS OS DADOS
+        // ✅ MENSAGEM COMPLETA COM TODOS OS DADOS (CONTATOS APARECEM SE PREENCHIDOS)
         let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
         texto += "══════════════════════════\n";
         texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
-        texto += "📞 CONTATO LOJA: " + dadosPedidoAtual.contatoLoja + "\n";
+        if (dadosPedidoAtual.contatoLoja) texto += "📞 CONTATO LOJA: " + dadosPedidoAtual.contatoLoja + "\n";
         texto += "📍 ENDEREÇO LOJA: " + dadosPedidoAtual.endLoja + "\n";
         texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
         texto += "══════════════════════════\n";
         texto += "👤 CLIENTE: " + dadosPedidoAtual.nomeDest + "\n";
-        texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
+        if (dadosPedidoAtual.contatoDest) texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
         texto += "📍 ENDEREÇO CLIENTE: " + dadosPedidoAtual.endDest + "\n";
         texto += "🔗 MAPA CLIENTE: " + linkCliente + "\n";
         if (dadosPedidoAtual.refDest) texto += "📍 PONTO DE REFERÊNCIA: " + dadosPedidoAtual.refDest + "\n";
@@ -433,9 +458,7 @@ async function gerarPedido() {
 }
 
 function refazerPedido() {
-    document.getElementById('nomeLoja').value = '';
-    document.getElementById('contatoLoja').value = '';
-    document.getElementById('endLoja').value = '';
+    // ✅ NÃO apaga os dados da loja — mantém salvo! Só limpa cliente
     document.getElementById('nomeDest').value = '';
     document.getElementById('contatoDest').value = '';
     document.getElementById('endDest').value = '';
@@ -546,4 +569,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-</html>
+                        </html>
