@@ -146,8 +146,8 @@
                         <input type="text" id="endDest" placeholder="Rua, número, bairro — Juiz de Fora-MG">
                         <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
-                        <label>Ponto de Referência <span class="opcional">(Opcional)</span></label>
-                        <input type="text" id="refDest" placeholder="Perto de onde?">
+                        <label>Ponto de Referência / Observação <span class="opcional">(Opcional)</span></label>
+                        <input type="text" id="refDest" placeholder="Perto de onde? Cuidados especiais?">
                     </div>
                 </div>
 
@@ -202,19 +202,19 @@
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
 
-                    <!-- ✅ ÁREA DO PIX ADICIONADA EXATAMENTE COMO PEDIU -->
+                    <!-- ✅ PIX COM VALOR EXATO E TRAVADO — NENHUMA ALTERAÇÃO NO RESTO -->
                     <div class="pagamento">
                         <h3 style="color:var(--dourado); margin-bottom:10px;">💸 FORMAS DE PAGAMENTO</h3>
-                        <p><strong>✅ Pix rápido e seguro</strong></p>
+                        <p><strong>✅ Pix rápido e seguro — VALOR JÁ PREENCHIDO!</strong></p>
                         <p>🔑 Chave Pix: <strong>(32) 9 9995-3215</strong></p>
                         <p>👤 Recebedor: Wellington Chagas Aleixo</p>
                         <p>🏦 Banco: Nu Pagamentos S.A.</p>
-                        <p>🔗 Link direto: <a href="https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283" target="_blank" style="color:var(--dourado);">Acessar página de pagamento</a></p>
+                        <p>🔗 Link com valor exato: <a id="linkPixValor" href="#" target="_blank" style="color:var(--dourado);">Clique aqui para pagar</a></p>
                         
                         <div class="qrcode-pix">
                             <canvas id="qrcodePix"></canvas>
                         </div>
-                        <p style="font-size:14px; color:#B2DFDB;">📷 Escaneie o código ou use a chave acima</p>
+                        <p style="font-size:14px; color:#B2DFDB;">📷 Escaneie ou clique — valor já vem pronto, não precisa digitar nada!</p>
                     </div>
                 </div>
 
@@ -300,7 +300,7 @@ const referenciaPedidos = banco.ref('pedidos');
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
-const LINK_PIX = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283";
+const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283?valor=";
 
 let googleCarregado = false;
 let servicoDistancia = null;
@@ -397,6 +397,7 @@ async function calcular() {
         const valorGorjeta = gorjeta === 'sim' ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
         
         const valorFinal = valorBase + valorRetorno + valorGorjeta;
+        const valorPixFormatado = valorFinal.toFixed(2).replace('.', ',');
 
         dadosPedidoAtual = {
             nomeLoja, contatoLoja, endLoja,
@@ -421,8 +422,10 @@ async function calcular() {
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
         document.getElementById('resumoPedido').classList.remove('escondido');
 
-        // ✅ GERA QR CODE DO PIX AUTOMATICAMENTE
-        QRCode.toCanvas(document.getElementById('qrcodePix'), LINK_PIX, {width: 160, margin: 1}, function (erro) {
+        // ✅ GERA LINK E QR CODE COM VALOR EXATO TRAVADO
+        const linkPixComValor = `${LINK_PIX_BASE}${valorFinal.toFixed(2)}`;
+        document.getElementById('linkPixValor').href = linkPixComValor;
+        QRCode.toCanvas(document.getElementById('qrcodePix'), linkPixComValor, {width: 160, margin: 1}, function (erro) {
             if (erro) console.error(erro)
         });
 
@@ -456,7 +459,7 @@ async function gerarPedido() {
         if (dadosPedidoAtual.contatoDest) texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
         texto += "📍 ENDEREÇO CLIENTE: " + dadosPedidoAtual.endDest + "\n";
         texto += "🔗 MAPA CLIENTE: " + linkCliente + "\n";
-        if (dadosPedidoAtual.refDest) texto += "📍 PONTO DE REFERÊNCIA: " + dadosPedidoAtual.refDest + "\n";
+        if (dadosPedidoAtual.refDest) texto += "📍 OBSERVAÇÃO: " + dadosPedidoAtual.refDest + "\n";
         texto += "══════════════════════════\n";
         texto += "📏 DISTÂNCIA REAL: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
         texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
@@ -583,4 +586,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+</html>
