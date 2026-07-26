@@ -36,8 +36,8 @@
         label {display: block; margin: 18px 0 6px; font-weight: 700; font-size: 15px;}
         label span {color: var(--perigo);}
         label .opcional {color: var(--cinza); font-weight: 500;}
-        input {width: 100%; padding: 14px 16px; border: 2px solid var(--borda); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none; transition: border 0.3s;}
-        input:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
+        input, select {width: 100%; padding: 14px 16px; border: 2px solid var(--borda); border-radius: 16px; background: rgba(15,43,51,0.6); color: white; font-size: 16px; outline: none; transition: border 0.3s;}
+        input:focus, select:focus {border-color: var(--dourado); box-shadow: 0 0 0 4px rgba(255,215,0,0.2);}
         .linha-dupla {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
         .opcoes-linha {display: flex; gap: 15px; align-items: center; margin: 10px 0; flex-wrap: wrap;}
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
@@ -48,8 +48,8 @@
         .carregando {color: var(--dourado); font-weight: 600; animation: piscar 1s infinite;}
         @keyframes piscar {50% {opacity: 0.5;}}
 
-        .linha-botoes {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0 10px;}
-        .btn {width: 100%; padding: 16px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s;}
+        .linha-botoes {display: flex; gap: 12px; margin: 30px 0 10px; flex-wrap: wrap;}
+        .btn {flex: 1; min-width: 120px; padding: 16px; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; cursor: pointer; transition: all 0.3s;}
         .btn:hover {transform: translateY(-2px);}
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
@@ -65,10 +65,11 @@
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
         .qrcode-pix {margin: 15px auto; padding: 10px; background: white; border-radius: 12px; display: inline-block;}
         .item-resumo {padding: 6px 0; border-bottom: 1px dashed rgba(255,215,0,0.3);}
-        .tabela-wrapper {max-height: 320px; overflow-y: auto; border-radius: 18px; border: 2px solid var(--dourado);}
+        .tabela-wrapper {border-radius: 18px; border: 2px solid var(--dourado);}
         .tabela-valores {width:100%; border-collapse:collapse;}
         .tabela-valores th {background:var(--dourado); color:#1A1A1A; padding:14px; text-align:center; font-weight:800;}
         .tabela-valores td {padding:12px; text-align:center; border-bottom:1px solid var(--borda); background:rgba(0,200,150,0.06);}
+        .aviso-tabela {background:rgba(255,215,0,0.12); border:2px solid var(--dourado); border-radius:16px; padding:16px; margin-top:15px; text-align:center; font-weight:600;}
         .destaque-percurso {background:rgba(255,215,0,0.15); border:2px solid var(--dourado); border-radius:18px; padding:18px; margin:20px 0; font-weight:600; line-height:2; text-align:center;}
         .titulo-bloco {display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
@@ -78,17 +79,17 @@
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
         hr {border:none; border-top:2px solid var(--dourado); margin:15px 0;}
 
-        .grade-dados {display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;}
+        .grade-dados {display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;}
         .card-dado {background: rgba(255,215,0,0.1); border: 2px solid var(--dourado); border-radius: 16px; padding: 18px; text-align: center;}
         .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
         .card-dado .valor {font-size: 26px; font-weight: 900;}
         .area-grafico {background: rgba(255,255,255,0.03); border: 2px solid var(--borda); border-radius: 20px; padding: 20px; margin: 25px 0;}
-        .lista-pedidos {max-height: 350px; overflow-y: auto; margin-top: 20px;}
+        .lista-pedidos {max-height: 400px; overflow-y: auto; margin-top: 20px;}
         .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
         .status-cancelado {color: #ef4444; font-weight: bold;}
-        .botoes-pedido {display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;}
+        .filtro-ativo {background: var(--primaria); color: white;}
     </style>
 </head>
 <body>
@@ -116,39 +117,37 @@
                     📍 SOMA TODOS OS KM • ARREDONDA PARA CIMA • VALOR ÚNICO
                 </div>
 
-                <div id="listaEntregas">
-                    <div class="bloco-entrega" id="entrega_1">
-                        <div class="titulo-bloco">
-                            <h4>📦 DADOS DA ENTREGA</h4>
-                        </div>
-
-                        <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez, fica salvo</span></h3>
-                        
-                        <label>Nome da Loja <span>*</span></label>
-                        <input type="text" id="nomeLoja" placeholder="Nome da sua loja">
-                        
-                        <label>Contato <span class="opcional">(Opcional)</span></label>
-                        <input type="tel" id="contatoLoja" placeholder="(32) 9XXXX-XXXX">
-                        
-                        <label>Endereço completo <span>*</span></label>
-                        <input type="text" id="endLoja" placeholder="Rua, número, bairro — Juiz de Fora-MG">
-                        <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
-
-                        <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
-                        
-                        <label>Nome do Cliente <span>*</span></label>
-                        <input type="text" id="nomeDest" placeholder="Nome completo">
-                        
-                        <label>Contato do Cliente <span class="opcional">(Opcional)</span></label>
-                        <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX">
-                        
-                        <label>Endereço completo <span>*</span></label>
-                        <input type="text" id="endDest" placeholder="Rua, número, bairro — Juiz de Fora-MG">
-                        <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
-
-                        <label>Ponto de Referência / Observação <span class="opcional">(Opcional)</span></label>
-                        <input type="text" id="refDest" placeholder="Perto de onde? Cuidados especiais?">
+                <div class="bloco-entrega">
+                    <div class="titulo-bloco">
+                        <h4>📦 DADOS DA ENTREGA</h4>
                     </div>
+
+                    <h3 style="color:var(--dourado); margin:0 0 14px;">🏪 Dados da Loja <span style="font-size:14px; color:#9CA3AF;">* Preencha uma vez, fica salvo</span></h3>
+                    
+                    <label>Nome da Loja <span>*</span></label>
+                    <input type="text" id="nomeLoja" placeholder="Nome da sua loja">
+                    
+                    <label>Contato <span class="opcional">(Opcional)</span></label>
+                    <input type="tel" id="contatoLoja" placeholder="(32) 9XXXX-XXXX">
+                    
+                    <label>Endereço completo <span>*</span></label>
+                    <input type="text" id="endLoja" placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                    <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
+
+                    <h3 style="color:var(--dourado); margin:30px 0 14px;">🏠 Dados do Cliente</h3>
+                    
+                    <label>Nome do Cliente <span>*</span></label>
+                    <input type="text" id="nomeDest" placeholder="Nome completo">
+                    
+                    <label>Contato do Cliente <span class="opcional">(Opcional)</span></label>
+                    <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX">
+                    
+                    <label>Endereço completo <span>*</span></label>
+                    <input type="text" id="endDest" placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                    <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
+
+                    <label>Ponto de Referência / Observação <span class="opcional">(Opcional)</span></label>
+                    <input type="text" id="refDest" placeholder="Perto de onde? Cuidados especiais?">
                 </div>
 
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">⚙️ Opções Adicionais</h3>
@@ -178,6 +177,18 @@
                     <input type="number" id="valorGorjeta" min="0" step="0.01" placeholder="R$ 0,00" style="margin-top:10px; display:none" oninput="calcular()">
                 </div>
 
+                <div class="caixa-pagamento" style="margin-top:20px;">
+                    <p><strong>💳 Quem vai pagar a entrega?</strong> <span>*</span></p>
+                    <div class="opcoes-linha">
+                        <label class="opcao-radio selecionado">
+                            <input type="radio" name="quemPaga" value="lojista" checked> Lojista (paga aqui na loja)
+                        </label>
+                        <label class="opcao-radio">
+                            <input type="radio" name="quemPaga" value="cliente"> Cliente (paga no endereço)
+                        </label>
+                    </div>
+                </div>
+
                 <div id="areaCalculando" class="carregando escondido">🔄 Calculando distância total com Google Maps...</div>
 
                 <div class="linha-botoes">
@@ -202,7 +213,6 @@
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
 
-                    <!-- ✅ PIX COM VALOR EXATO E TRAVADO — NENHUMA ALTERAÇÃO NO RESTO -->
                     <div class="pagamento">
                         <h3 style="color:var(--dourado); margin-bottom:10px;">💸 FORMAS DE PAGAMENTO</h3>
                         <p><strong>✅ Pix rápido e seguro — VALOR JÁ PREENCHIDO!</strong></p>
@@ -221,19 +231,22 @@
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
                 <div class="tabela-wrapper">
                     <table class="tabela-valores">
-                        <tr><th>Distância</th><th>Valor</th><th>Distância</th><th>Valor</th></tr>
-                        <tr><td>Até 1 km</td><td>R$ 9,00</td><td>11 km</td><td>R$ 19,00</td></tr>
-                        <tr><td>Até 2 km</td><td>R$ 10,00</td><td>12 km</td><td>R$ 20,00</td></tr>
-                        <tr><td>Até 3 km</td><td>R$ 11,00</td><td>13 km</td><td>R$ 21,00</td></tr>
-                        <tr><td>Até 4 km</td><td>R$ 12,00</td><td>14 km</td><td>R$ 22,00</td></tr>
-                        <tr><td>Até 5 km</td><td>R$ 13,00</td><td>15 km</td><td>R$ 23,00</td></tr>
-                        <tr><td>Até 6 km</td><td>R$ 14,00</td><td>16 km</td><td>R$ 24,00</td></tr>
-                        <tr><td>Até 7 km</td><td>R$ 15,00</td><td>17 km</td><td>R$ 25,00</td></tr>
-                        <tr><td>Até 8 km</td><td>R$ 16,00</td><td>18 km</td><td>R$ 26,00</td></tr>
-                        <tr><td>Até 9 km</td><td>R$ 17,00</td><td>19 km</td><td>R$ 27,00</td></tr>
-                        <tr><td>Até 10 km</td><td>R$ 18,00</td><td>20 km</td><td>R$ 28,00</td></tr>
-                        <tr><td colspan="4" style="text-align:center; font-weight:700;">✅ Acima de 20 km: + R$ 1,00 para cada km adicional</td></tr>
+                        <tr><th>Distância</th><th>Valor</th></tr>
+                        <tr><td>Até 1 km</td><td>R$ 9,00</td></tr>
+                        <tr><td>Até 2 km</td><td>R$ 10,00</td></tr>
+                        <tr><td>Até 3 km</td><td>R$ 11,00</td></tr>
+                        <tr><td>Até 4 km</td><td>R$ 12,00</td></tr>
+                        <tr><td>Até 5 km</td><td>R$ 13,00</td></tr>
+                        <tr><td>Até 6 km</td><td>R$ 14,00</td></tr>
+                        <tr><td>Até 7 km</td><td>R$ 16,00</td></tr>
+                        <tr><td>Até 8 km</td><td>R$ 18,00</td></tr>
+                        <tr><td>Até 9 km</td><td>R$ 20,00</td></tr>
+                        <tr><td>Até 10 km</td><td>R$ 22,00</td></tr>
                     </table>
+                </div>
+                <div class="aviso-tabela">
+                    <strong>📌 INFORMAÇÃO IMPORTANTE</strong><br>
+                    A partir do <strong>11º km em diante</strong>, cada quilômetro adicional acrescenta <strong>R$ 2,50</strong> ao valor total.
                 </div>
             </div>
 
@@ -268,7 +281,15 @@
                         </div>
                     </div>
 
-                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 TODOS OS PEDIDOS (ATUALIZA AUTOMÁTICO)</h3>
+                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 FILTRAR PEDIDOS</h3>
+                    <div class="linha-botoes">
+                        <button class="btn btn-secundario filtro-ativo" onclick="filtrarPedidos('todos')">Todos</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('pendente')">Pendentes</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('concluido')">Concluídos</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('cancelado')">Cancelados</button>
+                    </div>
+
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS</h3>
                     <div class="lista-pedidos" id="listaHistorico">
                         <p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos dos lojistas...</p>
                     </div>
@@ -305,6 +326,7 @@ const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82
 let googleCarregado = false;
 let servicoDistancia = null;
 let dadosPedidoAtual = null;
+let filtroAtivo = 'todos';
 
 function carregarDadosLojaSalvos() {
     const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
@@ -328,7 +350,11 @@ document.addEventListener('input', (e) => {
 });
 
 function buscarValorPorKm(kmArredondado) {
-    return 8.00 + kmArredondado * 1.00;
+    const valoresFixos = {
+        1:9, 2:10, 3:11, 4:12, 5:13, 6:14, 7:16, 8:18, 9:20, 10:22
+    };
+    if (kmArredondado <=10) return valoresFixos[kmArredondado];
+    return 22 + ((kmArredondado -10) * 2.5);
 }
 
 function iniciarGoogle() {
@@ -369,6 +395,13 @@ function mostrarAba(nomeAba) {
     document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
 }
 
+function filtrarPedidos(tipo) {
+    filtroAtivo = tipo;
+    document.querySelectorAll('.linha-botoes .btn').forEach(b => b.classList.remove('filtro-ativo'));
+    event.currentTarget.classList.add('filtro-ativo');
+    carregarPedidosPainel();
+}
+
 async function calcular() {
     const nomeLoja = document.getElementById('nomeLoja').value.trim();
     const contatoLoja = document.getElementById('contatoLoja').value.trim();
@@ -376,6 +409,7 @@ async function calcular() {
     const nomeDest = document.getElementById('nomeDest').value.trim();
     const contatoDest = document.getElementById('contatoDest').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
+    const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
 
     if (!nomeLoja || !endLoja || !nomeDest || !endDest) {
         alert("⚠️ Preencha: Nome e Endereço da Loja + Nome e Endereço do Cliente!");
@@ -403,6 +437,7 @@ async function calcular() {
             nomeLoja, contatoLoja, endLoja,
             nomeDest, contatoDest, endDest,
             refDest: document.getElementById('refDest').value.trim(),
+            quemPaga,
             kmReal, kmArredondado, valorBase, valorRetorno, valorGorjeta, valorFinal,
             data: new Date().toLocaleDateString('pt-BR'),
             hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
@@ -422,7 +457,6 @@ async function calcular() {
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
         document.getElementById('resumoPedido').classList.remove('escondido');
 
-        // ✅ GERA LINK E QR CODE COM VALOR EXATO TRAVADO
         const linkPixComValor = `${LINK_PIX_BASE}${valorFinal.toFixed(2)}`;
         document.getElementById('linkPixValor').href = linkPixComValor;
         QRCode.toCanvas(document.getElementById('qrcodePix'), linkPixComValor, {width: 160, margin: 1}, function (erro) {
@@ -448,6 +482,10 @@ async function gerarPedido() {
         const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
         const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
         
+        const textoQuemPaga = dadosPedidoAtual.quemPaga === 'lojista' 
+            ? '💳 QUEM PAGA: Lojista (paga aqui na loja)' 
+            : '💳 QUEM PAGA: Cliente (paga no endereço)';
+
         let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
         texto += "══════════════════════════\n";
         texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
@@ -464,6 +502,7 @@ async function gerarPedido() {
         texto += "📏 DISTÂNCIA REAL: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
         texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
         texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
+        texto += textoQuemPaga + "\n";
         texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo";
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
@@ -484,6 +523,7 @@ function refazerPedido() {
     document.getElementById('refDest').value = '';
     document.querySelector('input[name="retorno"][value="nao"]').checked = true;
     document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
+    document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
     document.getElementById('valorGorjeta').value = '';
     document.getElementById('valorGorjeta').style.display = 'none';
     document.getElementById('resumoPedido').classList.add('escondido');
@@ -511,6 +551,8 @@ function carregarPedidosPainel() {
 
         lista.innerHTML = '';
         Object.entries(todosPedidos).reverse().forEach(([chave, pedido]) => {
+            if (filtroAtivo !== 'todos' && pedido.status !== filtroAtivo) return;
+
             if (pedido.data === hoje && pedido.status === "Concluído") {
                 totalDia += pedido.valorFinal;
                 qtdDia++;
@@ -536,11 +578,15 @@ function carregarPedidosPainel() {
                 📍 ${pedido.endDest}<br>
                 📏 ${pedido.kmArredondado} km<br>
                 💰 Valor: R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')}<br>
+                💳 Pagamento: ${pedido.quemPaga === 'lojista' ? 'Lojista' : 'Cliente'}<br>
                 <span class="${classeStatus}">${textoStatus}</span>
                 <div class="botoes-pedido">
                     ${pedido.status === "Pendente" ? `
                         <button class="btn btn-principal" style="padding:8px; font-size:13px;" onclick="marcarConcluido('${chave}')">Marcar Entregue</button>
                         <button class="btn btn-cancelar" style="padding:8px; font-size:13px;" onclick="marcarCancelado('${chave}')">Cancelar</button>
+                    ` : ''}
+                    ${pedido.status === "Cancelado" ? `
+                        <button class="btn btn-perigo" style="padding:8px; font-size:13px;" onclick="excluirDefinitivamente('${chave}')">🗑️ EXCLUIR</button>
                     ` : ''}
                 </div>
             `;
@@ -570,6 +616,12 @@ async function marcarCancelado(chavePedido) {
     alert("❌ Pedido cancelado!");
 }
 
+async function excluirDefinitivamente(chavePedido) {
+    if (!confirm("🗑️ APAGAR PARA SEMPRE? Não tem volta, não aparece mais em lugar nenhum!")) return;
+    await referenciaPedidos.child(chavePedido).remove();
+    alert("✅ Pedido apagado com sucesso!");
+}
+
 function sairPainel() {
     document.getElementById('usuarioPainel').value = '';
     document.getElementById('senhaPainel').value = '';
@@ -586,4 +638,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-</html>
+                        </html>
