@@ -62,6 +62,7 @@
         
         .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
         .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
+        .mensagem-parceria {background: rgba(255,215,0,0.12); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0; text-align: center; font-weight: 700; font-size: 17px; color: #FFF8C1;}
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
         .qrcode-pix {margin: 15px auto; padding: 10px; background: white; border-radius: 12px; display: inline-block;}
         .item-resumo {padding: 6px 0; border-bottom: 1px dashed rgba(255,215,0,0.3);}
@@ -212,6 +213,12 @@
                     
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
+
+                    <!-- ✅ MENSAGEM DE PARCERIA ADICIONADA AQUI -->
+                    <div class="mensagem-parceria">
+                        💪🏿 Agradecemos pela confiança! 📸<br>
+                        Siga nosso Instagram @mtzexpress — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
+                    </div>
 
                     <div class="pagamento">
                         <h3 style="color:var(--dourado); margin-bottom:10px;">💸 FORMAS DE PAGAMENTO</h3>
@@ -503,7 +510,8 @@ async function gerarPedido() {
         texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
         texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
         texto += textoQuemPaga + "\n";
-        texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo";
+        texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo\n";
+        texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpress 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
         window.open(linkWpp, '_blank');
@@ -551,7 +559,10 @@ function carregarPedidosPainel() {
 
         lista.innerHTML = '';
         Object.entries(todosPedidos).reverse().forEach(([chave, pedido]) => {
-            if (filtroAtivo !== 'todos' && pedido.status !== filtroAtivo) return;
+            // REGRA DO FILTRO CORRIGIDA
+            if (filtroAtivo === 'pendente' && pedido.status !== 'Pendente') return;
+            if (filtroAtivo === 'concluido' && pedido.status !== 'Concluído') return;
+            if (filtroAtivo === 'cancelado' && pedido.status !== 'Cancelado') return;
 
             if (pedido.data === hoje && pedido.status === "Concluído") {
                 totalDia += pedido.valorFinal;
@@ -638,4 +649,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-                        </html>
+    </html>
