@@ -214,10 +214,10 @@
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
 
-                    <!-- ✅ MENSAGEM DE PARCERIA ADICIONADA AQUI -->
+                    <!-- ✅ MENSAGEM COM INSTAGRAM CORRETO @mtzexpresss -->
                     <div class="mensagem-parceria">
                         💪🏿 Agradecemos pela confiança! 📸<br>
-                        Siga nosso Instagram @mtzexpress — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
+                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
                     </div>
 
                     <div class="pagamento">
@@ -511,7 +511,8 @@ async function gerarPedido() {
         texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
         texto += textoQuemPaga + "\n";
         texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo\n";
-        texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpress 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
+        // ✅ INSTAGRAM CORRETO TAMBÉM NA MENSAGEM DO WHATSAPP
+        texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpresss 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
         window.open(linkWpp, '_blank');
@@ -559,7 +560,6 @@ function carregarPedidosPainel() {
 
         lista.innerHTML = '';
         Object.entries(todosPedidos).reverse().forEach(([chave, pedido]) => {
-            // REGRA DO FILTRO CORRIGIDA
             if (filtroAtivo === 'pendente' && pedido.status !== 'Pendente') return;
             if (filtroAtivo === 'concluido' && pedido.status !== 'Concluído') return;
             if (filtroAtivo === 'cancelado' && pedido.status !== 'Cancelado') return;
@@ -649,4 +649,4 @@ document.addEventListener('click', e => {
 });
 </script>
 </body>
-    </html>
+</html>
