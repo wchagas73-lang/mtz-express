@@ -319,9 +319,9 @@
                         <button class="btn btn-secundario" onclick="filtrarPedidos('cancelado')">Cancelados</button>
                     </div>
 
-                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS PENDENTES</h3>
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS</h3>
                     <div class="lista-pedidos" id="listaHistorico">
-                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido pendente no momento.</p>
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>
                     </div>
 
                     <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
@@ -335,13 +335,13 @@
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E***********",
+  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E9pQ6TzrQ0wV4",
   authDomain: "mtz-express-fcd0b.firebaseapp.com",
   databaseURL: "https://mtz-express-fcd0b-default-rtdb.firebaseio.com",
   projectId: "mtz-express-fcd0b",
   storageBucket: "mtz-express-fcd0b.appspot.com",
   messagingSenderId: "437748664314",
-  appId: "1:437748664314:web:371375ef8*********"
+  appId: "1:437748664314:web:371375ef8a9d7b2c8f8c7a"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -633,38 +633,68 @@ function atualizarListaPedidos() {
     const mesAtual = new Date().toLocaleDateString('pt-BR', {month:'2-digit', year:'numeric'});
 
     lista.innerHTML = '';
-    Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
-        // REGRA PRINCIPAL: SÓ MOSTRA PENDENTES NA LISTA VISÍVEL
-        if (pedido.status !== 'Pendente') return;
+    let temPedido = false;
 
+    Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
+        
+        // FILTRA DE ACORDO COM O BOTÃO SELECIONADO
+        let mostraPedido = false;
+        if (filtroAtivo === 'todos') mostraPedido = true;
+        if (filtroAtivo === 'pendente' && pedido.status === 'Pendente') mostraPedido = true;
+        if (filtroAtivo === 'concluido' && pedido.status === 'Concluído') mostraPedido = true;
+        if (filtroAtivo === 'cancelado' && pedido.status === 'Cancelado') mostraPedido = true;
+
+        // Calcula valores do dashboard
         const dataPedidoMes = pedido.data ? (pedido.data.split('/')[1] + '/' + pedido.data.split('/')[2]) : '';
         if (pedido.data === hoje && pedido.status === "Concluído") {
             totalDia += pedido.valorFinal || 0;
             qtdDia++;
         }
         if (dataPedidoMes === mesAtual && pedido.status === "Concluído") totalMes += pedido.valorFinal || 0;
+        }
 
-        lista.innerHTML += `
-        <div class="item-pedido">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                <span class="status-pendente">📌 Pendente</span>
-            </div>
-            <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
-            <p>📍 ${pedido.endLoja || 'Sem endereço'}</p>
-            <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}</p>
-            <p>📏 ${pedido.kmArredondado || 0} km</p>
+        // SÓ ADICIONA NA LISTA SE PASSAR NO FILTRO ESCOLHIDO
+        if (mostraPedido) {
+            temPedido = true;
+            let classeStatus, textoStatus;
+            if (pedido.status === 'Pendente') {
+                classeStatus = 'status-pendente';
+                textoStatus = '📌 Pendente';
+            } else if (pedido.status === 'Concluído') {
+                classeStatus = 'status-concluido';
+                textoStatus = '✅ Entregue';
+            } else {
+                classeStatus = 'status-cancelado';
+                textoStatus = '❌ Cancelado';
+            }
 
-            <div class="botoes-pedido">
-                <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick
-="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
-                <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
+            lista.innerHTML += `
+            <div class="item-pedido">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
+                    <span class="${classeStatus}">${textoStatus}</span>
+                </div>
+                <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
+                <p>📍 ${pedido.endLoja || 'Sem endereço'}</p>
+                <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}</p>
+                <p>📏 ${pedido.kmArredondado || 0} km</p>
+
+                <div class="botoes-pedido">
+                    ${pedido.status === 'Pendente' ? `
+                    <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
+                    <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
+                    ` : ''}
+                </div>
             </div>
-        </div>
-        `;
+            `;
+        }
     });
 
-    // Atualiza os valores do dashboard
+    if (!temPedido) {
+        lista.innerHTML = `<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado nessa opção.</p>`;
+    }
+
+    // Atualiza os valores do dashboard principal
     document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdDia').textContent = qtdDia;
     document.getElementById('fatMes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
@@ -672,9 +702,9 @@ function atualizarListaPedidos() {
     document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
 }
 
-// ✅ Função para alterar status: some da lista, fica salvo no banco e nos relatórios
+// ✅ Função para alterar status: move para a lista correta, fica salvo no banco
 function alterarStatusPedido(chavePedido, novoStatus) {
-    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"? Ele sumirá da lista visível mas ficará salvo nos seus relatórios.`)) {
+    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"? Ele vai aparecer na lista correspondente e ficar salvo nos relatórios.`)) {
         referenciaPedidos.child(chavePedido).update({
             status: novoStatus
         })
@@ -688,4 +718,4 @@ function alterarStatusPedido(chavePedido, novoStatus) {
 }
 </script>
 </body>
-                    </html>
+    </html>
