@@ -289,7 +289,6 @@
                         </div>
                     </div>
 
-                    <!-- ✅ FILTRO DE PERÍODO LIVRE FUNCIONAL -->
                     <div class="bloco-periodo">
                         <h3 style="color:var(--dourado); margin-bottom:15px;">📅 CONSULTAR PERÍODO LIVRE</h3>
                         <div class="linha-dupla">
@@ -320,9 +319,9 @@
                         <button class="btn btn-secundario" onclick="filtrarPedidos('cancelado')">Cancelados</button>
                     </div>
 
-                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS</h3>
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS PENDENTES</h3>
                     <div class="lista-pedidos" id="listaHistorico">
-                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos dos lojistas...</p>
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido pendente no momento.</p>
                     </div>
 
                     <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
@@ -475,10 +474,10 @@ function aplicarFiltroPeriodo() {
     let totalPeriodo = 0, qtdPeriodo = 0;
 
     Object.values(todosPedidosCarregados).forEach(pedido => {
-        if (!pedido.data) return;
+        if (!pedido.data || pedido.status !== "Concluído") return;
         const dataPedidoIso = converterDataBrParaIso(pedido.data);
         const dtPedido = new Date(dataPedidoIso);
-        if (dtPedido >= dtInicio && dtPedido <= dtFim && pedido.status === "Concluído") {
+        if (dtPedido >= dtInicio && dtPedido <= dtFim) {
             totalPeriodo += pedido.valorFinal || 0;
             qtdPeriodo++;
         }
@@ -521,7 +520,6 @@ async function calcular() {
         const valorGorjeta = gorjeta === 'sim' ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
         
         const valorFinal = valorBase + valorRetorno + valorGorjeta;
-        const valorPixFormatado = valorFinal.toFixed(2).replace('.', ',');
 
         dadosPedidoAtual = {
             nomeLoja, contatoLoja, endLoja,
@@ -636,9 +634,8 @@ function atualizarListaPedidos() {
 
     lista.innerHTML = '';
     Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
-        if (filtroAtivo === 'pendente' && pedido.status !== 'Pendente') return;
-        if (filtroAtivo === 'concluido' && pedido.status !== 'Concluído') return;
-        if (filtroAtivo === 'cancelado' && pedido.status !== 'Cancelado') return;
+        // REGRA PRINCIPAL: SÓ MOSTRA PENDENTES NA LISTA VISÍVEL
+        if (pedido.status !== 'Pendente') return;
 
         const dataPedidoMes = pedido.data ? (pedido.data.split('/')[1] + '/' + pedido.data.split('/')[2]) : '';
         if (pedido.data === hoje && pedido.status === "Concluído") {
@@ -647,22 +644,11 @@ function atualizarListaPedidos() {
         }
         if (dataPedidoMes === mesAtual && pedido.status === "Concluído") totalMes += pedido.valorFinal || 0;
 
-        let classeStatus = "status-pendente";
-        let textoStatus = "📌 Pendente";
-        if (pedido.status === "Concluído") {
-            classeStatus = "status-concluido";
-            textoStatus = "✅ Concluído";
-        }
-        if (pedido.status === "Cancelado") {
-            classeStatus = "status-cancelado";
-            textoStatus = "❌ Cancelado";
-        }
-
-                lista.innerHTML += `
+        lista.innerHTML += `
         <div class="item-pedido">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                <span class="${classeStatus}">${textoStatus}</span>
+                <span class="status-pendente">📌 Pendente</span>
             </div>
             <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
             <p>📍 ${pedido.endLoja || 'Sem endereço'}</p>
@@ -670,7 +656,8 @@ function atualizarListaPedidos() {
             <p>📏 ${pedido.kmArredondado || 0} km</p>
 
             <div class="botoes-pedido">
-                <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
+                <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick
+="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
                 <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
             </div>
         </div>
@@ -685,9 +672,9 @@ function atualizarListaPedidos() {
     document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
 }
 
-// ✅ Função para alterar status do pedido diretamente no painel
+// ✅ Função para alterar status: some da lista, fica salvo no banco e nos relatórios
 function alterarStatusPedido(chavePedido, novoStatus) {
-    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"?`)) {
+    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"? Ele sumirá da lista visível mas ficará salvo nos seus relatórios.`)) {
         referenciaPedidos.child(chavePedido).update({
             status: novoStatus
         })
@@ -701,4 +688,4 @@ function alterarStatusPedido(chavePedido, novoStatus) {
 }
 </script>
 </body>
-        </html>
+                    </html>
