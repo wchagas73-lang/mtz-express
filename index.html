@@ -91,8 +91,6 @@
         .status-concluido {color: #00C896; font-weight: bold;}
         .status-cancelado {color: #ef4444; font-weight: bold;}
         .filtro-ativo {background: var(--primaria); color: white;}
-        .bloco-periodo {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 25px 0;}
-        .botoes-pedido {display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;}
     </style>
 </head>
 <body>
@@ -216,6 +214,7 @@
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
 
+                    <!-- ✅ MENSAGEM COM INSTAGRAM CORRETO @mtzexpresss -->
                     <div class="mensagem-parceria">
                         💪🏿 Agradecemos pela confiança! 📸<br>
                         Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
@@ -280,7 +279,7 @@
                             <div class="valor" id="qtdDia">0</div>
                         </div>
                         <div class="card-dado">
-                            <h3>📅 Faturamento Mês Atual</h3>
+                            <h3>📅 Faturamento Mês</h3>
                             <div class="valor" id="fatMes">R$ 0,00</div>
                         </div>
                         <div class="card-dado">
@@ -289,29 +288,7 @@
                         </div>
                     </div>
 
-                    <div class="bloco-periodo">
-                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 CONSULTAR PERÍODO LIVRE</h3>
-                        <div class="linha-dupla">
-                            <div>
-                                <label>Data Inicial</label>
-                                <input type="date" id="dataInicial">
-                            </div>
-                            <div>
-                                <label>Data Final</label>
-                                <input type="date" id="dataFinal">
-                            </div>
-                        </div>
-                        <button class="btn btn-secundario" style="width:100%; margin-top:15px;" onclick="aplicarFiltroPeriodo()">🔍 APLICAR PERÍODO</button>
-                        
-                        <div id="resultadoPeriodo" class="escondido" style="margin-top:20px; padding:15px; background:rgba(0,200,150,0.1); border-radius:12px;">
-                            <h4 style="color:var(--dourado); margin-bottom:10px;">📊 VALORES DO PERÍODO SELECIONADO</h4>
-                            <p>📦 Total de entregas: <strong id="qtdPeriodo">0</strong></p>
-                            <p>💰 Faturamento total: <strong id="fatPeriodo">R$ 0,00</strong></p>
-                            <p>📊 Média por entrega: <strong id="mediaPeriodo">R$ 0,00</strong></p>
-                        </div>
-                    </div>
-
-                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 FILTRAR POR STATUS</h3>
+                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 FILTRAR PEDIDOS</h3>
                     <div class="linha-botoes">
                         <button class="btn btn-secundario filtro-ativo" onclick="filtrarPedidos('todos')">Todos</button>
                         <button class="btn btn-secundario" onclick="filtrarPedidos('pendente')">Pendentes</button>
@@ -321,7 +298,7 @@
 
                     <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS</h3>
                     <div class="lista-pedidos" id="listaHistorico">
-                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos dos lojistas...</p>
                     </div>
 
                     <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
@@ -335,13 +312,13 @@
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E9pQ6TzrQ0wV4",
+  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E***********",
   authDomain: "mtz-express-fcd0b.firebaseapp.com",
   databaseURL: "https://mtz-express-fcd0b-default-rtdb.firebaseio.com",
   projectId: "mtz-express-fcd0b",
   storageBucket: "mtz-express-fcd0b.appspot.com",
   messagingSenderId: "437748664314",
-  appId: "1:437748664314:web:371375ef8a9d7b2c8f8c7a"
+  appId: "1:437748664314:web:371375ef8*********"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -357,7 +334,6 @@ let googleCarregado = false;
 let servicoDistancia = null;
 let dadosPedidoAtual = null;
 let filtroAtivo = 'todos';
-let todosPedidosCarregados = {};
 
 function carregarDadosLojaSalvos() {
     const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
@@ -426,69 +402,11 @@ function mostrarAba(nomeAba) {
     document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
 }
 
-function verificarLoginPainel() {
-    const user = document.getElementById('usuarioPainel').value.trim();
-    const pass = document.getElementById('senhaPainel').value.trim();
-    
-    if (user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
-        document.getElementById('loginPainel').classList.add('escondido');
-        document.getElementById('conteudoPainel').classList.remove('escondido');
-        carregarPedidosPainel();
-    } else {
-        document.getElementById('erroLoginPainel').classList.remove('escondido');
-    }
-}
-
-function sairPainel() {
-    document.getElementById('conteudoPainel').classList.add('escondido');
-    document.getElementById('loginPainel').classList.remove('escondido');
-    document.getElementById('usuarioPainel').value = '';
-    document.getElementById('senhaPainel').value = '';
-}
-
 function filtrarPedidos(tipo) {
     filtroAtivo = tipo;
     document.querySelectorAll('.linha-botoes .btn').forEach(b => b.classList.remove('filtro-ativo'));
     event.currentTarget.classList.add('filtro-ativo');
-    atualizarListaPedidos();
-}
-
-function converterDataBrParaIso(dataBr) {
-    const partes = dataBr.split('/');
-    return `${partes[2]}-${partes[1]}-${partes[0]}`;
-}
-
-function aplicarFiltroPeriodo() {
-    const dataInicial = document.getElementById('dataInicial').value;
-    const dataFinal = document.getElementById('dataFinal').value;
-
-    if (!dataInicial || !dataFinal) {
-        alert("⚠️ Preencha Data Inicial e Data Final!");
-        return;
-    }
-
-    const dtInicio = new Date(dataInicial);
-    const dtFim = new Date(dataFinal);
-    dtFim.setHours(23, 59, 59);
-
-    let totalPeriodo = 0, qtdPeriodo = 0;
-
-    Object.values(todosPedidosCarregados).forEach(pedido => {
-        if (!pedido.data || pedido.status !== "Concluído") return;
-        const dataPedidoIso = converterDataBrParaIso(pedido.data);
-        const dtPedido = new Date(dataPedidoIso);
-        if (dtPedido >= dtInicio && dtPedido <= dtFim) {
-            totalPeriodo += pedido.valorFinal || 0;
-            qtdPeriodo++;
-        }
-    });
-
-    const mediaPeriodo = qtdPeriodo > 0 ? totalPeriodo / qtdPeriodo : 0;
-
-    document.getElementById('qtdPeriodo').textContent = qtdPeriodo;
-    document.getElementById('fatPeriodo').textContent = `R$ ${totalPeriodo.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaPeriodo').textContent = `R$ ${mediaPeriodo.toFixed(2).replace('.', ',')}`;
-    document.getElementById('resultadoPeriodo').classList.remove('escondido');
+    carregarPedidosPainel();
 }
 
 async function calcular() {
@@ -520,6 +438,7 @@ async function calcular() {
         const valorGorjeta = gorjeta === 'sim' ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
         
         const valorFinal = valorBase + valorRetorno + valorGorjeta;
+        const valorPixFormatado = valorFinal.toFixed(2).replace('.', ',');
 
         dadosPedidoAtual = {
             nomeLoja, contatoLoja, endLoja,
@@ -592,6 +511,7 @@ async function gerarPedido() {
         texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
         texto += textoQuemPaga + "\n";
         texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo\n";
+        // ✅ INSTAGRAM CORRETO TAMBÉM NA MENSAGEM DO WHATSAPP
         texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpresss 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
@@ -619,103 +539,114 @@ function refazerPedido() {
     dadosPedidoAtual = null;
 }
 
+function verificarLoginPainel() {
+    const user = document.getElementById('usuarioPainel').value.trim();
+    const pass = document.getElementById('senhaPainel').value.trim();
+    if (user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
+        document.getElementById('loginPainel').classList.add('escondido');
+        document.getElementById('conteudoPainel').classList.remove('escondido');
+        carregarPedidosPainel();
+    } else {
+        document.getElementById('erroLoginPainel').classList.remove('escondido');
+    }
+}
+
 function carregarPedidosPainel() {
     referenciaPedidos.on('value', (snapshot) => {
-        todosPedidosCarregados = snapshot.val() || {};
-        atualizarListaPedidos();
-    });
-}
+        const todosPedidos = snapshot.val() || {};
+        const lista = document.getElementById('listaHistorico');
+        let totalDia = 0, qtdDia = 0, totalMes = 0;
+        const hoje = new Date().toLocaleDateString('pt-BR');
 
-function atualizarListaPedidos() {
-    const lista = document.getElementById('listaHistorico');
-    let totalDia = 0, qtdDia = 0, totalMes = 0;
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const mesAtual = new Date().toLocaleDateString('pt-BR', {month:'2-digit', year:'numeric'});
+        lista.innerHTML = '';
+        Object.entries(todosPedidos).reverse().forEach(([chave, pedido]) => {
+            if (filtroAtivo === 'pendente' && pedido.status !== 'Pendente') return;
+            if (filtroAtivo === 'concluido' && pedido.status !== 'Concluído') return;
+            if (filtroAtivo === 'cancelado' && pedido.status !== 'Cancelado') return;
 
-    lista.innerHTML = '';
-    let temPedido = false;
+            if (pedido.data === hoje && pedido.status === "Concluído") {
+                totalDia += pedido.valorFinal;
+                qtdDia++;
+            }
+            if (pedido.status === "Concluído") totalMes += pedido.valorFinal;
 
-    Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
-        
-        // FILTRA DE ACORDO COM O BOTÃO SELECIONADO
-        let mostraPedido = false;
-        if (filtroAtivo === 'todos') mostraPedido = true;
-        if (filtroAtivo === 'pendente' && pedido.status === 'Pendente') mostraPedido = true;
-        if (filtroAtivo === 'concluido' && pedido.status === 'Concluído') mostraPedido = true;
-        if (filtroAtivo === 'cancelado' && pedido.status === 'Cancelado') mostraPedido = true;
-
-        // Calcula valores do dashboard
-        const dataPedidoMes = pedido.data ? (pedido.data.split('/')[1] + '/' + pedido.data.split('/')[2]) : '';
-        if (pedido.data === hoje && pedido.status === "Concluído") {
-            totalDia += pedido.valorFinal || 0;
-            qtdDia++;
-        }
-        if (dataPedidoMes === mesAtual && pedido.status === "Concluído") totalMes += pedido.valorFinal || 0;
-        }
-
-        // SÓ ADICIONA NA LISTA SE PASSAR NO FILTRO ESCOLHIDO
-        if (mostraPedido) {
-            temPedido = true;
-            let classeStatus, textoStatus;
-            if (pedido.status === 'Pendente') {
-                classeStatus = 'status-pendente';
-                textoStatus = '📌 Pendente';
-            } else if (pedido.status === 'Concluído') {
-                classeStatus = 'status-concluido';
-                textoStatus = '✅ Entregue';
-            } else {
-                classeStatus = 'status-cancelado';
-                textoStatus = '❌ Cancelado';
+            let classeStatus = "status-pendente";
+            let textoStatus = "📌 Pendente";
+            if (pedido.status === "Concluído") {
+                classeStatus = "status-concluido";
+                textoStatus = "✅ Concluído";
+            }
+            if (pedido.status === "Cancelado") {
+                classeStatus = "status-cancelado";
+                textoStatus = "❌ Cancelado";
             }
 
-            lista.innerHTML += `
-            <div class="item-pedido">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                    <span class="${classeStatus}">${textoStatus}</span>
-                </div>
-                <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
-                <p>📍 ${pedido.endLoja || 'Sem endereço'}</p>
-                <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}</p>
-                <p>📏 ${pedido.kmArredondado || 0} km</p>
-
+            const item = document.createElement('div');
+            item.className = 'item-pedido';
+            item.innerHTML = `
+                <strong>📅 ${pedido.data} ${pedido.hora} | ${pedido.nomeLoja}</strong><br>
+                👤 Cliente: ${pedido.nomeDest}<br>
+                📍 ${pedido.endDest}<br>
+                📏 ${pedido.kmArredondado} km<br>
+                💰 Valor: R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')}<br>
+                💳 Pagamento: ${pedido.quemPaga === 'lojista' ? 'Lojista' : 'Cliente'}<br>
+                <span class="${classeStatus}">${textoStatus}</span>
                 <div class="botoes-pedido">
-                    ${pedido.status === 'Pendente' ? `
-                    <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
-                    <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
+                    ${pedido.status === "Pendente" ? `
+                        <button class="btn btn-principal" style="padding:8px; font-size:13px;" onclick="marcarConcluido('${chave}')">Marcar Entregue</button>
+                        <button class="btn btn-cancelar" style="padding:8px; font-size:13px;" onclick="marcarCancelado('${chave}')">Cancelar</button>
+                    ` : ''}
+                    ${pedido.status === "Cancelado" ? `
+                        <button class="btn btn-perigo" style="padding:8px; font-size:13px;" onclick="excluirDefinitivamente('${chave}')">🗑️ EXCLUIR</button>
                     ` : ''}
                 </div>
-            </div>
             `;
+            lista.appendChild(item);
+        });
+
+        document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
+        document.getElementById('qtdDia').textContent = qtdDia;
+        document.getElementById('fatMes').textContent = `R$ ${(totalMes).toFixed(2).replace('.', ',')}`;
+        document.getElementById('mediaEntrega').textContent = qtdDia > 0 ? `R$ ${(totalDia / qtdDia).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+
+        if (Object.keys(todosPedidos).length === 0) {
+            lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Aguardando pedidos...</p>';
         }
     });
-
-    if (!temPedido) {
-        lista.innerHTML = `<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado nessa opção.</p>`;
-    }
-
-    // Atualiza os valores do dashboard principal
-    document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
-    document.getElementById('qtdDia').textContent = qtdDia;
-    document.getElementById('fatMes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
-    const mediaGeral = qtdDia > 0 ? totalDia / qtdDia : 0;
-    document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
 }
 
-// ✅ Função para alterar status: move para a lista correta, fica salvo no banco
-function alterarStatusPedido(chavePedido, novoStatus) {
-    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"? Ele vai aparecer na lista correspondente e ficar salvo nos relatórios.`)) {
-        referenciaPedidos.child(chavePedido).update({
-            status: novoStatus
-        })
-        .then(() => {
-            alert(`✅ Status alterado para "${novoStatus}" com sucesso!`);
-        })
-        .catch((erro) => {
-            alert("❌ Erro ao alterar status: " + erro);
-        });
-    }
+async function marcarConcluido(chavePedido) {
+    if (!confirm("✅ Marcar como entregue? Vai contar no faturamento.")) return;
+    await referenciaPedidos.child(chavePedido).update({status: "Concluído"});
+    alert("✅ Entrega confirmada!");
 }
+
+async function marcarCancelado(chavePedido) {
+    if (!confirm("❌ Cancelar pedido? Não vai contar no faturamento.")) return;
+    await referenciaPedidos.child(chavePedido).update({status: "Cancelado"});
+    alert("❌ Pedido cancelado!");
+}
+
+async function excluirDefinitivamente(chavePedido) {
+    if (!confirm("🗑️ APAGAR PARA SEMPRE? Não tem volta, não aparece mais em lugar nenhum!")) return;
+    await referenciaPedidos.child(chavePedido).remove();
+    alert("✅ Pedido apagado com sucesso!");
+}
+
+function sairPainel() {
+    document.getElementById('usuarioPainel').value = '';
+    document.getElementById('senhaPainel').value = '';
+    document.getElementById('erroLoginPainel').classList.add('escondido');
+    document.getElementById('loginPainel').classList.remove('escondido');
+    document.getElementById('conteudoPainel').classList.add('escondido');
+}
+
+document.addEventListener('click', e => {
+    if (e.target.closest('.opcao-radio')) {
+        document.querySelectorAll('.opcao-radio').forEach(el => el.classList.remove('selecionado'));
+        e.target.closest('.opcao-radio').classList.add('selecionado');
+    }
+});
 </script>
 </body>
     </html>
