@@ -353,15 +353,19 @@ const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
 const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283?valor=";
 
-// ✅ Declaração correta das variáveis primeiro
-let googleCarregado;
-let servicoDistancia;
+let googleCarregado = false;
+let servicoDistancia = null;
 let dadosPedidoAtual = null;
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
 
-googleCarregado = false;
-servicoDistancia = null;
+function limparEndereco(endereco) {
+    return endereco
+        .trim()
+        .replace(/\s*,\s*/g, ', ')
+        .replace(/\s+nº\s*/gi, ' ')
+        .replace(/\s+(\d+)$/, ', $1');
+}
 
 function carregarDadosLojaSalvos() {
     const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
@@ -404,8 +408,8 @@ function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
             erro("Aguarde carregar o Google Maps...");
             return;
         }
-        const origem = enderecoOrigem + ", Juiz de Fora - MG, Brasil";
-        const destino = enderecoDestino + ", Juiz de Fora - MG, Brasil";
+        const origem = limparEndereco(enderecoOrigem) + ", Juiz de Fora - MG, Brasil";
+        const destino = limparEndereco(enderecoDestino) + ", Juiz de Fora - MG, Brasil";
 
         servicoDistancia.getDistanceMatrix({
             origins: [origem],
@@ -435,8 +439,10 @@ function verificarLoginPainel() {
     const pass = document.getElementById('senhaPainel').value.trim();
     
     if (user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
-        document.getElementById('loginPainel').classList.add('escondido');
-        document.getElementById('conteudoPainel').classList.remove('escondido');
+        document.getElementById('loginPainel').style.display = 'none';
+        const painel = document.getElementById('conteudoPainel');
+        painel.style.display = 'block';
+        painel.classList.remove('escondido');
         carregarPedidosPainel();
     } else {
         document.getElementById('erroLoginPainel').classList.remove('escondido');
@@ -444,10 +450,13 @@ function verificarLoginPainel() {
 }
 
 function sairPainel() {
+    document.getElementById('conteudoPainel').style.display = 'none';
     document.getElementById('conteudoPainel').classList.add('escondido');
+    document.getElementById('loginPainel').style.display = 'block';
     document.getElementById('loginPainel').classList.remove('escondido');
     document.getElementById('usuarioPainel').value = '';
     document.getElementById('senhaPainel').value = '';
+    document.getElementById('erroLoginPainel').classList.add('escondido');
 }
 
 function filtrarPedidos(tipo) {
@@ -596,7 +605,6 @@ async function gerarPedido() {
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
         
-        // ✅ Ajuste especial para iPhone/Safari
         alert("✅ Pedido registrado com sucesso! Vamos abrir o WhatsApp para enviar para você.");
         
         setTimeout(() => {
@@ -634,7 +642,6 @@ function carregarPedidosPainel() {
     });
 }
 
-// ✅ Função para abrir detalhes completos do pedido
 function abrirDetalhesPedido(chavePedido) {
     const pedido = todosPedidosCarregados[chavePedido];
     if (!pedido) {
@@ -648,14 +655,14 @@ function abrirDetalhesPedido(chavePedido) {
     mensagem += "📞 Contato Loja: " + (pedido.contatoLoja || "Não informado") + "\n";
     mensagem += "📍 Endereço Loja: " + (pedido.endLoja || "Não informado") + "\n";
     mensagem += "══════════════════════════\n";
-    mensagem += "👤 Cliente: " + (pedido.nomeDest || "Não informado") + "\n";
+        mensagem += "👤 Cliente: " + (pedido.nomeDest || "Não informado") + "\n";
     mensagem += "📞 Contato Cliente: " + (pedido.contatoDest || "Não informado") + "\n";
     mensagem += "📍 Endereço Cliente: " + (pedido.endDest || "Não informado") + "\n";
     mensagem += "📍 Referência: " + (pedido.refDest || "Não informado") + "\n";
     mensagem += "══════════════════════════\n";
     mensagem += "📏 KM Real: " + (pedido.kmReal?.toFixed(1).replace('.', ',') || "0") + " km\n";
     mensagem += "📏 KM Arredondado: " + (pedido.kmArredondado || "0") + " km\n";
-    mensagem += "💰 Valor Base     mensagem += "💰 Valor Base: R$ " + (pedido.valorBase?.toFixed(2).replace('.', ',') || "0,00") + "\n";
+    mensagem += "💰 Valor Base: R$ " + (pedido.valorBase?.toFixed(2).replace('.', ',') || "0,00") + "\n";
     mensagem += "🔄 Retorno: " + (pedido.valorRetorno > 0 ? `R$ ${pedido.valorRetorno.toFixed(2).replace('.', ',')}` : "Não") + "\n";
     mensagem += "💸 Gorjeta: " + (pedido.valorGorjeta > 0 ? `R$ ${pedido.valorGorjeta.toFixed(2).replace('.', ',')}` : "Não") + "\n";
     mensagem += "💵 Valor Final: R$ " + (pedido.valorFinal?.toFixed(2).replace('.', ',') || "0,00") + "\n";
@@ -771,4 +778,4 @@ function alterarStatusPedido(chavePedido, novoStatus) {
 }
 </script>
 </body>
-                </html>
+    </html>
