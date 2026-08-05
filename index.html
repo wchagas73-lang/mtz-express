@@ -86,7 +86,7 @@
         .card-dado .valor {font-size: 26px; font-weight: 900;}
         .area-grafico {background: rgba(255,255,255,0.03); border: 2px solid var(--borda); border-radius: 20px; padding: 20px; margin: 25px 0;}
         .lista-pedidos {max-height: 400px; overflow-y: auto; margin-top: 20px;}
-        .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
+        .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0; cursor: pointer;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
         .status-cancelado {color: #ef4444; font-weight: bold;}
@@ -353,11 +353,15 @@ const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
 const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283?valor=";
 
-let googleCarregado = false;
-let servicoDistancia = null;
+// ✅ Declaração correta das variáveis primeiro
+let googleCarregado;
+let servicoDistancia;
 let dadosPedidoAtual = null;
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
+
+googleCarregado = false;
+servicoDistancia = null;
 
 function carregarDadosLojaSalvos() {
     const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
@@ -591,13 +595,21 @@ async function gerarPedido() {
         texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpresss 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
 
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
-        window.open(linkWpp, '_blank');
         
-        alert("✅ Pedido enviado com sucesso! A mensagem abre direto no seu WhatsApp.");
+        // ✅ Ajuste especial para iPhone/Safari
+        alert("✅ Pedido registrado com sucesso! Vamos abrir o WhatsApp para enviar para você.");
+        
+        setTimeout(() => {
+            window.location.href = linkWpp;
+            setTimeout(() => {
+                alert("⚠️ Se o WhatsApp não abriu sozinho, clique no link abaixo:\n\n" + linkWpp + "\n\nBasta clicar que já vai direto!");
+            }, 500);
+        }, 300);
+        
         refazerPedido();
 
     } catch (erro) {
-        alert("❌ Erro ao enviar pedido: " + erro);
+        alert("❌ Erro ao registrar pedido: " + erro);
     }
 }
 
@@ -622,6 +634,39 @@ function carregarPedidosPainel() {
     });
 }
 
+// ✅ Função para abrir detalhes completos do pedido
+function abrirDetalhesPedido(chavePedido) {
+    const pedido = todosPedidosCarregados[chavePedido];
+    if (!pedido) {
+        alert("❌ Pedido não encontrado!");
+        return;
+    }
+
+    let mensagem = "📋 DETALHES COMPLETOS DO PEDIDO\n";
+    mensagem += "══════════════════════════\n";
+    mensagem += "🏪 Loja: " + (pedido.nomeLoja || "Não informado") + "\n";
+    mensagem += "📞 Contato Loja: " + (pedido.contatoLoja || "Não informado") + "\n";
+    mensagem += "📍 Endereço Loja: " + (pedido.endLoja || "Não informado") + "\n";
+    mensagem += "══════════════════════════\n";
+    mensagem += "👤 Cliente: " + (pedido.nomeDest || "Não informado") + "\n";
+    mensagem += "📞 Contato Cliente: " + (pedido.contatoDest || "Não informado") + "\n";
+    mensagem += "📍 Endereço Cliente: " + (pedido.endDest || "Não informado") + "\n";
+    mensagem += "📍 Referência: " + (pedido.refDest || "Não informado") + "\n";
+    mensagem += "══════════════════════════\n";
+    mensagem += "📏 KM Real: " + (pedido.kmReal?.toFixed(1).replace('.', ',') || "0") + " km\n";
+    mensagem += "📏 KM Arredondado: " + (pedido.kmArredondado || "0") + " km\n";
+    mensagem += "💰 Valor Base     mensagem += "💰 Valor Base: R$ " + (pedido.valorBase?.toFixed(2).replace('.', ',') || "0,00") + "\n";
+    mensagem += "🔄 Retorno: " + (pedido.valorRetorno > 0 ? `R$ ${pedido.valorRetorno.toFixed(2).replace('.', ',')}` : "Não") + "\n";
+    mensagem += "💸 Gorjeta: " + (pedido.valorGorjeta > 0 ? `R$ ${pedido.valorGorjeta.toFixed(2).replace('.', ',')}` : "Não") + "\n";
+    mensagem += "💵 Valor Final: R$ " + (pedido.valorFinal?.toFixed(2).replace('.', ',') || "0,00") + "\n";
+    mensagem += "══════════════════════════\n";
+    mensagem += "📅 Data: " + (pedido.data || "Não informada") + " • ⏰ Hora: " + (pedido.hora || "Não informada") + "\n";
+    mensagem += "📌 Status: " + (pedido.status || "Pendente") + "\n";
+    mensagem += "💳 Paga por: " + (pedido.quemPaga === "lojista" ? "Lojista" : "Cliente");
+
+    alert(mensagem);
+}
+
 function atualizarListaPedidos() {
     const lista = document.getElementById('listaHistorico');
     let totalDia = 0, qtdDia = 0, totalMes = 0, qtdMes = 0;
@@ -635,7 +680,20 @@ function atualizarListaPedidos() {
     let temPedido = false;
 
     Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
-        
+        temPedido = true;
+        let classeStatus, textoStatus;
+
+        if (pedido.status === 'Pendente') {
+            classeStatus = 'status-pendente';
+            textoStatus = '⏳ Pendente';
+        } else if (pedido.status === 'Concluído') {
+            classeStatus = 'status-concluido';
+            textoStatus = '✅ Entregue';
+        } else {
+            classeStatus = 'status-cancelado';
+            textoStatus = '❌ Cancelado';
+        }
+
         let mostraPedido = false;
         if (filtroAtivo === 'todos') mostraPedido = true;
         if (filtroAtivo === 'pendente' && pedido.status === 'Pendente') mostraPedido = true;
@@ -648,7 +706,6 @@ function atualizarListaPedidos() {
                 qtdDia++;
             }
 
-            // ✅ CORREÇÃO APLICADA: LEITURA EXATA DO MÊS E ANO, SEM ERRO COM ZEROS
             const dataUsar = pedido.dataEntrega || pedido.data;
             if (dataUsar) {
                 const partes = dataUsar.split('/');
@@ -664,31 +721,17 @@ function atualizarListaPedidos() {
         }
 
         if (mostraPedido) {
-            temPedido = true;
-            let classeStatus, textoStatus;
-            if (pedido.status === 'Pendente') {
-                classeStatus = 'status-pendente';
-                textoStatus = '📌 Pendente';
-                        } else if (pedido.status === 'Concluído') {
-                classeStatus = 'status-concluido';
-                textoStatus = '✅ Entregue';
-            } else {
-                classeStatus = 'status-cancelado';
-                textoStatus = '❌ Cancelado';
-            }
-
             lista.innerHTML += `
-            <div class="item-pedido">
+            <div class="item-pedido" onclick="abrirDetalhesPedido('${chave}')">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
                     <span class="${classeStatus}">${textoStatus}</span>
                 </div>
                 <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
-                <p>📍 ${pedido.endLoja || 'Sem endereço'}</p>
-                <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}</p>
-                <p>📏 ${pedido.kmArredondado || 0} km</p>
+                <p>📍 ${pedido.endDest || 'Sem endereço do cliente'}</p>
+                <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} • ${pedido.kmArredondado || 0} km</p>
 
-                <div class="botoes-pedido">
+                <div class="botoes-pedido" onclick="event.stopPropagation()">
                     ${pedido.status === 'Pendente' ? `
                     <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
                     <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
@@ -700,10 +743,9 @@ function atualizarListaPedidos() {
     });
 
     if (!temPedido) {
-        lista.innerHTML = `<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado nessa opção.</p>`;
+        lista.innerHTML = `<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>`;
     }
 
-    // Atualiza os valores do dashboard
     document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdDia').textContent = qtdDia;
     document.getElementById('fatMes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
@@ -711,7 +753,6 @@ function atualizarListaPedidos() {
     document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
 }
 
-// Função para alterar status e salvar data real da entrega
 function alterarStatusPedido(chavePedido, novoStatus) {
     if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"?`)) {
         const dadosAtualizacao = { status: novoStatus };
@@ -730,4 +771,4 @@ function alterarStatusPedido(chavePedido, novoStatus) {
 }
 </script>
 </body>
-                                                                                               </html>
+                </html>
