@@ -56,12 +56,17 @@
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
         .btn-cancelar {background: linear-gradient(90deg, #f87171, #ef4444); color: white; padding: 10px; font-size: 14px; margin-top: 8px;}
         .btn-remover {background: var(--perigo); color: white; padding: 8px 12px; font-size: 14px; width: auto;}
+        .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; flex: 1; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;}
+        .btn-excluir:hover {background: linear-gradient(90deg, #dc2626, #b91c1c); transform: scale(1.02);}
+        .btn-alterar-status {background: linear-gradient(90deg, #3B82F6, #2563EB); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
         @keyframes aparecer {from{opacity:0; transform: translateY(15px);} to{opacity:1; transform: translateY(0);}}
         
         .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
         .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
+        .aviso-iphone {background: rgba(59,130,246,0.1); border: 2px solid var(--azul); border-radius: 14px; padding: 12px; margin: 15px 0; font-size: 14px; color: #93C5FD;}
+        .aviso-navegador-app {background: rgba(220,53,69,0.15); border: 2px solid var(--perigo); border-radius: 14px; padding: 12px; margin: 15px 0; font-size: 14px; color: #FCA5A5; font-weight: 600;}
         .mensagem-parceria {background: rgba(255,215,0,0.12); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0; text-align: center; font-weight: 700; font-size: 17px; color: #FFF8C1;}
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
         .qrcode-pix {margin: 15px auto; padding: 10px; background: white; border-radius: 12px; display: inline-block;}
@@ -85,14 +90,16 @@
         .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
         .card-dado .valor {font-size: 26px; font-weight: 900;}
         .area-grafico {background: rgba(255,255,255,0.03); border: 2px solid var(--borda); border-radius: 20px; padding: 20px; margin: 25px 0;}
-        .lista-pedidos {max-height: 400px; overflow-y: auto; margin-top: 20px;}
-        .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0; cursor: pointer;}
+        .lista-pedidos {max-height: 450px; overflow-y: auto; margin-top: 20px;}
+        .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
         .status-cancelado {color: #ef4444; font-weight: bold;}
         .filtro-ativo {background: var(--primaria); color: white;}
         .bloco-periodo {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 25px 0;}
         .botoes-pedido {display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;}
+        .link-copiavel {background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin: 10px 0; font-size: 13px; word-break: break-all; cursor: pointer;}
+        .link-copiavel:active {background: var(--primaria);}
     </style>
 </head>
 <body>
@@ -107,6 +114,15 @@
                     ⏰ Todos os dias: 08h às 22h<br>
                     💸 <strong>SEM TAXA, SEM MENSALIDADE, SEM COMISSÃO</strong> 💸
                 </div>
+            </div>
+
+            <div class="aviso-navegador-app escondido" id="avisoNavegadorApp">
+                ⚠️ <strong>AVISO IMPORTANTE:</strong> Não funciona dentro de redes sociais!<br>
+                Toque nos 3 pontinhos → "Abrir no navegador" ou "Abrir no Safari/Chrome" e refaça o pedido.
+            </div>
+
+            <div class="aviso-iphone">
+                💡 <strong>Dica rápida:</strong> Se o WhatsApp não abrir sozinho, copie o link e cole direto no WhatsApp. Prefira usar o navegador do celular (Safari ou Chrome).
             </div>
 
             <div class="abas">
@@ -235,27 +251,6 @@
                         <p style="font-size:14px; color:#B2DFDB;">📷 Escaneie ou clique — valor já vem pronto, não precisa digitar nada!</p>
                     </div>
                 </div>
-
-                <h3 style="color:var(--dourado); margin:30px 0 14px;">📊 TABELA DE VALORES OFICIAL</h3>
-                <div class="tabela-wrapper">
-                    <table class="tabela-valores">
-                        <tr><th>Distância</th><th>Valor</th></tr>
-                        <tr><td>Até 1 km</td><td>R$ 9,00</td></tr>
-                        <tr><td>Até 2 km</td><td>R$ 10,00</td></tr>
-                        <tr><td>Até 3 km</td><td>R$ 11,00</td></tr>
-                        <tr><td>Até 4 km</td><td>R$ 12,00</td></tr>
-                        <tr><td>Até 5 km</td><td>R$ 13,00</td></tr>
-                        <tr><td>Até 6 km</td><td>R$ 14,00</td></tr>
-                        <tr><td>Até 7 km</td><td>R$ 16,00</td></tr>
-                        <tr><td>Até 8 km</td><td>R$ 18,00</td></tr>
-                        <tr><td>Até 9 km</td><td>R$ 20,00</td></tr>
-                        <tr><td>Até 10 km</td><td>R$ 22,00</td></tr>
-                    </table>
-                </div>
-                <div class="aviso-tabela">
-                    <strong>📌 INFORMAÇÃO IMPORTANTE</strong><br>
-                    A partir do <strong>11º km em diante</strong>, cada quilômetro adicional acrescenta <strong>R$ 2,50</strong> ao valor total.
-                </div>
             </div>
 
             <div class="conteudo-aba" id="abaPainel">
@@ -311,7 +306,7 @@
                         </div>
                     </div>
 
-                    <h3 style="color:var(--dourado); margin:30px 0 10px;">📋 FILTRAR POR STATUS</h3>
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 FILTRAR POR STATUS</h3>
                     <div class="linha-botoes">
                         <button class="btn btn-secundario filtro-ativo" onclick="filtrarPedidos('todos')">Todos</button>
                         <button class="btn btn-secundario" onclick="filtrarPedidos('pendente')">Pendentes</button>
@@ -359,6 +354,16 @@ let dadosPedidoAtual = null;
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
 
+// Detecta se está dentro de app de rede social e avisa antes
+function verificarNavegadorApp() {
+    const agente = navigator.userAgent.toLowerCase();
+    if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(agente)) {
+        document.getElementById('avisoNavegadorApp').classList.remove('escondido');
+        return false;
+    }
+    return true;
+}
+
 function limparEndereco(endereco) {
     return endereco
         .trim()
@@ -400,6 +405,7 @@ function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
     carregarDadosLojaSalvos();
+    verificarNavegadorApp();
 }
 
 function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
@@ -526,7 +532,10 @@ async function calcular() {
         let valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
         
         const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
-        const valorGorjeta = gorjeta === 'sim' ? (parseFloat(document.getElementById('valorGorjeta').value) || 0) : 0;
+        let valorGorjeta = 0;
+        if (gorjeta === 'sim') {
+            valorGorjeta = parseFloat(document.getElementById('valorGorjeta').value) || 0;
+        }
         
         const valorFinal = valorBase + valorRetorno + valorGorjeta;
 
@@ -557,7 +566,7 @@ async function calcular() {
         const linkPixComValor = `${LINK_PIX_BASE}${valorFinal.toFixed(2)}`;
         document.getElementById('linkPixValor').href = linkPixComValor;
         QRCode.toCanvas(document.getElementById('qrcodePix'), linkPixComValor, {width: 160, margin: 1}, function (erro) {
-            if (erro) console.error(erro)
+            if (erro) console.error(erro);
         });
 
     } catch (erro) {
@@ -573,51 +582,65 @@ async function gerarPedido() {
         return;
     }
 
+    const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
+    const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
+    
+    const textoQuemPaga = dadosPedidoAtual.quemPaga === 'lojista' 
+        ? '💳 QUEM PAGA: Lojista (paga aqui na loja)' 
+        : '💳 QUEM PAGA: Cliente (paga no endereço)';
+
+    let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
+    texto += "══════════════════════════\n";
+    texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
+    if (dadosPedidoAtual.contatoLoja) texto += "📞 CONTATO LOJA: " + dadosPedidoAtual.contatoLoja + "\n";
+    texto += "📍 ENDEREÇO LOJA: " + dadosPedidoAtual.endLoja + "\n";
+    texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
+    texto += "══════════════════════════\n";
+    texto += "👤 CLIENTE: " + dadosPedidoAtual.nomeDest + "\n";
+    if (dadosPedidoAtual.contatoDest) texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
+    texto += "📍 ENDEREÇO CLIENTE: " + dadosPedidoAtual.endDest + "\n";
+    texto += "🔗 MAPA CLIENTE: " + linkCliente + "\n";
+    if (dadosPedidoAtual.refDest) texto += "📍 OBSERVAÇÃO: " + dadosPedidoAtual.refDest + "\n";
+    texto += "══════════════════════════\n";
+    texto += "📏 DISTÂNCIA REAL: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
+    texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
+    texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
+    texto += textoQuemPaga + "\n";
+    texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo\n";
+    texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpresss 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
+
     try {
-        await referenciaPedidos.push(dadosPedidoAtual);
-        
-        const linkLoja = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endLoja + ", Juiz de Fora - MG");
-        const linkCliente = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dadosPedidoAtual.endDest + ", Juiz de Fora - MG");
-        
-        const textoQuemPaga = dadosPedidoAtual.quemPaga === 'lojista' 
-            ? '💳 QUEM PAGA: Lojista (paga aqui na loja)' 
-            : '💳 QUEM PAGA: Cliente (paga no endereço)';
+        // ✅ PRIMEIRO: Salvar no Firebase e confirmar
+        const novaReferencia = await referenciaPedidos.push(dadosPedidoAtual);
+        console.log("✅ Pedido salvo com sucesso! Código:", novaReferencia.key);
 
-        let texto = "📦 NOVO PEDIDO - MTZ EXPRESS 📦\n";
-        texto += "══════════════════════════\n";
-        texto += "🏪 LOJA: " + dadosPedidoAtual.nomeLoja + "\n";
-        if (dadosPedidoAtual.contatoLoja) texto += "📞 CONTATO LOJA: " + dadosPedidoAtual.contatoLoja + "\n";
-        texto += "📍 ENDEREÇO LOJA: " + dadosPedidoAtual.endLoja + "\n";
-        texto += "🔗 MAPA LOJA: " + linkLoja + "\n";
-        texto += "══════════════════════════\n";
-        texto += "👤 CLIENTE: " + dadosPedidoAtual.nomeDest + "\n";
-        if (dadosPedidoAtual.contatoDest) texto += "📞 CONTATO CLIENTE: " + dadosPedidoAtual.contatoDest + "\n";
-        texto += "📍 ENDEREÇO CLIENTE: " + dadosPedidoAtual.endDest + "\n";
-        texto += "🔗 MAPA CLIENTE: " + linkCliente + "\n";
-        if (dadosPedidoAtual.refDest) texto += "📍 OBSERVAÇÃO: " + dadosPedidoAtual.refDest + "\n";
-        texto += "══════════════════════════\n";
-        texto += "📏 DISTÂNCIA REAL: " + dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',') + " km\n";
-        texto += "📏 DISTÂNCIA ARREDONDADA: " + dadosPedidoAtual.kmArredondado + " km\n";
-        texto += "💰 VALOR TOTAL: R$ " + dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',') + "\n";
-        texto += textoQuemPaga + "\n";
-        texto += "💸 PIX: (32) 9 9995-3215 | Wellington Chagas Aleixo\n";
-        texto += "\n💪🏿 Agradecemos pela parceria! Segue nosso Instagram @mtzexpresss 📸 — sua loja aparecerá em breve nos nossos Stories e Reels! 🤳🏿";
-
+        // ✅ Gerar link do WhatsApp no formato certo pro iPhone
         const linkWpp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
-        
-        alert("✅ Pedido registrado com sucesso! Vamos abrir o WhatsApp para enviar para você.");
-        
-        setTimeout(() => {
-            window.location.href = linkWpp;
+
+        // ✅ Mensagem de confirmação + link para copiar — funciona em TODOS os aparelhos
+        const mensagemConfirmacao = 
+            "✅ PEDIDO REGISTRADO COM SUCESSO!\n\n" +
+            "Clique em OK para abrir o WhatsApp.\n\n" +
+            "⚠️ Se não abrir automaticamente, copie o link abaixo e cole direto no WhatsApp:\n\n" +
+            linkWpp;
+
+        const confirmou = confirm(mensagemConfirmacao);
+
+        if (confirmou) {
+            // ✅ Abre em NOVA ABA — o iPhone bloqueia se for na mesma aba
+            window.open(linkWpp, '_blank', 'noopener,noreferrer');
+            
+            // ✅ Garantia extra: mostra o link novamente depois de alguns segundos
             setTimeout(() => {
-                alert("⚠️ Se o WhatsApp não abriu sozinho, clique no link abaixo:\n\n" + linkWpp + "\n\nBasta clicar que já vai direto!");
-            }, 500);
-        }, 300);
-        
+                alert("📋 Se o WhatsApp não abriu:\n\n1. Copie o link abaixo\n2. Abra o WhatsApp diretamente\n3. Cole lá dentro\n\n" + linkWpp);
+            }, 1000);
+        }
+
         refazerPedido();
 
     } catch (erro) {
-        alert("❌ Erro ao registrar pedido: " + erro);
+        console.error("❌ Erro ao salvar pedido:", erro);
+        alert("❌ Não foi possível registrar o pedido:\n\n" + erro + "\n\nPor favor, verifique sua conexão e tente novamente. Se o problema persistir, nos chame no WhatsApp!");
     }
 }
 
@@ -625,7 +648,7 @@ function refazerPedido() {
     document.getElementById('nomeDest').value = '';
     document.getElementById('contatoDest').value = '';
     document.getElementById('endDest').value = '';
-    document.getElementById('refDest').value = '';
+    document.getElementById('refDest').value = ''
     document.querySelector('input[name="retorno"][value="nao"]').checked = true;
     document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
     document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
@@ -639,143 +662,126 @@ function carregarPedidosPainel() {
     referenciaPedidos.on('value', (snapshot) => {
         todosPedidosCarregados = snapshot.val() || {};
         atualizarListaPedidos();
+        calcularResumoPainel();
     });
 }
 
-function abrirDetalhesPedido(chavePedido) {
-    const pedido = todosPedidosCarregados[chavePedido];
-    if (!pedido) {
-        alert("❌ Pedido não encontrado!");
-        return;
-    }
+function calcularResumoPainel() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const mesAtual = new Date().getMonth() + 1;
+    const anoAtual = new Date().getFullYear();
 
-    let mensagem = "📋 DETALHES COMPLETOS DO PEDIDO\n";
-    mensagem += "══════════════════════════\n";
-    mensagem += "🏪 Loja: " + (pedido.nomeLoja || "Não informado") + "\n";
-    mensagem += "📞 Contato Loja: " + (pedido.contatoLoja || "Não informado") + "\n";
-    mensagem += "📍 Endereço Loja: " + (pedido.endLoja || "Não informado") + "\n";
-    mensagem += "══════════════════════════\n";
-        mensagem += "👤 Cliente: " + (pedido.nomeDest || "Não informado") + "\n";
-    mensagem += "📞 Contato Cliente: " + (pedido.contatoDest || "Não informado") + "\n";
-    mensagem += "📍 Endereço Cliente: " + (pedido.endDest || "Não informado") + "\n";
-    mensagem += "📍 Referência: " + (pedido.refDest || "Não informado") + "\n";
-    mensagem += "══════════════════════════\n";
-    mensagem += "📏 KM Real: " + (pedido.kmReal?.toFixed(1).replace('.', ',') || "0") + " km\n";
-    mensagem += "📏 KM Arredondado: " + (pedido.kmArredondado || "0") + " km\n";
-    mensagem += "💰 Valor Base: R$ " + (pedido.valorBase?.toFixed(2).replace('.', ',') || "0,00") + "\n";
-    mensagem += "🔄 Retorno: " + (pedido.valorRetorno > 0 ? `R$ ${pedido.valorRetorno.toFixed(2).replace('.', ',')}` : "Não") + "\n";
-    mensagem += "💸 Gorjeta: " + (pedido.valorGorjeta > 0 ? `R$ ${pedido.valorGorjeta.toFixed(2).replace('.', ',')}` : "Não") + "\n";
-    mensagem += "💵 Valor Final: R$ " + (pedido.valorFinal?.toFixed(2).replace('.', ',') || "0,00") + "\n";
-    mensagem += "══════════════════════════\n";
-    mensagem += "📅 Data: " + (pedido.data || "Não informada") + " • ⏰ Hora: " + (pedido.hora || "Não informada") + "\n";
-    mensagem += "📌 Status: " + (pedido.status || "Pendente") + "\n";
-    mensagem += "💳 Paga por: " + (pedido.quemPaga === "lojista" ? "Lojista" : "Cliente");
+    let fatDia = 0, qtdDia = 0;
+    let fatMes = 0, qtdMes = 0;
 
-    alert(mensagem);
+    Object.values(todosPedidosCarregados).forEach(pedido => {
+        if (!pedido.data || pedido.status !== "Concluído") return;
+        const partes = pedido.data.split('/');
+        if (partes.length !== 3) return;
+
+        if (pedido.data === hoje) {
+            fatDia += pedido.valorFinal || 0;
+            qtdDia++;
+        }
+
+        const dtPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+        if (dtPedido.getMonth() + 1 === mesAtual && dtPedido.getFullYear() === anoAtual) {
+            fatMes += pedido.valorFinal || 0;
+            qtdMes++;
+        }
+    });
+
+    const media = qtdMes > 0 ? fatMes / qtdMes : 0;
+
+    document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
+    document.getElementById('qtdDia').textContent = qtdDia;
+    document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaEntrega').textContent = `R$ ${media.toFixed(2).replace('.', ',')}`;
 }
 
 function atualizarListaPedidos() {
     const lista = document.getElementById('listaHistorico');
-    let totalDia = 0, qtdDia = 0, totalMes = 0, qtdMes = 0;
-    
-    const hoje = new Date();
-    const dataHojeStr = hoje.toLocaleDateString('pt-BR');
-    const mesAtual = hoje.getMonth() + 1;
-    const anoAtual = hoje.getFullYear();
-
     lista.innerHTML = '';
+
     let temPedido = false;
+    for (const [chave, pedido] of Object.entries(todosPedidosCarregados).reverse()) {
+        const status = (pedido.status || "Pendente").toLowerCase();
+        if (filtroAtivo !== 'todos' && status !== filtroAtivo) continue;
 
-    Object.entries(todosPedidosCarregados).reverse().forEach(([chave, pedido]) => {
         temPedido = true;
-        let classeStatus, textoStatus;
+        const classeStatus = status === "concluído" ? "status-concluido" : 
+                            status === "cancelado" ? "status-cancelado" : "status-pendente";
 
-        if (pedido.status === 'Pendente') {
-            classeStatus = 'status-pendente';
-            textoStatus = '⏳ Pendente';
-        } else if (pedido.status === 'Concluído') {
-            classeStatus = 'status-concluido';
-            textoStatus = '✅ Entregue';
-        } else {
-            classeStatus = 'status-cancelado';
-            textoStatus = '❌ Cancelado';
-        }
-
-        let mostraPedido = false;
-        if (filtroAtivo === 'todos') mostraPedido = true;
-        if (filtroAtivo === 'pendente' && pedido.status === 'Pendente') mostraPedido = true;
-        if (filtroAtivo === 'concluido' && pedido.status === 'Concluído') mostraPedido = true;
-        if (filtroAtivo === 'cancelado' && pedido.status === 'Cancelado') mostraPedido = true;
-
-        if (pedido.status === "Concluído") {
-            if (pedido.data === dataHojeStr) {
-                totalDia += pedido.valorFinal || 0;
-                qtdDia++;
-            }
-
-            const dataUsar = pedido.dataEntrega || pedido.data;
-            if (dataUsar) {
-                const partes = dataUsar.split('/');
-                if (partes.length === 3) {
-                    const mesPedido = parseInt(partes[1]);
-                    const anoPedido = parseInt(partes[2]);
-                    if (mesPedido === mesAtual && anoPedido === anoAtual) {
-                        totalMes += pedido.valorFinal || 0;
-                        qtdMes++;
-                    }
-                }
-            }
-        }
-
-        if (mostraPedido) {
-            lista.innerHTML += `
-            <div class="item-pedido" onclick="abrirDetalhesPedido('${chave}')">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                    <span class="${classeStatus}">${textoStatus}</span>
-                </div>
-                <p>📅 ${pedido.data || 'Sem data'} • ⏰ ${pedido.hora || 'Sem hora'}</p>
-                <p>📍 ${pedido.endDest || 'Sem endereço do cliente'}</p>
-                <p>💰 Valor: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} • ${pedido.kmArredondado || 0} km</p>
-
-                <div class="botoes-pedido" onclick="event.stopPropagation()">
-                    ${pedido.status === 'Pendente' ? `
-                    <button class="btn btn-principal" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Concluído')">✅ Marcar Entregue</button>
-                    <button class="btn btn-cancelar" style="padding:8px 12px; font-size:13px; flex:1;" onclick="alterarStatusPedido('${chave}', 'Cancelado')">❌ Cancelar</button>
-                    ` : ''}
+        lista.innerHTML += `
+            <div class="item-pedido">
+                <strong>${pedido.nomeLoja}</strong> → ${pedido.nomeDest}<br>
+                📅 ${pedido.data} ${pedido.hora} | 💰 R$ ${(pedido.valorFinal||0).toFixed(2).replace('.', ',')}<br>
+                Status: <span class="${classeStatus}">${pedido.status || "Pendente"}</span>
+                <div class="botoes-pedido">
+                    <button class="btn-alterar-status" onclick="abrirAcoesPedido('${chave}')">⚙️ Ações</button>
+                    <button class="btn-excluir" onclick="excluirPedido('${chave}')">🗑️ Excluir</button>
                 </div>
             </div>
-            `;
-        }
-    });
+        `;
+    }
 
     if (!temPedido) {
-        lista.innerHTML = `<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>`;
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
     }
-
-    document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
-    document.getElementById('qtdDia').textContent = qtdDia;
-    document.getElementById('fatMes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
-    const mediaGeral = qtdDia > 0 ? totalDia / qtdDia : 0;
-    document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
 }
 
-function alterarStatusPedido(chavePedido, novoStatus) {
-    if(confirm(`Tem certeza que quer marcar este pedido como "${novoStatus}"?`)) {
-        const dadosAtualizacao = { status: novoStatus };
-        if (novoStatus === "Concluído") {
-            dadosAtualizacao.dataEntrega = new Date().toLocaleDateString('pt-BR');
-            dadosAtualizacao.horaEntrega = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-        }
-        referenciaPedidos.child(chavePedido).update(dadosAtualizacao)
+function abrirAcoesPedido(chave) {
+    const pedido = todosPedidosCarregados[chave];
+    if (!pedido) return;
+
+    const acao = prompt(
+        `📋 Pedido: ${pedido.nomeLoja} → ${pedido.nomeDest}\n` +
+        `Status atual: ${pedido.status || "Pendente"}\n\n` +
+        `Digite:\n` +
+        `1 → Marcar como CONCLUÍDO\n` +
+        `2 → Marcar como CANCELADO\n` +
+        `3 → Ver detalhes completos`
+    );
+
+    if (acao === '1') {
+        referenciaPedidos.child(chave).update({ status: "Concluído" });
+        alert("✅ Pedido marcado como CONCLUÍDO!");
+    } else if (acao === '2') {
+        referenciaPedidos.child(chave).update({ status: "Cancelado" });
+        alert("⚠️ Pedido marcado como CANCELADO!");
+    } else if (acao === '3') {
+        const detalhes = 
+            `📋 DETALHES COMPLETOS\n` +
+            `══════════════════════\n` +
+            `🏪 Loja: ${pedido.nomeLoja}\n` +
+            `📍 Endereço Loja: ${pedido.endLoja}\n` +
+            `👤 Cliente: ${pedido.nomeDest}\n` +
+            `📍 Endereço Cliente: ${pedido.endDest}\n` +
+            `📏 KM: ${(pedido.kmReal||0).toFixed(1).replace('.', ',')} → ${pedido.kmArredondado} arredondado\n` +
+            `💰 Valor: R$ ${(pedido.valorFinal||0).toFixed(2).replace('.', ',')}\n` +
+            `📅 Data: ${pedido.data} ${pedido.hora}\n` +
+            `Status: ${pedido.status || "Pendente"}`;
+        alert(detalhes);
+    }
+}
+
+function excluirPedido(chave) {
+    if (!confirm("⚠️ TEM CERTEZA?\n\nEsse pedido será EXCLUÍDO PERMANENTEMENTE e NÃO poderá ser recuperado!\n\nConfirma exclusão?")) {
+        return;
+    }
+    if (!confirm("🔐 CONFIRMAÇÃO FINAL:\n\nTem certeza mesmo? Essa ação apaga do sistema para sempre!\n\nClique em OK para EXCLUIR ou Cancelar para manter.")) {
+        return;
+    }
+
+    referenciaPedidos.child(chave).remove()
         .then(() => {
-            alert(`✅ Status alterado com sucesso!`);
+            alert("✅ Pedido EXCLUÍDO com sucesso! Não aparece mais em nenhum lugar do sistema.");
         })
         .catch((erro) => {
-            alert("❌ Erro ao alterar status: " + erro);
+            alert("❌ Erro ao excluir: " + erro);
         });
-    }
 }
 </script>
+
 </body>
     </html>
