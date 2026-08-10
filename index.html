@@ -114,7 +114,7 @@
             </div>
 
             <div class="aviso-iphone">
-                💡 <strong>Dica rápida:</strong> O link JÁ FOI COPIADO automaticamente! É só abrir o WhatsApp e colar (segure e toque em COLAR).
+                💡 <strong>Dica rápida:</strong> O pedido já vai aparecer completo aqui! É só copiar e colar no WhatsApp.
             </div>
 
             <div class="abas">
@@ -348,7 +348,6 @@ let dadosPedidoAtual = null;
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
 
-// Detecta origem do dispositivo
 function detectarOrigem() {
     const ua = navigator.userAgent;
     if (/iPhone|iPad|iPod/.test(ua)) return 'iPhone';
@@ -356,17 +355,14 @@ function detectarOrigem() {
     return 'Outro';
 }
 
-// Monta o link do Google Maps
 function linkGoogleMaps(endereco) {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco + ", Juiz de Fora - MG")}`;
 }
 
-// ✅ MONTA O PEDIDO COMPLETO — PARA VISUALIZAR E COPIAR
 function montarPedidoCompleto(pedido) {
     const observacao = pedido.refDest && pedido.refDest.trim() !== '' 
         ? pedido.refDest 
-        : 'Nenhuma observação / referência informada';
-    
+        : 'Nenhuma observação informada';
     const retornoTexto = pedido.valorRetorno && pedido.valorRetorno > 0 ? '✅ Sim' : '❌ Não';
     const quemPagaTexto = pedido.quemPaga === 'lojista' ? '🏪 Paga pela Loja' : '👤 Paga pelo Cliente';
     const origem = pedido.origem || detectarOrigem();
@@ -381,7 +377,7 @@ function montarPedidoCompleto(pedido) {
     const dataHora = pedido.data && pedido.hora ? `${pedido.data} ${pedido.hora}` : '--';
 
     return `═══════════════════════════════════════
-📦 PEDIDO — MTZ EXPRESS
+📦 PEDIDO COMPLETO — MTZ EXPRESS
 📅 Data: ${dataHora}
 📱 Origem: ${origem}
 ═══════════════════════════════════════
@@ -430,7 +426,6 @@ function montarPedidoCompleto(pedido) {
 `;
 }
 
-// Copia para área de transferência
 async function copiarParaAreaDeTransferencia(texto) {
     try {
         await navigator.clipboard.writeText(texto);
@@ -453,7 +448,6 @@ async function copiarParaAreaDeTransferencia(texto) {
     }
 }
 
-// Detecta se está dentro de app de rede social e avisa antes
 function verificarNavegadorApp() {
     const agente = navigator.userAgent.toLowerCase();
     if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(agente)) {
@@ -685,100 +679,48 @@ async function gerarPedido() {
     const linkLoja = linkGoogleMaps(dadosPedidoAtual.endLoja);
     const linkCliente = linkGoogleMaps(dadosPedidoAtual.endDest);
     
-
-    const textoQuemPaga = dadosPedidoAtual.quemPaga === 'lojista' 
-        ? '🏪 Paga pela Loja' 
-        : '👤 Paga pelo Cliente';
-
-    const textoPedidoCompleto = `═══════════════════════════════════════
-📦 NOVO PEDIDO — MTZ EXPRESS
-📅 Data: ${dadosPedidoAtual.data} às ${dadosPedidoAtual.hora}
-📱 Origem: ${dadosPedidoAtual.origem}
-═══════════════════════════════════════
-
-🏪 DADOS DA LOJA
-▫️ Nome: ${dadosPedidoAtual.nomeLoja}
-▫️ Contato: ${dadosPedidoAtual.contatoLoja || 'Não informado'}
-▫️ Endereço: ${dadosPedidoAtual.endLoja}
-🔗 Mapa — Loja: ${linkLoja}
-
-───────────────────────────────────────
-
-👤 DADOS DO CLIENTE
-▫️ Nome: ${dadosPedidoAtual.nomeDest}
-▫️ Contato: ${dadosPedidoAtual.contatoDest || 'Não informado'}
-▫️ Endereço: ${dadosPedidoAtual.endDest}
-🔗 Mapa — Cliente: ${linkCliente}
-
-───────────────────────────────────────
-
-📝 OBSERVAÇÃO / REFERÊNCIA
-▫️ ${dadosPedidoAtual.refDest && dadosPedidoAtual.refDest.trim() !== '' ? dadosPedidoAtual.refDest : 'Nenhuma observação informada'}
-
-───────────────────────────────────────
-
-📏 PERCURSO
-▫️ Km real: ${dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',')} km
-▫️ Km arredondado: ${dadosPedidoAtual.kmArredondado} km
-▫️ Retorno: ${dadosPedidoAtual.valorRetorno > 0 ? '✅ Sim' : '❌ Não'}
-
-───────────────────────────────────────
-
-💰 VALORES
-▫️ Entrega: R$ ${dadosPedidoAtual.valorBase.toFixed(2).replace('.', ',')}
-▫️ Retorno: R$ ${dadosPedidoAtual.valorRetorno.toFixed(2).replace('.', ',')}
-▫️ Gorjeta: R$ ${dadosPedidoAtual.valorGorjeta.toFixed(2).replace('.', ',')}
-▫️ TOTAL FINAL: R$ ${dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',')}
-
-───────────────────────────────────────
-
-💳 PAGAMENTO
-▫️ ${textoQuemPaga}
-▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
-
-═══════════════════════════════════════
-`;
+    const textoPedidoCompleto = montarPedidoCompleto(dadosPedidoAtual);
 
     try {
         const idPedido = referenciaPedidos.push(dadosPedidoAtual).key;
         console.log('✅ Pedido salvo — ID:', idPedido);
         
-        // Se vier de iPhone: avisa e mostra o texto completo pra copiar
         if (dadosPedidoAtual.origem === 'iPhone') {
             alert('✅ Pedido gerado com sucesso!\n\n📱 Como veio de iPhone, é só COPIAR abaixo e colar no seu WhatsApp!');
             mostrarTextoParaCopiar(textoPedidoCompleto);
         } else {
-            // Tenta enviar direto no WhatsApp
             window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoCompleto)}`, '_blank');
             alert('✅ Pedido gerado e enviado!');
         }
 
     } catch (erro) {
         console.error('❌ Erro ao salvar:', erro);
-        alert('⚠️ Pedido salvo, mas houve um problema — abra o Painel para ver tudo completo!');
+        alert('⚠️ Pedido salvo no Painel! Abra para ver tudo completo.');
     }
 }
 
-// Mostra o pedido completo na tela com botão de copiar
 function mostrarTextoParaCopiar(textoCompleto) {
+    const areaResumo = document.getElementById('resumoPedido');
+    const divExistente = areaResumo.querySelector('.bloco-texto-copia');
+    if (divExistente) divExistente.remove();
+
     const divResumo = document.createElement('div');
-    divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
+    divResumo.className = 'bloco-texto-copia';
+        divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
     divResumo.textContent = textoCompleto;
-    
+
     const botaoCopiar = document.createElement('button');
     botaoCopiar.textContent = '📋 COPIAR PEDIDO INTEIRO';
     botaoCopiar.style = 'width:100%; padding:14px; margin-top:15px; background:linear-gradient(90deg, #8B5CF6, #7C3AED); color:white; border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;';
     botaoCopiar.onclick = async function() {
         const ok = await copiarParaAreaDeTransferencia(textoCompleto);
-        alert(ok ? '✅ COPIADO! É só colar no WhatsApp!' : '❌ Selecione e copie manualmente');
+        alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
     };
 
-    const areaResumo = document.getElementById('resumoPedido');
     areaResumo.appendChild(divResumo);
     areaResumo.appendChild(botaoCopiar);
 }
 
-// Carrega e mostra todos os pedidos no Painel de Gestão
 function carregarPedidosPainel() {
     referenciaPedidos.on('value', (snapshot) => {
         todosPedidosCarregados = snapshot.val() || {};
@@ -792,12 +734,18 @@ function atualizarListaPedidos() {
     lista.innerHTML = '';
 
     const pedidosFiltrados = Object.entries(todosPedidosCarregados)
-        .filter(([_, p]) => filtroAtivo === 'todos' || p.status === filtroAtivo)
-        .sort((a, b) => b[1].hora.localeCompare(a[1].hora))
+        .filter(([_, p]) => {
+            if (filtroAtivo === 'todos') return true;
+            const status = (p.status || 'Pendente').toLowerCase().trim();
+            if (filtroAtivo === 'pendente') return status === 'pendente';
+            if (filtroAtivo === 'concluido') return status === 'concluído' || status === 'concluido';
+            if (filtroAtivo === 'cancelado') return status === 'cancelado';
+            return true;
+        })
         .sort((a, b) => {
             const dtA = a[1].data.split('/').reverse().join('');
             const dtB = b[1].data.split('/').reverse().join('');
-            return dtB.localeCompare(dtA);
+            return dtB.localeCompare(dtA) || b[1].hora.localeCompare(a[1].hora);
         });
 
     if (pedidosFiltrados.length === 0) {
@@ -806,19 +754,20 @@ function atualizarListaPedidos() {
     }
 
     pedidosFiltrados.forEach(([id, pedido]) => {
-        const statusClasse = pedido.status === 'Concluído' ? 'status-concluido' 
-                            : pedido.status === 'Cancelado' ? 'status-cancelado' 
+        const status = (pedido.status || 'Pendente').trim();
+        const statusClasse = status.toLowerCase().includes('concluído') ? 'status-concluido' 
+                            : status.toLowerCase().includes('cancelado') ? 'status-cancelado' 
                             : 'status-pendente';
 
         const item = document.createElement('div');
         item.className = 'item-pedido';
         item.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong>${pedido.nomeLoja}</strong>
-                <span class="${statusClasse}">${pedido.status}</span>
+                <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
+                <span class="${statusClasse}">${status}</span>
             </div>
             <small>📅 ${pedido.data} às ${pedido.hora} | 📱 ${pedido.origem || 'Não informado'}</small>
-            <p>💰 R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')} — ${pedido.nomeDest}</p>
+            <p>💰 R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} — ${pedido.nomeDest || 'Cliente não informado'}</p>
             
             <div class="botoes-pedido">
                 <button class="btn-alterar-status" onclick="mostrarDetalhesPedido('${id}')">👁️ VER COMPLETO</button>
@@ -848,66 +797,7 @@ async function copiarPedidoCompleto(id) {
     const pedido = todosPedidosCarregados[id];
     const texto = montarPedidoCompleto(pedido);
     const ok = await copiarParaAreaDeTransferencia(texto);
-    alert(ok ? '✅ COPIADO! É só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
-}
-
-function montarPedidoCompleto(pedido) {
-    const observacao = pedido.refDest && pedido.refDest.trim() !== '' 
-        ? pedido.refDest 
-        : 'Nenhuma observação informada';
-    const retornoTexto = pedido.valorRetorno > 0 ? '✅ Sim' : '❌ Não';
-    const quemPagaTexto = pedido.quemPaga === 'lojista' ? '🏪 Paga pela Loja' : '👤 Paga pelo Cliente';
-    const linkLoja = linkGoogleMaps(pedido.endLoja);
-    const linkCliente = linkGoogleMaps(pedido.endDest);
-
-    return `═══════════════════════════════════════
-📦 PEDIDO COMPLETO — MTZ EXPRESS
-📅 Data: ${pedido.data} às ${pedido.hora}
-📱 Origem: ${pedido.origem || 'Não informado'}
-═══════════════════════════════════════
-
-🏪 DADOS DA LOJA
-▫️ Nome: ${pedido.nomeLoja || 'Não informado'}
-▫️ Contato: ${pedido.contatoLoja || 'Não informado'}
-▫️ Endereço: ${pedido.endLoja || 'Não informado'}
-🔗 Mapa — Loja: ${linkLoja}
-
-───────────────────────────────────────
-
-👤 DADOS DO CLIENTE
-▫️ Nome: ${pedido.nomeDest || 'Não informado'}
-▫️ Contato: ${pedido.contatoDest || 'Não informado'}
-▫️ Endereço: ${pedido.endDest || 'Não informado'}
-🔗 Mapa — Cliente: ${linkCliente}
-
-───────────────────────────────────────
-
-📝 OBSERVAÇÃO / REFERÊNCIA
-▫️ ${observacao}
-
-───────────────────────────────────────
-
-📏 PERCURSO
-▫️ Km real: ${(pedido.kmReal || 0).toFixed(1).replace('.', ',')} km
-▫️ Km arredondado: ${pedido.kmArredondado || 0} km
-▫️ Retorno: ${retornoTexto}
-
-───────────────────────────────────────
-
-💰 VALORES
-▫️ Entrega: R$ ${(pedido.valorBase || 0).toFixed(2).replace('.', ',')}
-▫️ Retorno: R$ ${(pedido.valorRetorno || 0).toFixed(2).replace('.', ',')}
-▫️ Gorjeta: R$ ${(pedido.valorGorjeta || 0).toFixed(2).replace('.', ',')}
-▫️ TOTAL FINAL: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}
-
-───────────────────────────────────────
-
-💳 PAGAMENTO
-▫️ ${quemPagaTexto}
-▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
-
-═══════════════════════════════════════
-`;
+    alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
 }
 
 function alterarStatus(id, novoStatus) {
@@ -956,7 +846,6 @@ function refazerPedido() {
     window.scrollTo(0, 0);
 }
 
-// Reseta seleções de opções
 document.querySelectorAll('.opcao-radio').forEach(opt => {
     opt.addEventListener('click', function() {
         const nomeGrupo = this.querySelector('input').name;
@@ -971,4 +860,4 @@ window.onload = function() {
 };
 </script>
 </body>
-   </html>
+                    </html>
