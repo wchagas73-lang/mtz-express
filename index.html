@@ -1,8 +1,3 @@
-<!-- ==========================================================
-   MTZ EXPRESS — PÁGINA DE PEDIDOS COMPLETA
-   Atualização: Resumo 100% completo para consulta manual
-   ========================================================== -->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,7 +6,6 @@
     <title>MTZ Express | Entregas — Juiz de Fora-MG</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -64,13 +58,14 @@
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
         .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; flex: 1; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;}
         .btn-alterar-status {background: linear-gradient(90deg, #3B82F6, #2563EB); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
+        .btn-copiar {background: linear-gradient(90deg, #8B5CF6, #7C3AED); color: white; padding: 10px 14px; font-size: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%;}
         .conteudo-aba {display: none;}
         .conteudo-aba.visivel {display: block; animation: aparecer 0.4s ease-out;}
         @keyframes aparecer {from{opacity:0; transform: translateY(15px);} to{opacity:1; transform: translateY(0);}}
         
         .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
-        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2; white-space: pre-wrap;}
-        .resumo h4 {color: var(--azul); margin: 18px 0 8px; font-size: 16px; border-bottom: 1px dashed rgba(255,215,0,0.3); padding-bottom: 6px;}
+        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
+        .resumo-completo {background: rgba(59,130,246,0.08); border: 2px solid var(--azul); border-radius: 16px; padding: 18px; margin: 12px 0; font-size: 14px; line-height: 1.8; white-space: pre-wrap;}
         .mensagem-parceria {background: rgba(255,215,0,0.12); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0; text-align: center; font-weight: 700; font-size: 17px; color: #FFF8C1;}
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
         .qrcode-pix {margin: 15px auto; padding: 10px; background: white; border-radius: 12px; display: inline-block;}
@@ -81,12 +76,14 @@
         .caixa-login {max-width: 450px; margin: 30px auto; padding: 25px; border: 2px solid var(--azul); border-radius: 20px; background: rgba(59,130,246,0.06);}
         .aviso-erro {color: var(--perigo); text-align: center; margin-top: 15px; font-weight: 600;}
         hr {border:none; border-top:2px solid var(--dourado); margin:15px 0;}
+        .link-mapa {color: #93C5FD; font-size: 13px; text-decoration: none;}
+        .link-mapa:hover {text-decoration: underline;}
 
         .grade-dados {display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;}
         .card-dado {background: rgba(255,215,0,0.1); border: 2px solid var(--dourado); border-radius: 16px; padding: 18px; text-align: center;}
         .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
         .card-dado .valor {font-size: 26px; font-weight: 900;}
-        .lista-pedidos {max-height: 450px; overflow-y: auto; margin-top: 20px;}
+        .lista-pedidos {max-height: 500px; overflow-y: auto; margin-top: 20px;}
         .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
@@ -94,8 +91,7 @@
         .filtro-ativo {background: var(--primaria); color: white;}
         .bloco-periodo {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 25px 0;}
         .botoes-pedido {display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;}
-        .link-mapa {color: #93C5FD; font-size: 14px; text-decoration: none;}
-        .link-mapa:hover {text-decoration: underline;}
+        .detalhes-pedido {margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 13px; line-height: 1.8; white-space: pre-wrap;}
     </style>
 </head>
 <body>
@@ -163,7 +159,7 @@
                     <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                     <label>Ponto de Referência / Observação <span class="opcional">(Opcional)</span></label>
-                    <input type="text" id="refDest" placeholder="Ex: 10º andar, em frente à farmácia, deixar na portaria...">
+                    <input type="text" id="refDest" placeholder="Perto de onde? Andar, portaria, cuidados especiais...">
                 </div>
 
                 <h3 style="color:var(--dourado); margin:30px 0 14px;">⚙️ Opções Adicionais</h3>
@@ -171,10 +167,10 @@
                 <div class="caixa-retorno">
                     <p><strong>✅ Retorno para a Loja?</strong></p>
                     <div class="opcoes-linha">
-                        <label class="opcao-radio selecionado" id="optRetornoNao">
+                        <label class="opcao-radio selecionado">
                             <input type="radio" name="retorno" value="nao" checked onclick="calcular()"> Não
                         </label>
-                        <label class="opcao-radio" id="optRetornoSim">
+                        <label class="opcao-radio">
                             <input type="radio" name="retorno" value="sim" onclick="calcular()"> Sim
                         </label>
                     </div>
@@ -183,10 +179,10 @@
                 <div class="caixa-gorjeta">
                     <p><strong>💸 Gorjeta para o Motoboy?</strong></p>
                     <div class="opcoes-linha">
-                        <label class="opcao-radio selecionado" id="optGorjetaNao">
+                        <label class="opcao-radio selecionado">
                             <input type="radio" name="gorjeta" value="nao" checked onclick="document.getElementById('valorGorjeta').style.display='none'; calcular()"> Não
                         </label>
-                        <label class="opcao-radio" id="optGorjetaSim">
+                        <label class="opcao-radio">
                             <input type="radio" name="gorjeta" value="sim" onclick="document.getElementById('valorGorjeta').style.display='block'; calcular()"> Sim
                         </label>
                     </div>
@@ -196,10 +192,10 @@
                 <div class="caixa-pagamento" style="margin-top:20px;">
                     <p><strong>💳 Quem vai pagar a entrega?</strong> <span>*</span></p>
                     <div class="opcoes-linha">
-                        <label class="opcao-radio selecionado" id="optPagaLoja">
+                        <label class="opcao-radio selecionado">
                             <input type="radio" name="quemPaga" value="lojista" checked> Lojista (paga aqui na loja)
                         </label>
-                        <label class="opcao-radio" id="optPagaCliente">
+                        <label class="opcao-radio">
                             <input type="radio" name="quemPaga" value="cliente"> Cliente (paga no endereço)
                         </label>
                     </div>
@@ -214,186 +210,195 @@
 
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
 
-                <!-- ==================================================
-                     RESUMO COMPLETO DO PEDIDO — PARA CONSULTA E CÓPIA
-                     SEMPRE APARECE TUDO, INCLUSIVE LINKS DO GOOGLE MAPS
-                     ================================================== -->
                 <div class="resumo escondido" id="resumoPedido">
-                    <h3 style="color:var(--dourado); text-align:center; margin-bottom:15px;">📋 RESUMO COMPLETO DO PEDIDO</h3>
-                    <div id="conteudoResumoCompleto"></div>
-                    <div class="linha-botoes">
-                        <button class="btn btn-secundario" onclick="copiarResumoCompleto()">📋 COPIAR PEDIDO INTEIRO</button>
-                        <button class="btn btn-principal" onclick="enviarWhatsApp()">📤 ENVIAR WHATSAPP</button>
+                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO TOTAL</h3>
+                    
+                    <div style="background:rgba(0,200,150,0.15); border:2px solid var(--primaria); border-radius:12px; padding:12px; margin:15px 0; font-weight:700;">
+                        📏 KM TOTAL: <span id="kmTotal">--</span> km<br>
+                        📏 KM ARREDONDADO: <span id="kmTotalArred">--</span> km<br>
+                        💲 VALOR ÚNICO: <span id="valorTotalEntregas">--</span>
+                    </div>
+                    
+                    <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor total): <span id="valRetorno">--</span></p>
+                    <p id="linhaGorjeta" class="escondido">💸 Gorjeta: <span id="valGorjetaRes">--</span></p>
+                    
+                    <hr>
+                    <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
+
+                    <div class="mensagem-parceria">
+                        💪🏿 Agradecemos pela confiança! 📸<br>
+                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
+                    </div>
+
+                    <div class="pagamento">
+                        <h3 style="color:var(--dourado); margin-bottom:10px;">💸 FORMAS DE PAGAMENTO</h3>
+                        <p><strong>✅ Pix rápido e seguro — VALOR JÁ PREENCHIDO!</strong></p>
+                        <p>🔑 Chave Pix: <strong>(32) 9 9995-3215</strong></p>
+                        <p>👤 Recebedor: Wellington Chagas Aleixo</p>
+                        <p>🏦 Banco: Nu Pagamentos S.A.</p>
+                        <p>🔗 Link com valor exato: <a id="linkPixValor" href="#" target="_blank" style="color:var(--dourado);">Clique aqui para pagar</a></p>
+                        
+                        <div class="qrcode-pix">
+                            <canvas id="qrcodePix"></canvas>
+                        </div>
+                        <p style="font-size:14px; color:#B2DFDB;">📷 Escaneie ou clique — valor já vem pronto, não precisa digitar nada!</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== ABA PAINEL GESTÃO ==================== -->
+            <!-- ==================== ABA PAINEL DE GESTÃO ==================== -->
             <div class="conteudo-aba" id="abaPainel">
-                <div class="caixa-login" id="areaLoginPainel">
-                    <h3 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 Área do Gestor</h3>
-                    <label>Senha de acesso</label>
-                    <input type="password" id="senhaPainel" placeholder="Digite a senha">
-                    <button class="btn btn-principal" style="width:100%; margin-top:15px;" onclick="verificarSenha()">🔓 ENTRAR</button>
-                    <p class="aviso-erro" id="avisoSenhaIncorreta" style="display:none;">❌ Senha incorreta</p>
+                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO (SEU ACESSO EXCLUSIVO)</h2>
+                <div class="caixa-login" id="loginPainel">
+                    <label>Usuário</label>
+                    <input type="text" id="usuarioPainel" placeholder="Digite seu usuário">
+                    <label>Senha</label>
+                    <input type="password" id="senhaPainel" placeholder="Digite sua senha">
+                    <p class="aviso-erro escondido" id="erroLoginPainel">❌ Usuário ou senha incorretos</p>
+                    <button class="btn btn-principal" style="width:100%; margin-top:20px;" onclick="verificarLoginPainel()">ENTRAR</button>
                 </div>
 
-                <div id="conteudoPainel" class="escondido">
-                    <h3 style="color:var(--dourado); text-align:center; margin-bottom:20px;">📊 PAINEL DE GESTÃO — MTZ EXPRESS</h3>
-                    
-                    <div class="bloco-periodo">
-                        <h4 style="color:var(--dourado); margin-bottom:15px;">📅 Período</h4>
-                        <div class="linha-dupla">
-                            <div>
-                                <label>Data inicial</label>
-                                <input type="date" id="dataInicial" onchange="filtrarPedidos()">
-                            </div>
-                            <div>
-                                <label>Data final</label>
-                                <input type="date" id="dataFinal" onchange="filtrarPedidos()">
-                            </div>
-                        </div>
-                        <div style="margin-top:12px;">
-                            <button class="btn filtro-ativo" onclick="aplicarFiltro('hoje')">Hoje</button>
-                            <button class="btn" onclick="aplicarFiltro('semana')">Esta Semana</button>
-                            <button class="btn" onclick="aplicarFiltro('mes')">Este Mês</button>
-                            <button class="btn" onclick="aplicarFiltro('todos')">Todos</button>
-                        </div>
-                    </div>
-
+                <div class="escondido" id="conteudoPainel">
                     <div class="grade-dados">
                         <div class="card-dado">
-                            <h3>📦 Total de Pedidos</h3>
-                            <div class="valor" id="qtdeTotal">0</div>
+                            <h3>💰 Faturamento Hoje</h3>
+                            <div class="valor" id="fatDia">R$ 0,00</div>
                         </div>
                         <div class="card-dado">
-                            <h3>✅ Concluídos</h3>
-                            <div class="valor" id="qtdeConcluido">0</div>
+                            <h3>📦 Entregas Hoje</h3>
+                            <div class="valor" id="qtdDia">0</div>
                         </div>
                         <div class="card-dado">
-                            <h3>💰 Valor Total</h3>
-                            <div class="valor" id="valorTotal">R$ 0,00</div>
+                            <h3>📅 Faturamento Mês Atual</h3>
+                            <div class="valor" id="fatMes">R$ 0,00</div>
                         </div>
                         <div class="card-dado">
-                            <h3>📏 Km Percorrido</h3>
-                            <div class="valor" id="kmTotal">0 km</div>
+                            <h3>📊 Média por Entrega</h3>
+                            <div class="valor" id="mediaEntrega">R$ 0,00</div>
                         </div>
                     </div>
 
-                    <div class="lista-pedidos" id="listaPedidos">
-                        <!-- Lista carregada via JavaScript -->
+                    <div class="bloco-periodo">
+                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 FILTRAR POR PERÍODO LIVRE</h3>
+                        <div class="linha-dupla">
+                            <div>
+                                <label>Data Inicial</label>
+                                <input type="date" id="dataInicial">
+                            </div>
+                            <div>
+                                <label>Data Final</label>
+                                <input type="date" id="dataFinal">
+                            </div>
+                        </div>
+                        <button class="btn btn-secundario" style="width:100%; margin-top:15px;" onclick="aplicarFiltroPeriodo()">🔍 APLICAR PERÍODO</button>
+                        
+                        <div id="resultadoPeriodo" class="escondido" style="margin-top:20px; padding:15px; background:rgba(0,200,150,0.1); border-radius:12px;">
+                            <h4 style="color:var(--dourado); margin-bottom:10px;">📊 VALORES DO PERÍODO SELECIONADO</h4>
+                            <p>📦 Total de entregas: <strong id="qtdPeriodo">0</strong></p>
+                            <p>💰 Faturamento total: <strong id="fatPeriodo">R$ 0,00</strong></p>
+                            <p>📊 Média por entrega: <strong id="mediaPeriodo">R$ 0,00</strong></p>
+                        </div>
                     </div>
+
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 FILTRAR POR STATUS</h3>
+                    <div class="linha-botoes">
+                        <button class="btn btn-secundario filtro-ativo" onclick="filtrarPedidos('todos')">Todos</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('pendente')">Pendentes</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('concluido')">Concluídos</button>
+                        <button class="btn btn-secundario" onclick="filtrarPedidos('cancelado')">Cancelados</button>
+                    </div>
+
+                    <h3 style="color:var(--dourado); margin:20px 0 10px;">📋 LISTA DE PEDIDOS</h3>
+                    <div class="lista-pedidos" id="listaHistorico">
+                        <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>
+                    </div>
+
+                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <script>
-        // ==================== VARIÁVEIS GLOBAIS ====================
-        let kmTotalCalculado = 0;
-        let pedidoAtual = {};
-        let origemDispositivo = '';
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
 
-        // Detecta origem do dispositivo
-        function detectarOrigem() {
-            const ua = navigator.userAgent;
-            if (/iPhone|iPad|iPod/.test(ua)) return 'iPhone';
-            if (/Android/.test(ua)) return 'Android';
-            return 'Outro';
-        }
-        origemDispositivo = detectarOrigem();
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E9pQ6TzrQ0wV4",
+  authDomain: "mtz-express-fcd0b.firebaseapp.com",
+  databaseURL: "https://mtz-express-fcd0b-default-rtdb.firebaseio.com",
+  projectId: "mtz-express-fcd0b",
+  storageBucket: "mtz-express-fcd0b.appspot.com",
+  messagingSenderId: "437748664314",
+  appId: "1:437748664314:web:371375ef8a9d7b2c8f8c7a"
+};
 
-        // ==================== ALTERNAR ABAS ====================
-        function mostrarAba(nomeAba) {
-            document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
-            event.target.classList.add('ativa');
-            document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
-            document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
-        }
+firebase.initializeApp(firebaseConfig);
+const banco = firebase.database();
+const referenciaPedidos = banco.ref('pedidos');
 
-        // ==================== SELEÇÃO DE OPÇÕES ====================
-        document.querySelectorAll('.opcao-radio').forEach(opt => {
-            opt.addEventListener('click', function() {
-                const nomeGrupo = this.querySelector('input').name;
-                document.querySelectorAll(`input[name="${nomeGrupo}"]`).forEach(i => {
-                    i.closest('.opcao-radio').classList.remove('selecionado');
-                });
-                this.classList.add('selecionado');
-            });
-        });
+const USUARIO_ADMIN = "mtz2026";
+const SENHA_ADMIN = "1120";
+const NUMERO_WHATSAPP = "5532999953215";
+const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283?valor=";
 
-        // ==================== FUNÇÃO DE CALCULAR ====================
-        function calcular() {
-            // Simulação — substituir por cálculo real com Google Maps
-            kmTotalCalculado = Math.floor(Math.random() * 15) + 2; // valor exemplo
-            const valorPorKm = 2.50;
-            const valorEntrega = kmTotalCalculado * valorPorKm;
-            
-            const retorno = document.querySelector('input[name="retorno"]:checked').value === 'sim';
-            const valorRetorno = retorno ? valorEntrega * 0.5 : 0;
+let googleCarregado = false;
+let servicoDistancia = null;
+let dadosPedidoAtual = null;
+let filtroAtivo = 'todos';
+let todosPedidosCarregados = {};
 
-            const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value === 'sim';
-            const valorGorjeta = gorjeta ? parseFloat(document.getElementById('valorGorjeta').value) || 0 : 0;
+// Detecta origem do dispositivo
+function detectarOrigem() {
+    const ua = navigator.userAgent;
+    if (/iPhone|iPad|iPod/.test(ua)) return 'iPhone';
+    if (/Android/.test(ua)) return 'Android';
+    return 'Outro';
+}
 
-            const valorTotal = valorEntrega + valorRetorno + valorGorjeta;
+// Monta o link do Google Maps
+function linkGoogleMaps(endereco) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco + ", Juiz de Fora - MG")}`;
+}
 
-            pedidoAtual = {
-                nomeLoja: document.getElementById('nomeLoja').value || 'Não informado',
-                contatoLoja: document.getElementById('contatoLoja').value || 'Não informado',
-                endLoja: document.getElementById('endLoja').value || 'Não informado',
-                nomeDest: document.getElementById('nomeDest').value || 'Não informado',
-                contatoDest: document.getElementById('contatoDest').value || 'Não informado',
-                endDest: document.getElementById('endDest').value || 'Não informado',
-                refDest: document.getElementById('refDest').value || '',
-                retorno: retorno ? 'sim' : 'nao',
-                gorjeta: gorjeta ? 'sim' : 'nao',
-                valorGorjeta: valorGorjeta.toFixed(2).replace('.', ','),
-                quemPaga: document.querySelector('input[name="quemPaga"]:checked').value,
-                kmTotal: kmTotalCalculado,
-                valorEntrega: valorEntrega.toFixed(2).replace('.', ','),
-                valorRetorno: valorRetorno.toFixed(2).replace('.', ','),
-                valorTotal: valorTotal.toFixed(2).replace('.', ','),
-                dataHora: new Date().toLocaleString('pt-BR'),
-                origem: origemDispositivo
-            };
+// ✅ MONTA O PEDIDO COMPLETO — PARA VISUALIZAR E COPIAR
+function montarPedidoCompleto(pedido) {
+    const observacao = pedido.refDest && pedido.refDest.trim() !== '' 
+        ? pedido.refDest 
+        : 'Nenhuma observação / referência informada';
+    
+    const retornoTexto = pedido.valorRetorno && pedido.valorRetorno > 0 ? '✅ Sim' : '❌ Não';
+    const quemPagaTexto = pedido.quemPaga === 'lojista' ? '🏪 Paga pela Loja' : '👤 Paga pelo Cliente';
+    const origem = pedido.origem || detectarOrigem();
+    const linkLoja = linkGoogleMaps(pedido.endLoja);
+    const linkCliente = linkGoogleMaps(pedido.endDest);
+    const kmReal = pedido.kmReal ? pedido.kmReal.toFixed(1).replace('.', ',') : '--';
+    const kmArred = pedido.kmArredondado || '--';
+    const valorBase = pedido.valorBase ? pedido.valorBase.toFixed(2).replace('.', ',') : '--';
+    const valorRetorno = pedido.valorRetorno ? pedido.valorRetorno.toFixed(2).replace('.', ',') : '0,00';
+    const valorGorjeta = pedido.valorGorjeta ? pedido.valorGorjeta.toFixed(2).replace('.', ',') : '0,00';
+    const valorFinal = pedido.valorFinal ? pedido.valorFinal.toFixed(2).replace('.', ',') : '--';
+    const dataHora = pedido.data && pedido.hora ? `${pedido.data} ${pedido.hora}` : '--';
 
-            return pedidoAtual;
-        }
-
-        // ==================== MONTAR LINK DO GOOGLE MAPS ====================
-        function linkGoogleMaps(endereco) {
-            const end = encodeURIComponent(endereco);
-            return `https://www.google.com/maps/search/?api=1&query=${end}`;
-        }
-
-        // ==================== MONTAR RESUMO COMPLETO ====================
-        function montarTextoResumoCompleto() {
-            const p = pedidoAtual;
-            const observacao = p.refDest && p.refDest.trim() !== '' ? p.refDest : 'Nenhuma observação informada';
-            const retornoTexto = p.retorno === 'sim' ? '✅ Sim' : '❌ Não';
-            const quemPagaTexto = p.quemPaga === 'lojista' ? '🏪 Paga pela Loja' : '👤 Paga pelo Cliente';
-            const linkLoja = linkGoogleMaps(p.endLoja);
-            const linkDest = linkGoogleMaps(p.endDest);
-
-            return `═══════════════════════════════════════
+    return `═══════════════════════════════════════
 📦 PEDIDO — MTZ EXPRESS
-📅 Data: ${p.dataHora}
-📱 Origem: ${p.origem}
+📅 Data: ${dataHora}
+📱 Origem: ${origem}
 ═══════════════════════════════════════
 
 🏪 DADOS DA LOJA
-▫️ Nome: ${p.nomeLoja}
-▫️ Contato: ${p.contatoLoja}
-▫️ Endereço: ${p.endLoja}
+▫️ Nome: ${pedido.nomeLoja || 'Não informado'}
+▫️ Contato: ${pedido.contatoLoja || 'Não informado'}
+▫️ Endereço: ${pedido.endLoja || 'Não informado'}
 🔗 Abrir no Mapa: ${linkLoja}
 
 ───────────────────────────────────────
 
 👤 DADOS DO CLIENTE
-▫️ Nome: ${p.nomeDest}
-▫️ Contato: ${p.contatoDest}
-▫️ Endereço: ${p.endDest}
-🔗 Abrir no Mapa: ${linkDest}
+▫️ Nome: ${pedido.nomeDest || 'Não informado'}
+▫️ Contato: ${pedido.contatoDest || 'Não informado'}
+▫️ Endereço: ${pedido.endDest || 'Não informado'}
+🔗 Abrir no Mapa: ${linkCliente}
 
 ───────────────────────────────────────
 
@@ -403,111 +408,567 @@
 ───────────────────────────────────────
 
 📏 PERCURSO
-▫️ Km total: ${p.kmTotal} km
+▫️ Km real: ${kmReal} km
+▫️ Km arredondado: ${kmArred} km
 ▫️ Retorno para loja: ${retornoTexto}
 
 ───────────────────────────────────────
 
 💰 VALORES
-▫️ Entrega: R$ ${p.valorEntrega}
-▫️ Retorno: R$ ${p.valorRetorno}
-▫️ Gorjeta: R$ ${p.valorGorjeta}
-▫️ TOTAL FINAL: R$ ${p.valorTotal}
+▫️ Entrega: R$ ${valorBase}
+▫️ Retorno: R$ ${valorRetorno}
+▫️ Gorjeta: R$ ${valorGorjeta}
+▫️ TOTAL FINAL: R$ ${valorFinal}
 
 ───────────────────────────────────────
 
 💳 FORMA DE PAGAMENTO
 ▫️ ${quemPagaTexto}
+▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
 
 ═══════════════════════════════════════
 `;
-        }
+}
 
-        // ==================== EXIBIR RESUMO COMPLETO ====================
-        function exibirResumoCompleto() {
-            calcular();
-            const texto = montarTextoResumoCompleto();
-            document.getElementById('conteudoResumoCompleto').textContent = texto;
-            document.getElementById('resumoPedido').classList.remove('escondido');
+// Copia para área de transferência
+async function copiarParaAreaDeTransferencia(texto) {
+    try {
+        await navigator.clipboard.writeText(texto);
+        return true;
+    } catch (erro) {
+        const areaTexto = document.createElement('textarea');
+        areaTexto.value = texto;
+        areaTexto.style.position = 'fixed';
+        areaTexto.style.opacity = '0';
+        document.body.appendChild(areaTexto);
+        areaTexto.select();
+        try {
+            document.execCommand('copy');
+            document.body.removeChild(areaTexto);
+            return true;
+        } catch (e) {
+            document.body.removeChild(areaTexto);
+            return false;
         }
+    }
+}
 
-        // ==================== COPIAR RESUMO COMPLETO ====================
-        function copiarResumoCompleto() {
-            const texto = montarTextoResumoCompleto();
-            navigator.clipboard.writeText(texto).then(() => {
-                alert('✅ Pedido copiado! É só colar no WhatsApp');
-            }).catch(() => {
-                alert('❌ Não foi possível copiar. Selecione e copie manualmente.');
-            });
+// Detecta se está dentro de app de rede social e avisa antes
+function verificarNavegadorApp() {
+    const agente = navigator.userAgent.toLowerCase();
+    if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(agente)) {
+        document.getElementById('avisoNavegadorApp').classList.remove('escondido');
+        return false;
+    }
+    return true;
+}
+
+function limparEndereco(endereco) {
+    return endereco
+        .trim()
+        .replace(/\s*,\s*/g, ', ')
+        .replace(/\s+nº\s*/gi, ' ')
+        .replace(/\s+(\d+)$/, ', $1');
+}
+
+function carregarDadosLojaSalvos() {
+    const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
+    if (dadosSalvos) {
+        const loja = JSON.parse(dadosSalvos);
+        document.getElementById('nomeLoja').value = loja.nome || '';
+        document.getElementById('contatoLoja').value = loja.contato || '';
+        document.getElementById('endLoja').value = loja.endereco || '';
+    }
+}
+function salvarDadosLojaAutomatico() {
+    const dados = {
+        nome: document.getElementById('nomeLoja').value.trim(),
+        contato: document.getElementById('contatoLoja').value.trim(),
+        endereco: document.getElementById('endLoja').value.trim()
+    };
+    localStorage.setItem('dadosLojaMTZ', JSON.stringify(dados));
+}
+document.addEventListener('input', (e) => {
+    if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
+});
+
+function buscarValorPorKm(kmArredondado) {
+    const valoresFixos = {
+        1:9, 2:10, 3:11, 4:12, 5:13, 6:14, 7:16, 8:18, 9:20, 10:22
+    };
+    if (kmArredondado <=10) return valoresFixos[kmArredondado];
+    return 22 + ((kmArredondado -10) * 2.5);
+}
+
+function iniciarGoogle() {
+    googleCarregado = true;
+    servicoDistancia = new google.maps.DistanceMatrixService();
+    carregarDadosLojaSalvos();
+    verificarNavegadorApp();
+}
+
+function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
+    return new Promise((sucesso, erro) => {
+        if (!googleCarregado || !servicoDistancia) {
+            erro("Aguarde carregar o Google Maps...");
+            return;
         }
+        const origem = limparEndereco(enderecoOrigem) + ", Juiz de Fora - MG, Brasil";
+        const destino = limparEndereco(enderecoDestino) + ", Juiz de Fora - MG, Brasil";
 
-        // ==================== GERAR PEDIDO ====================
-        function gerarPedido() {
-            exibirResumoCompleto();
-            // Aqui salva no banco de dados
-            console.log('Pedido salvo:', pedidoAtual);
-        }
-
-        // ==================== ENVIAR WHATSAPP ====================
-        function enviarWhatsApp() {
-            const texto = montarTextoResumoCompleto();
-            const numero = '5532999953215'; // Seu número com DDD
-            const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
-        }
-
-        // ==================== REFAZER PEDIDO ====================
-        function refazerPedido() {
-            document.getElementById('nomeLoja').value = '';
-            document.getElementById('contatoLoja').value = '';
-            document.getElementById('endLoja').value = '';
-            document.getElementById('nomeDest').value = '';
-            document.getElementById('contatoDest').value = '';
-            document.getElementById('endDest').value = '';
-            document.getElementById('refDest').value = '';
-            document.getElementById('valorGorjeta').value = '';
-            document.getElementById('valorGorjeta').style.display = 'none';
-            document.getElementById('resumoPedido').classList.add('escondido');
-            
-            // Reseta seleções
-            document.querySelectorAll('.opcao-radio').forEach(opt => opt.classList.remove('selecionado'));
-            document.querySelector('#optRetornoNao').classList.add('selecionado');
-            document.querySelector('#optGorjetaNao').classList.add('selecionado');
-            document.querySelector('#optPagaLoja').classList.add('selecionado');
-            document.querySelector('input[name="retorno"][value="nao"]').checked = true;
-            document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
-            document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
-            
-            window.scrollTo(0, 0);
-        }
-
-        // ==================== FUNÇÕES DO PAINEL (exemplo) ====================
-        function verificarSenha() {
-            const senha = document.getElementById('senhaPainel').value;
-            if (senha === 'mtz2026') { // altere para sua senha
-                document.getElementById('areaLoginPainel').classList.add('escondido');
-                document.getElementById('conteudoPainel').classList.remove('escondido');
-                carregarDadosPainel();
+        servicoDistancia.getDistanceMatrix({
+            origins: [origem],
+            destinations: [destino],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        }, function(resposta, status) {
+            if (status === "OK" && resposta.rows[0].elements[0].status === "OK") {
+                const km = resposta.rows[0].elements[0].distance.value / 1000;
+                sucesso(km);
             } else {
-                document.getElementById('avisoSenhaIncorreta').style.display = 'block';
+                erro("❌ Endereço não encontrado! Verifique.");
             }
+        });
+    });
+}
+
+function mostrarAba(nomeAba) {
+    document.querySelectorAll('.aba').forEach(botao => botao.classList.remove('ativa'));
+    event.currentTarget.classList.add('ativa');
+    document.querySelectorAll('.conteudo-aba').forEach(div => div.classList.remove('visivel'));
+    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
+}
+
+function verificarLoginPainel() {
+    const user = document.getElementById('usuarioPainel').value.trim();
+    const pass = document.getElementById('senhaPainel').value.trim();
+    
+    if (user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
+        document.getElementById('loginPainel').style.display = 'none';
+        const painel = document.getElementById('conteudoPainel');
+        painel.style.display = 'block';
+        painel.classList.remove('escondido');
+        carregarPedidosPainel();
+    } else {
+        document.getElementById('erroLoginPainel').classList.remove('escondido');
+    }
+}
+
+function sairPainel() {
+    document.getElementById('conteudoPainel').style.display = 'none';
+    document.getElementById('conteudoPainel').classList.add('escondido');
+    document.getElementById('loginPainel').style.display = 'block';
+    document.getElementById('loginPainel').classList.remove('escondido');
+    document.getElementById('usuarioPainel').value = '';
+    document.getElementById('senhaPainel').value = '';
+    document.getElementById('erroLoginPainel').classList.add('escondido');
+}
+
+function filtrarPedidos(tipo) {
+    filtroAtivo = tipo;
+    document.querySelectorAll('.linha-botoes .btn').forEach(b => b.classList.remove('filtro-ativo'));
+    event.currentTarget.classList.add('filtro-ativo');
+    atualizarListaPedidos();
+}
+
+function aplicarFiltroPeriodo() {
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+
+    if (!dataInicial || !dataFinal) {
+        alert("⚠️ Preencha Data Inicial e Data Final!");
+        return;
+    }
+
+    const dtInicio = new Date(dataInicial);
+    const dtFim = new Date(dataFinal);
+    dtFim.setHours(23, 59, 59);
+
+    let totalPeriodo = 0, qtdPeriodo = 0;
+
+    Object.values(todosPedidosCarregados).forEach(pedido => {
+        if (!pedido.data || pedido.status !== "Concluído") return;
+        const partes = pedido.data.split('/');
+        if (partes.length !== 3) return;
+        const dtPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+        if (dtPedido >= dtInicio && dtPedido <= dtFim) {
+            totalPeriodo += pedido.valorFinal || 0;
+            qtdPeriodo++;
+        }
+    });
+
+    const mediaPeriodo = qtdPeriodo > 0 ? totalPeriodo / qtdPeriodo : 0;
+
+    document.getElementById('qtdPeriodo').textContent = qtdPeriodo;
+    document.getElementById('fatPeriodo').textContent = `R$ ${totalPeriodo.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaPeriodo').textContent = `R$ ${mediaPeriodo.toFixed(2).replace('.', ',')}`;
+    document.getElementById('resultadoPeriodo').classList.remove('escondido');
+}
+
+async function calcular() {
+    const nomeLoja = document.getElementById('nomeLoja').value.trim();
+    const contatoLoja = document.getElementById('contatoLoja').value.trim();
+    const endLoja = document.getElementById('endLoja').value.trim();
+    const nomeDest = document.getElementById('nomeDest').value.trim();
+    const contatoDest = document.getElementById('contatoDest').value.trim();
+    const endDest = document.getElementById('endDest').value.trim();
+    const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
+
+    if (!nomeLoja || !endLoja || !nomeDest || !endDest) {
+        alert("⚠️ Preencha: Nome e Endereço da Loja + Nome e Endereço do Cliente!");
+        return;
+    }
+
+    document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('areaCalculando').classList.remove('escondido');
+
+    try {
+        const kmReal = await calcularDistanciaGoogle(endLoja, endDest);
+        const kmArredondado = Math.ceil(kmReal);
+        const valorBase = buscarValorPorKm(kmArredondado);
+
+        const retorno = document.querySelector('input[name="retorno"]:checked').value;
+        let valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
+        
+        const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
+        let valorGorjeta = 0;
+        if (gorjeta === 'sim') {
+            valorGorjeta = parseFloat(document.getElementById('valorGorjeta').value) || 0;
+        }
+        
+        const valorFinal = valorBase + valorRetorno + valorGorjeta;
+
+        dadosPedidoAtual = {
+            nomeLoja, contatoLoja, endLoja,
+            nomeDest, contatoDest, endDest,
+            refDest: document.getElementById('refDest').value.trim(),
+            quemPaga,
+            kmReal, kmArredondado, valorBase, valorRetorno, valorGorjeta, valorFinal,
+            data: new Date().toLocaleDateString('pt-BR'),
+            hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+            origem: detectarOrigem(),
+            status: "Pendente"
+        };
+
+        document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
+        document.getElementById('kmTotalArred').textContent = kmArredondado;
+        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+        
+        document.getElementById('linhaRetorno').classList.toggle('escondido', retorno !== 'sim');
+        document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
+        
+        document.getElementById('linhaGorjeta').classList.toggle('escondido', gorjeta !== 'sim');
+        document.getElementById('valGorjetaRes').textContent = `R$ ${valorGorjeta.toFixed(2).replace('.', ',')}`;
+        
+        document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resumoPedido').classList.remove('escondido');
+
+        const linkPixComValor = `${LINK_PIX_BASE}${valorFinal.toFixed(2)}`;
+        document.getElementById('linkPixValor').href = linkPixComValor;
+        QRCode.toCanvas(document.getElementById('qrcodePix'), linkPixComValor, {width: 160, margin: 1}, function (erro) {
+            if (erro) console.error(erro);
+        });
+
+    } catch (erro) {
+        alert(erro);
+    } finally {
+        document.getElementById('areaCalculando').classList.add('escondido');
+    }
+}
+
+async function gerarPedido() {
+    if (!dadosPedidoAtual) {
+        alert("⚠️ Primeiro calcule o valor!");
+        return;
+    }
+
+    const linkLoja = linkGoogleMaps(dadosPedidoAtual.endLoja);
+    const linkCliente = linkGoogleMaps(dadosPedidoAtual.endDest);
+    
+
+    const textoQuemPaga = dadosPedidoAtual.quemPaga === 'lojista' 
+        ? '🏪 Paga pela Loja' 
+        : '👤 Paga pelo Cliente';
+
+    const textoPedidoCompleto = `═══════════════════════════════════════
+📦 NOVO PEDIDO — MTZ EXPRESS
+📅 Data: ${dadosPedidoAtual.data} às ${dadosPedidoAtual.hora}
+📱 Origem: ${dadosPedidoAtual.origem}
+═══════════════════════════════════════
+
+🏪 DADOS DA LOJA
+▫️ Nome: ${dadosPedidoAtual.nomeLoja}
+▫️ Contato: ${dadosPedidoAtual.contatoLoja || 'Não informado'}
+▫️ Endereço: ${dadosPedidoAtual.endLoja}
+🔗 Mapa — Loja: ${linkLoja}
+
+───────────────────────────────────────
+
+👤 DADOS DO CLIENTE
+▫️ Nome: ${dadosPedidoAtual.nomeDest}
+▫️ Contato: ${dadosPedidoAtual.contatoDest || 'Não informado'}
+▫️ Endereço: ${dadosPedidoAtual.endDest}
+🔗 Mapa — Cliente: ${linkCliente}
+
+───────────────────────────────────────
+
+📝 OBSERVAÇÃO / REFERÊNCIA
+▫️ ${dadosPedidoAtual.refDest && dadosPedidoAtual.refDest.trim() !== '' ? dadosPedidoAtual.refDest : 'Nenhuma observação informada'}
+
+───────────────────────────────────────
+
+📏 PERCURSO
+▫️ Km real: ${dadosPedidoAtual.kmReal.toFixed(1).replace('.', ',')} km
+▫️ Km arredondado: ${dadosPedidoAtual.kmArredondado} km
+▫️ Retorno: ${dadosPedidoAtual.valorRetorno > 0 ? '✅ Sim' : '❌ Não'}
+
+───────────────────────────────────────
+
+💰 VALORES
+▫️ Entrega: R$ ${dadosPedidoAtual.valorBase.toFixed(2).replace('.', ',')}
+▫️ Retorno: R$ ${dadosPedidoAtual.valorRetorno.toFixed(2).replace('.', ',')}
+▫️ Gorjeta: R$ ${dadosPedidoAtual.valorGorjeta.toFixed(2).replace('.', ',')}
+▫️ TOTAL FINAL: R$ ${dadosPedidoAtual.valorFinal.toFixed(2).replace('.', ',')}
+
+───────────────────────────────────────
+
+💳 PAGAMENTO
+▫️ ${textoQuemPaga}
+▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
+
+═══════════════════════════════════════
+`;
+
+    try {
+        const idPedido = referenciaPedidos.push(dadosPedidoAtual).key;
+        console.log('✅ Pedido salvo — ID:', idPedido);
+        
+        // Se vier de iPhone: avisa e mostra o texto completo pra copiar
+        if (dadosPedidoAtual.origem === 'iPhone') {
+            alert('✅ Pedido gerado com sucesso!\n\n📱 Como veio de iPhone, é só COPIAR abaixo e colar no seu WhatsApp!');
+            mostrarTextoParaCopiar(textoPedidoCompleto);
+        } else {
+            // Tenta enviar direto no WhatsApp
+            window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoCompleto)}`, '_blank');
+            alert('✅ Pedido gerado e enviado!');
         }
 
-        function carregarDadosPainel() {
-            // Aqui carrega do Firebase
-            document.getElementById('qtdeTotal').textContent = '0';
-            document.getElementById('qtdeConcluido').textContent = '0';
-            document.getElementById('valorTotal').textContent = 'R$ 0,00';
-            document.getElementById('kmTotal').textContent = '0 km';
-        }
+    } catch (erro) {
+        console.error('❌ Erro ao salvar:', erro);
+        alert('⚠️ Pedido salvo, mas houve um problema — abra o Painel para ver tudo completo!');
+    }
+}
 
-        function aplicarFiltro(periodo) {
-            console.log('Filtrar por:', periodo);
-        }
+// Mostra o pedido completo na tela com botão de copiar
+function mostrarTextoParaCopiar(textoCompleto) {
+    const divResumo = document.createElement('div');
+    divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
+    divResumo.textContent = textoCompleto;
+    
+    const botaoCopiar = document.createElement('button');
+    botaoCopiar.textContent = '📋 COPIAR PEDIDO INTEIRO';
+    botaoCopiar.style = 'width:100%; padding:14px; margin-top:15px; background:linear-gradient(90deg, #8B5CF6, #7C3AED); color:white; border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;';
+    botaoCopiar.onclick = async function() {
+        const ok = await copiarParaAreaDeTransferencia(textoCompleto);
+        alert(ok ? '✅ COPIADO! É só colar no WhatsApp!' : '❌ Selecione e copie manualmente');
+    };
 
-        function filtrarPedidos() {
-            console.log('Filtrar por datas selecionadas');
+    const areaResumo = document.getElementById('resumoPedido');
+    areaResumo.appendChild(divResumo);
+    areaResumo.appendChild(botaoCopiar);
+}
+
+// Carrega e mostra todos os pedidos no Painel de Gestão
+function carregarPedidosPainel() {
+    referenciaPedidos.on('value', (snapshot) => {
+        todosPedidosCarregados = snapshot.val() || {};
+        atualizarListaPedidos();
+        atualizarResumoPainel();
+    });
+}
+
+function atualizarListaPedidos() {
+    const lista = document.getElementById('listaHistorico');
+    lista.innerHTML = '';
+
+    const pedidosFiltrados = Object.entries(todosPedidosCarregados)
+        .filter(([_, p]) => filtroAtivo === 'todos' || p.status === filtroAtivo)
+        .sort((a, b) => b[1].hora.localeCompare(a[1].hora))
+        .sort((a, b) => {
+            const dtA = a[1].data.split('/').reverse().join('');
+            const dtB = b[1].data.split('/').reverse().join('');
+            return dtB.localeCompare(dtA);
+        });
+
+    if (pedidosFiltrados.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
+        return;
+    }
+
+    pedidosFiltrados.forEach(([id, pedido]) => {
+        const statusClasse = pedido.status === 'Concluído' ? 'status-concluido' 
+                            : pedido.status === 'Cancelado' ? 'status-cancelado' 
+                            : 'status-pendente';
+
+        const item = document.createElement('div');
+        item.className = 'item-pedido';
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${pedido.nomeLoja}</strong>
+                <span class="${statusClasse}">${pedido.status}</span>
+            </div>
+            <small>📅 ${pedido.data} às ${pedido.hora} | 📱 ${pedido.origem || 'Não informado'}</small>
+            <p>💰 R$ ${pedido.valorFinal.toFixed(2).replace('.', ',')} — ${pedido.nomeDest}</p>
+            
+            <div class="botoes-pedido">
+                <button class="btn-alterar-status" onclick="mostrarDetalhesPedido('${id}')">👁️ VER COMPLETO</button>
+                <button class="btn-alterar-status" onclick="copiarPedidoCompleto('${id}')">📋 COPIAR</button>
+                <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'Concluído')">✅ Concluir</button>
+                <button class="btn-excluir" onclick="alterarStatus('${id}', 'Cancelado')">❌ Cancelar</button>
+            </div>
+            <div id="detalhes-${id}" class="detalhes-pedido escondido"></div>
+        `;
+        lista.appendChild(item);
+    });
+}
+
+function mostrarDetalhesPedido(id) {
+    const pedido = todosPedidosCarregados[id];
+    const detalhesDiv = document.getElementById(`detalhes-${id}`);
+    
+    if (detalhesDiv.classList.contains('escondido')) {
+        detalhesDiv.textContent = montarPedidoCompleto(pedido);
+        detalhesDiv.classList.remove('escondido');
+    } else {
+        detalhesDiv.classList.add('escondido');
+    }
+}
+
+async function copiarPedidoCompleto(id) {
+    const pedido = todosPedidosCarregados[id];
+    const texto = montarPedidoCompleto(pedido);
+    const ok = await copiarParaAreaDeTransferencia(texto);
+    alert(ok ? '✅ COPIADO! É só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
+}
+
+function montarPedidoCompleto(pedido) {
+    const observacao = pedido.refDest && pedido.refDest.trim() !== '' 
+        ? pedido.refDest 
+        : 'Nenhuma observação informada';
+    const retornoTexto = pedido.valorRetorno > 0 ? '✅ Sim' : '❌ Não';
+    const quemPagaTexto = pedido.quemPaga === 'lojista' ? '🏪 Paga pela Loja' : '👤 Paga pelo Cliente';
+    const linkLoja = linkGoogleMaps(pedido.endLoja);
+    const linkCliente = linkGoogleMaps(pedido.endDest);
+
+    return `═══════════════════════════════════════
+📦 PEDIDO COMPLETO — MTZ EXPRESS
+📅 Data: ${pedido.data} às ${pedido.hora}
+📱 Origem: ${pedido.origem || 'Não informado'}
+═══════════════════════════════════════
+
+🏪 DADOS DA LOJA
+▫️ Nome: ${pedido.nomeLoja || 'Não informado'}
+▫️ Contato: ${pedido.contatoLoja || 'Não informado'}
+▫️ Endereço: ${pedido.endLoja || 'Não informado'}
+🔗 Mapa — Loja: ${linkLoja}
+
+───────────────────────────────────────
+
+👤 DADOS DO CLIENTE
+▫️ Nome: ${pedido.nomeDest || 'Não informado'}
+▫️ Contato: ${pedido.contatoDest || 'Não informado'}
+▫️ Endereço: ${pedido.endDest || 'Não informado'}
+🔗 Mapa — Cliente: ${linkCliente}
+
+───────────────────────────────────────
+
+📝 OBSERVAÇÃO / REFERÊNCIA
+▫️ ${observacao}
+
+───────────────────────────────────────
+
+📏 PERCURSO
+▫️ Km real: ${(pedido.kmReal || 0).toFixed(1).replace('.', ',')} km
+▫️ Km arredondado: ${pedido.kmArredondado || 0} km
+▫️ Retorno: ${retornoTexto}
+
+───────────────────────────────────────
+
+💰 VALORES
+▫️ Entrega: R$ ${(pedido.valorBase || 0).toFixed(2).replace('.', ',')}
+▫️ Retorno: R$ ${(pedido.valorRetorno || 0).toFixed(2).replace('.', ',')}
+▫️ Gorjeta: R$ ${(pedido.valorGorjeta || 0).toFixed(2).replace('.', ',')}
+▫️ TOTAL FINAL: R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')}
+
+───────────────────────────────────────
+
+💳 PAGAMENTO
+▫️ ${quemPagaTexto}
+▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
+
+═══════════════════════════════════════
+`;
+}
+
+function alterarStatus(id, novoStatus) {
+    referenciaPedidos.child(id).update({ status: novoStatus })
+        .then(() => alert(`✅ Status alterado para: ${novoStatus}`))
+        .catch(erro => alert('❌ Erro: ' + erro));
+}
+
+function atualizarResumoPainel() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
+    const mesAtual = new Date().toLocaleDateString('pt-BR').split('/')[1];
+
+    Object.values(todosPedidosCarregados).forEach(pedido => {
+        if (pedido.status !== 'Concluído') return;
+        const partes = pedido.data.split('/');
+        if (partes.length !== 3) return;
+        
+        if (pedido.data === hoje) {
+            fatDia += pedido.valorFinal || 0;
+            qtdDia++;
         }
-    </script>
+        if (partes[1] === mesAtual) {
+            fatMes += pedido.valorFinal || 0;
+            qtdMes++;
+        }
+    });
+
+    document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
+    document.getElementById('qtdDia').textContent = qtdDia;
+    document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaEntrega').textContent = qtdMes > 0 
+        ? `R$ ${(fatMes / qtdMes).toFixed(2).replace('.', ',')}` 
+        : 'R$ 0,00';
+}
+
+function refazerPedido() {
+    document.getElementById('nomeDest').value = '';
+    document.getElementById('contatoDest').value = '';
+    document.getElementById('endDest').value = '';
+    document.getElementById('refDest').value = '';
+    document.getElementById('valorGorjeta').value = '';
+    document.getElementById('valorGorjeta').style.display = 'none';
+    document.getElementById('resumoPedido').classList.add('escondido');
+    dadosPedidoAtual = null;
+    window.scrollTo(0, 0);
+}
+
+// Reseta seleções de opções
+document.querySelectorAll('.opcao-radio').forEach(opt => {
+    opt.addEventListener('click', function() {
+        const nomeGrupo = this.querySelector('input').name;
+        document.querySelectorAll(`input[name="${nomeGrupo}"]`).forEach(i => i.closest('.opcao-radio').classList.remove('selecionado'));
+        this.classList.add('selecionado');
+    });
+});
+
+window.onload = function() {
+    carregarDadosLojaSalvos();
+    verificarNavegadorApp();
+};
+</script>
 </body>
-</html>
+   </html>
