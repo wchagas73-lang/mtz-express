@@ -155,7 +155,7 @@
                     <input type="tel" id="contatoDest" placeholder="(32) 9XXXX-XXXX">
                     
                     <label>Endereço completo <span>*</span></label>
-                    <input type="text" id="endDest" placeholder="Rua, número, bairro — Juiz de Fora-MG">
+                    <input type="text" id="endDest" placeholder="Rua, número, apartamento, bairro — Juiz de Fora-MG">
                     <p class="aviso-auto">✅ Google Maps valida automaticamente</p>
 
                     <label>Ponto de Referência / Observação <span class="opcional">(Opcional)</span></label>
@@ -355,8 +355,21 @@ function detectarOrigem() {
     return 'Outro';
 }
 
+// ✅ LIMPA COMPLEMENTO (apartamento/andar) APENAS PARA O LINK DO MAPA
+function limparParaMapa(endereco) {
+    if (!endereco) return '';
+    return endereco
+        .trim()
+        .replace(/\s*\/\d+[A-Za-z0-9-]*/g, '')      // Remove /201, /102A, etc.
+        .replace(/\s*-\s*(bloco|apto|apartamento|casa|sala|andar)\s*[A-Za-z0-9-]*/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function linkGoogleMaps(endereco) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco + ", Juiz de Fora - MG")}`;
+    const endSemComplemento = limparParaMapa(endereco);
+    const endCompleto = `${endSemComplemento}, Juiz de Fora - MG, Brasil`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endCompleto)}`;
 }
 
 function montarPedidoCompleto(pedido) {
@@ -676,9 +689,6 @@ async function gerarPedido() {
         return;
     }
 
-    const linkLoja = linkGoogleMaps(dadosPedidoAtual.endLoja);
-    const linkCliente = linkGoogleMaps(dadosPedidoAtual.endDest);
-    
     const textoPedidoCompleto = montarPedidoCompleto(dadosPedidoAtual);
 
     try {
@@ -695,169 +705,149 @@ async function gerarPedido() {
 
     } catch (erro) {
         console.error('❌ Erro ao salvar:', erro);
-        alert('⚠️ Pedido salvo no Painel! Abra para ver tudo completo.');
-    }
 }
-
-function mostrarTextoParaCopiar(textoCompleto) {
-    const areaResumo = document.getElementById('resumoPedido');
-    const divExistente = areaResumo.querySelector('.bloco-texto-copia');
-    if (divExistente) divExistente.remove();
-
-    const divResumo = document.createElement('div');
-    divResumo.className = 'bloco-texto-copia';
-        divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
-    divResumo.textContent = textoCompleto;
-
-    const botaoCopiar = document.createElement('button');
-    botaoCopiar.textContent = '📋 COPIAR PEDIDO INTEIRO';
-    botaoCopiar.style = 'width:100%; padding:14px; margin-top:15px; background:linear-gradient(90deg, #8B5CF6, #7C3AED); color:white; border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;';
-    botaoCopiar.onclick = async function() {
-        const ok = await copiarParaAreaDeTransferencia(textoCompleto);
-        alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
-    };
-
-    areaResumo.appendChild(divResumo);
-    areaResumo.appendChild(botaoCopiar);
-}
-
-function carregarPedidosPainel() {
-    referenciaPedidos.on('value', (snapshot) => {
-        todosPedidosCarregados = snapshot.val() || {};
-        atualizarListaPedidos();
-        atualizarResumoPainel();
-    });
-}
-
-function atualizarListaPedidos() {
-    const lista = document.getElementById('listaHistorico');
-    lista.innerHTML = '';
-
-    const pedidosFiltrados = Object.entries(todosPedidosCarregados)
-        .filter(([_, p]) => {
-            if (filtroAtivo === 'todos') return true;
-            const status = (p.status || 'Pendente').toLowerCase().trim();
-            if (filtroAtivo === 'pendente') return status === 'pendente';
-            if (filtroAtivo === 'concluido') return status === 'concluído' || status === 'concluido';
-            if (filtroAtivo === 'cancelado') return status === 'cancelado';
-            return true;
-        })
-        .sort((a, b) => {
-            const dtA = a[1].data.split('/').reverse().join('');
-            const dtB = b[1].data.split('/').reverse().join('');
-            return dtB.localeCompare(dtA) || b[1].hora.localeCompare(a[1].hora);
-        });
-
-    if (pedidosFiltrados.length === 0) {
-        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
-        return;
-    }
-
-    pedidosFiltrados.forEach(([id, pedido]) => {
-        const status = (pedido.status || 'Pendente').trim();
-        const statusClasse = status.toLowerCase().includes('concluído') ? 'status-concluido' 
-                            : status.toLowerCase().includes('cancelado') ? 'status-cancelado' 
-                            : 'status-pendente';
-
-        const item = document.createElement('div');
-        item.className = 'item-pedido';
-        item.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                <span class="${statusClasse}">${status}</span>
-            </div>
-            <small>📅 ${pedido.data} às ${pedido.hora} | 📱 ${pedido.origem || 'Não informado'}</small>
-            <p>💰 R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} — ${pedido.nomeDest || 'Cliente não informado'}</p>
-            
-            <div class="botoes-pedido">
-                <button class="btn-alterar-status" onclick="mostrarDetalhesPedido('${id}')">👁️ VER COMPLETO</button>
-                <button class="btn-alterar-status" onclick="copiarPedidoCompleto('${id}')">📋 COPIAR</button>
-                <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'Concluído')">✅ Concluir</button>
-                <button class="btn-excluir" onclick="alterarStatus('${id}', 'Cancelado')">❌ Cancelar</button>
-            </div>
-            <div id="detalhes-${id}" class="detalhes-pedido escondido"></div>
-        `;
-        lista.appendChild(item);
-    });
-}
-
-function mostrarDetalhesPedido(id) {
-    const pedido = todosPedidosCarregados[id];
-    const detalhesDiv = document.getElementById(`detalhes-${id}`);
-    
-    if (detalhesDiv.classList.contains('escondido')) {
-        detalhesDiv.textContent = montarPedidoCompleto(pedido);
-        detalhesDiv.classList.remove('escondido');
-    } else {
-        detalhesDiv.classList.add('escondido');
-    }
-}
-
-async function copiarPedidoCompleto(id) {
-    const pedido = todosPedidosCarregados[id];
-    const texto = montarPedidoCompleto(pedido);
-    const ok = await copiarParaAreaDeTransferencia(texto);
-    alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
-}
-
-function alterarStatus(id, novoStatus) {
-    referenciaPedidos.child(id).update({ status: novoStatus })
-        .then(() => alert(`✅ Status alterado para: ${novoStatus}`))
-        .catch(erro => alert('❌ Erro: ' + erro));
-}
-
-function atualizarResumoPainel() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
-    const mesAtual = new Date().toLocaleDateString('pt-BR').split('/')[1];
-
-    Object.values(todosPedidosCarregados).forEach(pedido => {
-        if (pedido.status !== 'Concluído') return;
-        const partes = pedido.data.split('/');
-        if (partes.length !== 3) return;
-        
-        if (pedido.data === hoje) {
-            fatDia += pedido.valorFinal || 0;
-            qtdDia++;
-        }
-        if (partes[1] === mesAtual) {
-            fatMes += pedido.valorFinal || 0;
-            qtdMes++;
-        }
-    });
-
-    document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
-    document.getElementById('qtdDia').textContent = qtdDia;
-    document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaEntrega').textContent = qtdMes > 0 
-        ? `R$ ${(fatMes / qtdMes).toFixed(2).replace('.', ',')}` 
-        : 'R$ 0,00';
-}
-
-function refazerPedido() {
-    document.getElementById('nomeDest').value = '';
-    document.getElementById('contatoDest').value = '';
-    document.getElementById('endDest').value = '';
-    document.getElementById('refDest').value = '';
-    document.getElementById('valorGorjeta').value = '';
-    document.getElementById('valorGorjeta').style.display = 'none';
-    document.getElementById('resumoPedido').classList.add('escondido');
-    dadosPedidoAtual = null;
-    window.scrollTo(0, 0);
-}
-
-document.querySelectorAll('.opcao-radio').forEach(opt => {
-    opt.addEventListener('click', function() {
-        const nomeGrupo = this.querySelector('input').name;
-        document.querySelectorAll(`input[name="${nomeGrupo}"]`).forEach(i => i.closest('.opcao-radio').classList.remove('selecionado'));
-        this.classList.add('selecionado');
-    });
-});
-
-window.onload = function() {
-    carregarDadosLojaSalvos();
-    verificarNavegadorApp();
-};
-</script>
-</body>
-                    </html>
+ }
+ function mostrarTextoParaCopiar(textoCompleto) {
+     const areaResumo = document.getElementById('resumoPedido');
+     const divExistente = areaResumo.querySelector('.bloco-texto-copia');
+     if (divExistente) divExistente.remove();
+     const divResumo = document.createElement('div');
+     divResumo.className = 'bloco-texto-copia';
+     divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
+     divResumo.textContent = textoCompleto;
+     const botaoCopiar = document.createElement('button');
+     botaoCopiar.textContent = '📋 COPIAR PEDIDO INTEIRO';
+     botaoCopiar.style = 'width:100%; padding:14px; margin-top:15px; background:linear-gradient(90deg, #8B5CF6, #7C3AED); color:white; border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;';
+     botaoCopiar.onclick = async function() {
+         const ok = await copiarParaAreaDeTransferencia(textoCompleto);
+         alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
+     };
+     areaResumo.appendChild(divResumo);
+     areaResumo.appendChild(botaoCopiar);
+ }
+ function carregarPedidosPainel() {
+     referenciaPedidos.on('value', (snapshot) => {
+         todosPedidosCarregados = snapshot.val() || {};
+         atualizarListaPedidos();
+         atualizarResumoPainel();
+     });
+ }
+ function atualizarListaPedidos() {
+     const lista = document.getElementById('listaHistorico');
+     lista.innerHTML = '';
+     const pedidosFiltrados = Object.entries(todosPedidosCarregados)
+         .filter(([_, p]) => {
+             if (filtroAtivo === 'todos') return true;
+             const status = (p.status || 'Pendente').toLowerCase().trim();
+             if (filtroAtivo === 'pendente') return status === 'pendente';
+             if (filtroAtivo === 'concluido') return status === 'concluído' || status === 'concluido';
+             if (filtroAtivo === 'cancelado') return status === 'cancelado';
+             return true;
+         })
+         .sort((a, b) => {
+             const dtA = a[1].data.split('/').reverse().join('');
+             const dtB = b[1].data.split('/').reverse().join('');
+             return dtB.localeCompare(dtA) || b[1].hora.localeCompare(a[1].hora);
+         });
+     if (pedidosFiltrados.length === 0) {
+         lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
+         return;
+     }
+     pedidosFiltrados.forEach(([id, pedido]) => {
+         const status = (pedido.status || 'Pendente').trim();
+         const statusClasse = status.toLowerCase().includes('concluído') ? 'status-concluido' 
+                             : status.toLowerCase().includes('cancelado') ? 'status-cancelado' 
+                             : 'status-pendente';
+         const item = document.createElement('div');
+         item.className = 'item-pedido';
+         item.innerHTML = `
+             <div style="display:flex; justify-content:space-between; align-items:center;">
+                 <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
+                 <span class="${statusClasse}">${status}</span>
+             </div>
+             <small>📅 ${pedido.data} às ${pedido.hora} | 📱 ${pedido.origem || 'Não informado'}</small>
+             <p>💰 R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} — ${pedido.nomeDest || 'Cliente não informado'}</p>
+             
+             <div class="botoes-pedido">
+                 <button class="btn-alterar-status" onclick="mostrarDetalhesPedido('${id}')">👁️ VER COMPLETO</button>
+                 <button class="btn-alterar-status" onclick="copiarPedidoCompleto('${id}')">📋 COPIAR</button>
+                 <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'Concluído')">✅ Concluir</button>
+                 <button class="btn-excluir" onclick="alterarStatus('${id}', 'Cancelado')">❌ Cancelar</button>
+             </div>
+             <div id="detalhes-${id}" class="detalhes-pedido escondido"></div>
+         `;
+         lista.appendChild(item);
+     });
+ }
+ function mostrarDetalhesPedido(id) {
+     const pedido = todosPedidosCarregados[id];
+     const detalhesDiv = document.getElementById(`detalhes-${id}`);
+     
+     if (detalhesDiv.classList.contains('escondido')) {
+         detalhesDiv.textContent = montarPedidoCompleto(pedido);
+         detalhesDiv.classList.remove('escondido');
+     } else {
+         detalhesDiv.classList.add('escondido');
+     }
+ }
+ async function copiarPedidoCompleto(id) {
+     const pedido = todosPedidosCarregados[id];
+     const texto = montarPedidoCompleto(pedido);
+     const ok = await copiarParaAreaDeTransferencia(texto);
+     alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
+ }
+ function alterarStatus(id, novoStatus) {
+     referenciaPedidos.child(id).update({ status: novoStatus })
+         .then(() => alert(`✅ Status alterado para: ${novoStatus}`))
+         .catch(erro => alert('❌ Erro: ' + erro));
+ }
+ function atualizarResumoPainel() {
+     const hoje = new Date().toLocaleDateString('pt-BR');
+     let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
+     const mesAtual = new Date().toLocaleDateString('pt-BR').split('/')[1];
+     Object.values(todosPedidosCarregados).forEach(pedido => {
+         if (pedido.status !== 'Concluído') return;
+         const partes = pedido.data.split('/');
+         if (partes.length !== 3) return;
+         
+         if (pedido.data === hoje) {
+             fatDia += pedido.valorFinal || 0;
+             qtdDia++;
+         }
+         if (partes[1] === mesAtual) {
+             fatMes += pedido.valorFinal || 0;
+             qtdMes++;
+         }
+     });
+     document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
+     document.getElementById('qtdDia').textContent = qtdDia;
+     document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
+     document.getElementById('mediaEntrega').textContent = qtdMes > 0 
+         ? `R$ ${(fatMes / qtdMes).toFixed(2).replace('.', ',')}` 
+         : 'R$ 0,00';
+ }
+ function refazerPedido() {
+     document.getElementById('nomeDest').value = '';
+     document.getElementById('contatoDest').value = '';
+     document.getElementById('endDest').value = '';
+     document.getElementById('refDest').value = '';
+     document.getElementById('valorGorjeta').value = '';
+     document.getElementById('valorGorjeta').style.display = 'none';
+     document.getElementById('resumoPedido').classList.add('escondido');
+     dadosPedidoAtual = null;
+     window.scrollTo(0, 0);
+ }
+ document.querySelectorAll('.opcao-radio').forEach(opt => {
+     opt.addEventListener('click', function() {
+         const nomeGrupo = this.querySelector('input').name;
+         document.querySelectorAll(`input[name="${nomeGrupo}"]`).forEach(i => i.closest('.opcao-radio').classList.remove('selecionado'));
+         this.classList.add('selecionado');
+     });
+ });
+ window.onload = function() {
+     carregarDadosLojaSalvos();
+     verificarNavegadorApp();
+ };
+ </script>
+ </body>
+    </html>
