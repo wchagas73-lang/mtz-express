@@ -219,7 +219,7 @@
                         💲 VALOR ÚNICO: <span id="valorTotalEntregas">--</span>
                     </div>
                     
-                    <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor total): <span id="valRetorno">--</span></p>
+                    <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor base): <span id="valRetorno">--</span></p>
                     <p id="linhaGorjeta" class="escondido">💸 Gorjeta: <span id="valGorjetaRes">--</span></p>
                     
                     <hr>
@@ -499,12 +499,29 @@ document.addEventListener('input', (e) => {
     if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
 });
 
+// ==================================================
+// ✅ TABELA DE PREÇOS ATUALIZADA CONFORME VOCÊ PEDIU
+// ==================================================
 function buscarValorPorKm(kmArredondado) {
     const valoresFixos = {
-        1:9, 2:10, 3:11, 4:12, 5:13, 6:14, 7:16, 8:18, 9:20, 10:22
+        1: 10,  // 1 km → R$ 10,00
+        2: 11,  // 2 km → R$ 11,00
+        3: 13,  // 3 km → R$ 13,00
+        4: 14,  // 4 km → R$ 14,00
+        5: 15,  // 5 km → R$ 15,00
+        6: 16,  // 6 km → R$ 16,00
+        7: 22,  // 7 km → R$ 22,00
+        8: 24,  // 8 km → R$ 24,00
+        9: 25,  // 9 km → R$ 25,00
+        10: 30  // 10 km → R$ 30,00
     };
-    if (kmArredondado <=10) return valoresFixos[kmArredondado];
-    return 22 + ((kmArredondado -10) * 2.5);
+
+    if (kmArredondado <= 10) {
+        return valoresFixos[kmArredondado];
+    } else {
+        // Acima de 10 km: + R$ 3,00 por km adicional
+        return 30 + ((kmArredondado - 10) * 3);
+    }
 }
 
 function iniciarGoogle() {
@@ -635,7 +652,7 @@ async function calcular() {
         const valorBase = buscarValorPorKm(kmArredondado);
 
         const retorno = document.querySelector('input[name="retorno"]:checked').value;
-        let valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
+        let valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0; // ✅ RETORNO CONTINUA 50%
         
         const gorjeta = document.querySelector('input[name="gorjeta"]:checked').value;
         let valorGorjeta = 0;
@@ -685,169 +702,207 @@ async function calcular() {
 
 async function gerarPedido() {
     if (!dadosPedidoAtual) {
-        alert("⚠️ Primeiro calcule o valor!");
+        alert("⚠️ Primeiro clique em 'CALCULAR VALOR TOTAL'!");
         return;
     }
 
     const textoPedidoCompleto = montarPedidoCompleto(dadosPedidoAtual);
-
-    try {
-        const idPedido = referenciaPedidos.push(dadosPedidoAtual).key;
-        console.log('✅ Pedido salvo — ID:', idPedido);
+    
+    referenciaPedidos.push(dadosPedidoAtual)
+    .then((ref) => {
+        const idPedido = ref.key;
+        todosPedidosCarregados[idPedido] = {...dadosPedidoAtual, id: idPedido};
         
-        if (dadosPedidoAtual.origem === 'iPhone') {
-            alert('✅ Pedido gerado com sucesso!\n\n📱 Como veio de iPhone, é só COPIAR abaixo e colar no seu WhatsApp!');
-            mostrarTextoParaCopiar(textoPedidoCompleto);
-        } else {
-            window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoCompleto)}`, '_blank');
-            alert('✅ Pedido gerado e enviado!');
+        const copiou = copiarParaAreaDeTransferencia(textoPedidoCompleto);
+        
+        let mensagem = `✅ PEDIDO SALVO COM SUCESSO!\n\n🔢 Código: ${idPedido}\n`;
+        mensagem += copiou ? "📋 Pedido copiado automaticamente!" : "⚠️ Não foi possível copiar automaticamente — selecione e copie abaixo:";
+        
+        alert(mensagem);
+        
+        const janelaWhats = window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoCompleto)}`, '_blank');
+        if (!janelaWhats || janelaWhats.closed) {
+            alert("📱 Se não abriu, copie o pedido e envie manualmente pelo WhatsApp!");
         }
-
-    } catch (erro) {
-        console.error('❌ Erro ao salvar:', erro);
+        
+        const resumoDiv = document.getElementById('resumoPedido');
+        if (!document.getElementById('pedidoTextoCompleto')) {
+            const blocoCompleto = document.createElement('div');
+            blocoCompleto.id = 'pedidoTextoCompleto';
+            blocoCompleto.className = 'resumo-completo';
+            blocoCompleto.innerHTML = `<strong>📋 TEXTO COMPLETO DO PEDIDO:</strong><br><br><pre style="white-space:pre-wrap; font-family:monospace; font-size:12px;">${textoPedidoCompleto}</pre>`;
+            
+            const botaoCopiarTudo = document.createElement('button');
+            botaoCopiarTudo.className = 'btn btn-copiar';
+            botaoCopiarTudo.textContent = '📋 COPIAR PEDIDO INTEIRO';
+            botaoCopiarTudo.onclick = () => {
+                copiarParaAreaDeTransferencia(textoPedidoCompleto);
+                alert("✅ Copiado!");
+            };
+            
+            resumoDiv.appendChild(blocoCompleto);
+            resumoDiv.appendChild(botaoCopiarTudo);
+        }
+    })
+    .catch((erro) => {
+        console.error(erro);
+        alert("❌ Erro ao salvar pedido: " + erro.message);
+    });
 }
- }
- function mostrarTextoParaCopiar(textoCompleto) {
-     const areaResumo = document.getElementById('resumoPedido');
-     const divExistente = areaResumo.querySelector('.bloco-texto-copia');
-     if (divExistente) divExistente.remove();
-     const divResumo = document.createElement('div');
-     divResumo.className = 'bloco-texto-copia';
-     divResumo.style = 'margin-top:25px; padding:20px; background:rgba(59,130,246,0.1); border:2px solid #3B82F6; border-radius:16px; white-space:pre-wrap; font-size:14px; line-height:1.8;';
-     divResumo.textContent = textoCompleto;
-     const botaoCopiar = document.createElement('button');
-     botaoCopiar.textContent = '📋 COPIAR PEDIDO INTEIRO';
-     botaoCopiar.style = 'width:100%; padding:14px; margin-top:15px; background:linear-gradient(90deg, #8B5CF6, #7C3AED); color:white; border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;';
-     botaoCopiar.onclick = async function() {
-         const ok = await copiarParaAreaDeTransferencia(textoCompleto);
-         alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
-     };
-     areaResumo.appendChild(divResumo);
-     areaResumo.appendChild(botaoCopiar);
- }
- function carregarPedidosPainel() {
-     referenciaPedidos.on('value', (snapshot) => {
-         todosPedidosCarregados = snapshot.val() || {};
-         atualizarListaPedidos();
-         atualizarResumoPainel();
-     });
- }
- function atualizarListaPedidos() {
-     const lista = document.getElementById('listaHistorico');
-     lista.innerHTML = '';
-     const pedidosFiltrados = Object.entries(todosPedidosCarregados)
-         .filter(([_, p]) => {
-             if (filtroAtivo === 'todos') return true;
-             const status = (p.status || 'Pendente').toLowerCase().trim();
-             if (filtroAtivo === 'pendente') return status === 'pendente';
-             if (filtroAtivo === 'concluido') return status === 'concluído' || status === 'concluido';
-             if (filtroAtivo === 'cancelado') return status === 'cancelado';
-             return true;
-         })
-         .sort((a, b) => {
-             const dtA = a[1].data.split('/').reverse().join('');
-             const dtB = b[1].data.split('/').reverse().join('');
-             return dtB.localeCompare(dtA) || b[1].hora.localeCompare(a[1].hora);
-         });
-     if (pedidosFiltrados.length === 0) {
-         lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
-         return;
-     }
-     pedidosFiltrados.forEach(([id, pedido]) => {
-         const status = (pedido.status || 'Pendente').trim();
-         const statusClasse = status.toLowerCase().includes('concluído') ? 'status-concluido' 
-                             : status.toLowerCase().includes('cancelado') ? 'status-cancelado' 
-                             : 'status-pendente';
-         const item = document.createElement('div');
-         item.className = 'item-pedido';
-         item.innerHTML = `
-             <div style="display:flex; justify-content:space-between; align-items:center;">
-                 <strong>${pedido.nomeLoja || 'Loja não informada'}</strong>
-                 <span class="${statusClasse}">${status}</span>
-             </div>
-             <small>📅 ${pedido.data} às ${pedido.hora} | 📱 ${pedido.origem || 'Não informado'}</small>
-             <p>💰 R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} — ${pedido.nomeDest || 'Cliente não informado'}</p>
-             
-             <div class="botoes-pedido">
-                 <button class="btn-alterar-status" onclick="mostrarDetalhesPedido('${id}')">👁️ VER COMPLETO</button>
-                 <button class="btn-alterar-status" onclick="copiarPedidoCompleto('${id}')">📋 COPIAR</button>
-                 <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'Concluído')">✅ Concluir</button>
-                 <button class="btn-excluir" onclick="alterarStatus('${id}', 'Cancelado')">❌ Cancelar</button>
-             </div>
-             <div id="detalhes-${id}" class="detalhes-pedido escondido"></div>
-         `;
-         lista.appendChild(item);
-     });
- }
- function mostrarDetalhesPedido(id) {
-     const pedido = todosPedidosCarregados[id];
-     const detalhesDiv = document.getElementById(`detalhes-${id}`);
-     
-     if (detalhesDiv.classList.contains('escondido')) {
-         detalhesDiv.textContent = montarPedidoCompleto(pedido);
-         detalhesDiv.classList.remove('escondido');
-     } else {
-         detalhesDiv.classList.add('escondido');
-     }
- }
- async function copiarPedidoCompleto(id) {
-     const pedido = todosPedidosCarregados[id];
-     const texto = montarPedidoCompleto(pedido);
-     const ok = await copiarParaAreaDeTransferencia(texto);
-     alert(ok ? '✅ COPIADO COM SUCESSO!\nÉ só colar no seu WhatsApp!' : '❌ Selecione e copie manualmente');
- }
- function alterarStatus(id, novoStatus) {
-     referenciaPedidos.child(id).update({ status: novoStatus })
-         .then(() => alert(`✅ Status alterado para: ${novoStatus}`))
-         .catch(erro => alert('❌ Erro: ' + erro));
- }
- function atualizarResumoPainel() {
-     const hoje = new Date().toLocaleDateString('pt-BR');
-     let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
-     const mesAtual = new Date().toLocaleDateString('pt-BR').split('/')[1];
-     Object.values(todosPedidosCarregados).forEach(pedido => {
-         if (pedido.status !== 'Concluído') return;
-         const partes = pedido.data.split('/');
-         if (partes.length !== 3) return;
-         
-         if (pedido.data === hoje) {
-             fatDia += pedido.valorFinal || 0;
-             qtdDia++;
-         }
-         if (partes[1] === mesAtual) {
-             fatMes += pedido.valorFinal || 0;
-             qtdMes++;
-         }
-     });
-     document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
-     document.getElementById('qtdDia').textContent = qtdDia;
-     document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
-     document.getElementById('mediaEntrega').textContent = qtdMes > 0 
-         ? `R$ ${(fatMes / qtdMes).toFixed(2).replace('.', ',')}` 
-         : 'R$ 0,00';
- }
- function refazerPedido() {
-     document.getElementById('nomeDest').value = '';
-     document.getElementById('contatoDest').value = '';
-     document.getElementById('endDest').value = '';
-     document.getElementById('refDest').value = '';
-     document.getElementById('valorGorjeta').value = '';
-     document.getElementById('valorGorjeta').style.display = 'none';
-     document.getElementById('resumoPedido').classList.add('escondido');
-     dadosPedidoAtual = null;
-     window.scrollTo(0, 0);
- }
- document.querySelectorAll('.opcao-radio').forEach(opt => {
-     opt.addEventListener('click', function() {
-         const nomeGrupo = this.querySelector('input').name;
-         document.querySelectorAll(`input[name="${nomeGrupo}"]`).forEach(i => i.closest('.opcao-radio').classList.remove('selecionado'));
-         this.classList.add('selecionado');
-     });
- });
- window.onload = function() {
-     carregarDadosLojaSalvos();
-     verificarNavegadorApp();
- };
- </script>
- </body>
-    </html>
+
+function refazerPedido() {
+    if (confirm("🔄 Limpar tudo e começar novo pedido? Os dados da loja permanecem salvos.")) {
+        const nomeLojaSalvo = document.getElementById('nomeLoja').value;
+        const contatoLojaSalvo = document.getElementById('contatoLoja').value;
+        const endLojaSalvo = document.getElementById('endLoja').value;
+        
+        document.querySelectorAll('input[type="text"], input[type="tel"], input[type="number"]').forEach(input => {
+            if (!['nomeLoja','contatoLoja','endLoja'].includes(input.id)) input.value = '';
+        });
+        
+        document.getElementById('nomeLoja').value = nomeLojaSalvo;
+        document.getElementById('contatoLoja').value = contatoLojaSalvo;
+        document.getElementById('endLoja').value = endLojaSalvo;
+        
+        document.querySelector('input[name="retorno"][value="nao"]').checked = true;
+        document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
+        document.getElementById('valorGorjeta').style.display = 'none';
+        document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
+        
+        document.getElementById('resumoPedido').classList.add('escondido');
+        const blocoExistente = document.getElementById('pedidoTextoCompleto');
+        if (blocoExistente) blocoExistente.remove();
+        
+        dadosPedidoAtual = null;
+        window.scrollTo({top:0, behavior:'smooth'});
+    }
+}
+
+function carregarPedidosPainel() {
+    referenciaPedidos.once('value')
+    .then((snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
+            todosPedidosCarregados = dados;
+            atualizarListaPedidos();
+            atualizarTotaisPainel();
+        } else {
+            document.getElementById('listaHistorico').innerHTML = '<p style="text-align:center; color:#9CA3AF;">Nenhum pedido encontrado.</p>';
+        }
+    })
+    .catch((erro) => {
+        console.error(erro);
+    });
+}
+
+function atualizarTotaisPainel() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let fatDia = 0, qtdDia = 0, fatMes = 0;
+    const mesAtual = new Date().getMonth();
+    const anoAtual = new Date().getFullYear();
+    
+    Object.values(todosPedidosCarregados).forEach(pedido => {
+        if (!pedido.data) return;
+        const partes = pedido.data.split('/');
+        if (partes.length !== 3) return;
+        const dia = parseInt(partes[0]);
+        const mes = parseInt(partes[1]) - 1;
+        const ano = parseInt(partes[2]);
+        
+        if (pedido.data === hoje) {
+            fatDia += pedido.valorFinal || 0;
+            qtdDia++;
+        }
+        
+        if (mes === mesAtual && ano === anoAtual) {
+            fatMes += pedido.valorFinal || 0;
+        }
+    });
+    
+    const mediaGeral = qtdDia > 0 ? fatDia / qtdDia : 0;
+    
+    document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
+    document.getElementById('qtdDia').textContent = qtdDia;
+    document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaEntrega').textContent = `R$ ${mediaGeral.toFixed(2).replace('.', ',')}`;
+}
+
+function atualizarListaPedidos() {
+    const lista = document.getElementById('listaHistorico');
+    lista.innerHTML = '';
+    
+    let contador = 0;
+    const pedidosOrdenados = Object.entries(todosPedidosCarregados).reverse();
+    
+    pedidosOrdenados.forEach(([id, pedido]) => {
+        if (filtroAtivo !== 'todos' && pedido.status?.toLowerCase() !== filtroAtivo) return;
+        
+        contador++;
+        const item = document.createElement('div');
+        item.className = 'item-pedido';
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <strong>#${id.slice(-6)} — ${pedido.data} ${pedido.hora || ''}</strong>
+                <span class="status-${pedido.status?.toLowerCase() || 'pendente'}">${pedido.status || 'Pendente'}</span>
+            </div>
+            <div style="margin-top:8px; font-size:14px;">
+                🏪 ${pedido.nomeLoja || '-'}<br>
+                👤 ${pedido.nomeDest || '-'}<br>
+                💲 R$ ${(pedido.valorFinal || 0).toFixed(2).replace('.', ',')} | 📏 ${(pedido.kmArredondado || '--')} km
+            </div>
+            <div class="botoes-pedido">
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${id}', 'Concluído')">✅ Concluído</button>
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${id}', 'Pendente')">⏳ Pendente</button>
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${id}', 'Cancelado')">❌ Cancelado</button>
+                <button class="btn-excluir" onclick="excluirPedido('${id}')">🗑️ Excluir</button>
+            </div>
+            <div class="detalhes-pedido escondido" id="det-${id}">${montarPedidoCompleto(pedido)}</div>
+            <button class="btn-copiar" style="width:auto; margin-top:8px; padding:6px 12px; font-size:12px;" onclick="mostrarDetalhes('${id}')">📄 Ver/Detalhar</button>
+        `;
+        lista.appendChild(item);
+    });
+    
+    if (contador === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF;">Nenhum pedido encontrado com este filtro.</p>';
+    }
+}
+
+function mostrarDetalhes(id) {
+    const bloco = document.getElementById(`det-${id}`);
+    if (bloco) {
+        bloco.classList.toggle('escondido');
+    }
+}
+
+function alterarStatusPedido(id, novoStatus) {
+    referenciaPedidos.child(id).update({status: novoStatus})
+    .then(() => {
+        if (todosPedidosCarregados[id]) todosPedidosCarregados[id].status = novoStatus;
+        atualizarListaPedidos();
+        atualizarTotaisPainel();
+    })
+    .catch((erro) => alert("Erro: " + erro));
+}
+
+function excluirPedido(id) {
+    if (!confirm("⚠️ Tem certeza? Isso apaga definitivamente o pedido!")) return;
+    
+    referenciaPedidos.child(id).remove()
+    .then(() => {
+        delete todosPedidosCarregados[id];
+        atualizarListaPedidos();
+        atualizarTotaisPainel();
+    })
+    .catch((erro) => alert("Erro: " + erro));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarDadosLojaSalvos();
+    verificarNavegadorApp();
+    const hoje = new Date();
+    document.getElementById('dataInicial').valueAsDate = hoje;
+    document.getElementById('dataFinal').valueAsDate = hoje;
+});
+</script>
+</body>
+                    </html>
