@@ -58,8 +58,8 @@
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
-        .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; flex: 1; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
-        .btn-alterar-status {background: linear-gradient(90deg, #3B82F6, #2563EB); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
+        .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
+        .btn-alterar-status {background: linear-gradient(90deg, #3B82F6, #2563EB); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin: 2px;}
         .btn-copiar {background: linear-gradient(90deg, #8B5CF6, #7C3AED); color: white; padding: 12px 16px; font-size: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%;}
         .btn-whatsapp {background: linear-gradient(90deg, #25D366, #128C7E); color: white; padding: 14px 16px; font-size: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%;}
         .conteudo-aba {display: none;}
@@ -85,15 +85,15 @@
         .card-dado {background: rgba(255,215,0,0.1); border: 2px solid var(--dourado); border-radius: 16px; padding: 18px; text-align: center;}
         .card-dado h3 {font-size: 16px; color: var(--dourado); margin-bottom: 8px;}
         .card-dado .valor {font-size: 26px; font-weight: 900;}
-        .lista-pedidos {max-height: 500px; overflow-y: auto; margin-top: 20px;}
+        .lista-pedidos {max-height: 600px; overflow-y: auto; margin-top: 20px;}
         .item-pedido {background: rgba(59,130,246,0.08); border: 1px solid var(--azul); border-radius: 12px; padding: 14px; margin: 8px 0;}
         .status-pendente {color: #FFD700; font-weight: bold;}
         .status-concluido {color: #00C896; font-weight: bold;}
         .status-cancelado {color: #ef4444; font-weight: bold;}
         .filtro-ativo {background: var(--primaria); color: white;}
         .bloco-periodo {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 25px 0;}
-        .botoes-pedido {display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;}
-        .detalhes-pedido {margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 13px; line-height: 1.8; white-space: pre-wrap;}
+        .botoes-pedido {display: flex; gap: 4px; margin-top: 12px; flex-wrap: wrap;}
+        .detalhes-pedido {margin-top:10px; padding:15px; background:rgba(0,0,0,0.25); border-radius:12px; font-size:13px; line-height:1.8; white-space:pre-wrap; border:1px solid var(--dourado);}
         .sucesso-copia {color: var(--primaria); font-weight: 700; margin-top: 8px;}
     </style>
 </head>
@@ -118,7 +118,7 @@
 
             <div class="aviso-iphone" id="avisoIphone">
                 ✅ <strong>Pedido gerado!</strong> O WhatsApp vai abrir direto com o texto já pronto.<br>
-                💡 Se não abrir, toque no botão abaixo — é só enviar!
+                💡 Se não abrir, use o botão abaixo — é só enviar!
             </div>
 
             <div class="abas">
@@ -233,7 +233,7 @@
                         <strong>📋 PEDIDO PRONTO:</strong>
                         <textarea id="textoPedidoCompleto" class="texto-copia" readonly></textarea>
                         
-                        <button class="btn-whatsapp" id="btnAbrirWhatsApp" onclick="abrirWhatsAppDireto()">💬 ABRIR WHATSAPP — PEDIDO JÁ PRONTO ✅</button>
+                        <button class="btn-whatsapp" id="btnAbrirWhatsApp" onclick="abrirWhatsAppDireto()">💬 ABRIR WHATSAPP ✅</button>
                         <p style="font-size:13px; color:var(--primaria); margin:8px 0;">👉 O texto já aparece lá dentro! É só enviar!</p>
                         
                         <button class="btn-copiar" onclick="copiarTextoPedido()">📋 COPIAR (se preferir)</button>
@@ -242,7 +242,7 @@
 
                     <div class="mensagem-parceria">
                         💪🏿 Agradecemos pela confiança! 📸<br>
-                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels para todo Juiz de Fora ver! 🤳🏿
+                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels! 🤳🏿
                     </div>
 
                     <div class="pagamento">
@@ -258,7 +258,7 @@
 
             <!-- ==================== ABA PAINEL DE GESTÃO ==================== -->
             <div class="conteudo-aba" id="abaPainel">
-                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO (SEU ACESSO EXCLUSIVO)</h2>
+                <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO</h2>
                 <div class="caixa-login" id="loginPainel">
                     <label>Usuário</label>
                     <input type="text" id="usuarioPainel" placeholder="Digite seu usuário">
@@ -279,7 +279,7 @@
                             <div class="valor" id="qtdDia">0</div>
                         </div>
                         <div class="card-dado">
-                            <h3>📅 Faturamento Mês Atual</h3>
+                            <h3>📅 Faturamento Mês</h3>
                             <div class="valor" id="fatMes">R$ 0,00</div>
                         </div>
                         <div class="card-dado">
@@ -289,7 +289,7 @@
                     </div>
 
                     <div class="bloco-periodo">
-                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 FILTRAR POR PERÍODO LIVRE</h3>
+                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 FILTRAR POR PERÍODO</h3>
                         <div class="linha-dupla">
                             <div>
                                 <label>Data Inicial</label>
@@ -300,13 +300,13 @@
                                 <input type="date" id="dataFinal">
                             </div>
                         </div>
-                        <button class="btn btn-secundario" style="width:100%; margin-top:15px;" onclick="aplicarFiltroPeriodo()">🔍 APLICAR PERÍODO</button>
+                        <button class="btn btn-secundario" style="width:100%; margin-top:15px;" onclick="aplicarFiltroPeriodo()">🔍 APLICAR</button>
                         
                         <div id="resultadoPeriodo" class="escondido" style="margin-top:20px; padding:15px; background:rgba(0,200,150,0.1); border-radius:12px;">
-                            <h4 style="color:var(--dourado); margin-bottom:10px;">📊 VALORES DO PERÍODO SELECIONADO</h4>
-                            <p>📦 Total de entregas: <strong id="qtdPeriodo">0</strong></p>
-                            <p>💰 Faturamento total: <strong id="fatPeriodo">R$ 0,00</strong></p>
-                            <p>📊 Média por entrega: <strong id="mediaPeriodo">R$ 0,00</strong></p>
+                            <h4 style="color:var(--dourado); margin-bottom:10px;">📊 RESULTADO</h4>
+                            <p>📦 Total: <strong id="qtdPeriodo">0</strong></p>
+                            <p>💰 Faturamento: <strong id="fatPeriodo">R$ 0,00</strong></p>
+                            <p>📊 Média: <strong id="mediaPeriodo">R$ 0,00</strong></p>
                         </div>
                     </div>
 
@@ -323,7 +323,7 @@
                         <p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>
                     </div>
 
-                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR DO PAINEL</button>
+                    <button class="btn btn-secundario" style="width:100%; margin-top:30px;" onclick="sairPainel()">🚪 SAIR</button>
                 </div>
             </div>
 
@@ -367,25 +367,18 @@ function detectarOrigem() {
 
 function limparParaMapa(endereco) {
     if (!endereco) return '';
-    return endereco
-        .trim()
-        .replace(/\s*\/\d+[A-Za-z0-9-]*/g, '')
-        .replace(/\s*-\s*(bloco|apto|apartamento|casa|sala|andar)\s*[A-Za-z0-9-]*/gi, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+    return endereco.trim().replace(/\s*\/\d+[A-Za-z0-9-]*/g, '').replace(/\s*-\s*(bloco|apto|apartamento|casa|sala|andar)\s*[A-Za-z0-9-]*/gi, '').replace(/\s+/g, ' ').trim();
 }
 
 function linkGoogleMaps(endereco) {
-    const endSemComplemento = limparParaMapa(endereco);
-    const endCompleto = `${endSemComplemento}, Juiz de Fora - MG, Brasil`;
+    const endSemComp = limparParaMapa(endereco);
+    const endCompleto = `${endSemComp}, Juiz de Fora - MG, Brasil`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endCompleto)}`;
 }
 
 function montarPedidoCompleto(pedido) {
-    const observacao = pedido.refDest && pedido.refDest.trim() !== '' 
-        ? pedido.refDest 
-        : 'Nenhuma observação informada';
-    const retornoTexto = pedido.valorRetorno && pedido.valorRetorno > 0 ? '✅ Sim' : '❌ Não';
+    const observacao = pedido.refDest && pedido.refDest.trim() !== '' ? pedido.refDest : 'Nenhuma';
+    const retornoTexto = pedido.retorno === 'sim' ? '✅ Sim' : '❌ Não';
     const quemPagaTexto = pedido.quemPaga === 'lojista' ? '🏪 Pela Origem' : '👤 Pelo Destino';
     const linkOrigem = linkGoogleMaps(pedido.endLoja);
     const linkDestino = linkGoogleMaps(pedido.endDest);
@@ -407,7 +400,7 @@ function montarPedidoCompleto(pedido) {
 ▫️ Nome: ${pedido.nomeLoja || 'Não informado'}
 ▫️ Contato: ${pedido.contatoLoja || 'Não informado'}
 ▫️ Endereço: ${pedido.endLoja || 'Não informado'}
-🔗 Abrir no Mapa: ${linkOrigem}
+🔗 Mapa: ${linkOrigem}
 
 ───────────────────────────────────────
 
@@ -415,11 +408,11 @@ function montarPedidoCompleto(pedido) {
 ▫️ Nome: ${pedido.nomeDest || 'Não informado'}
 ▫️ Contato: ${pedido.contatoDest || 'Não informado'}
 ▫️ Endereço: ${pedido.endDest || 'Não informado'}
-🔗 Abrir no Mapa: ${linkDestino}
+🔗 Mapa: ${linkDestino}
 
 ───────────────────────────────────────
 
-📝 OBSERVAÇÃO / REFERÊNCIA
+📝 OBSERVAÇÃO
 ▫️ ${observacao}
 
 ───────────────────────────────────────
@@ -427,7 +420,7 @@ function montarPedidoCompleto(pedido) {
 📏 PERCURSO
 ▫️ Km real: ${kmReal} km
 ▫️ Km arredondado: ${kmArred} km
-▫️ Retorno para origem: ${retornoTexto}
+▫️ Retorno: ${retornoTexto}
 
 ───────────────────────────────────────
 
@@ -439,72 +432,38 @@ function montarPedidoCompleto(pedido) {
 
 ───────────────────────────────────────
 
-💳 FORMA DE PAGAMENTO
+💳 PAGAMENTO
 ▫️ ${quemPagaTexto}
 ▫️ Pix: (32) 9 9995-3215 — Wellington Chagas Aleixo
-
-═══════════════════════════════════════
-`;
+═══════════════════════════════════════`;
 }
 
 async function copiarTextoPedido() {
-    const texto = textoPedidoGerado;
-    if (!texto) {
-        alert("⚠️ Gere o pedido primeiro!");
-        return;
+    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
+    let ok = false;
+    try { await navigator.clipboard.writeText(textoPedidoGerado); ok = true; }
+    catch {
+        const ta = document.getElementById('textoPedidoCompleto');
+        ta.select(); ta.setSelectionRange(0, 99999);
+        ok = document.execCommand('copy');
     }
-
-    let sucesso = false;
-    try {
-        await navigator.clipboard.writeText(texto);
-        sucesso = true;
-    } catch (erro) {
-        try {
-            const areaTexto = document.getElementById('textoPedidoCompleto');
-            areaTexto.select();
-            areaTexto.setSelectionRange(0, 99999);
-            sucesso = document.execCommand('copy');
-        } catch (erro2) {}
-    }
-
-    if (sucesso) {
+    if (ok) {
         document.getElementById('msgCopiaSucesso').classList.remove('escondido');
-        setTimeout(() => document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
-    } else {
-        alert("⚠️ Não foi possível copiar automaticamente.\nSelecione, copie e cole no WhatsApp.");
-    }
+        setTimeout(()=>document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
+    } else alert("⚠️ Copie manualmente o texto.");
 }
 
 function abrirWhatsAppDireto() {
-    if (!textoPedidoGerado) {
-        alert("⚠️ Gere o pedido primeiro!");
-        return;
-    }
-    const linkWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`;
-    window.open(linkWhatsApp, '_blank', 'noopener,noreferrer');
+    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank', 'noopener,noreferrer');
 }
 
 function verificarNavegadorApp() {
-    const agente = navigator.userAgent.toLowerCase();
-    if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(agente)) {
+    if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(navigator.userAgent.toLowerCase())) {
         document.getElementById('avisoNavegadorApp').classList.remove('escondido');
         return false;
     }
     return true;
-}
-
-function limparEndereco(endereco) {
-    return endereco.trim().replace(/\s*,\s*/g, ', ').replace(/\s+nº\s*/gi, ' ');
-}
-
-function carregarDadosLojaSalvos() {
-    const dadosSalvos = localStorage.getItem('dadosLojaMTZ');
-    if (dadosSalvos) {
-        const loja = JSON.parse(dadosSalvos);
-        if (loja.nome) document.getElementById('nomeLoja').value = loja.nome;
-        if (loja.contato) document.getElementById('contatoLoja').value = loja.contato;
-        if (loja.endereco) document.getElementById('endLoja').value = loja.endereco;
-    }
 }
 
 function salvarDadosLojaAutomatico() {
@@ -513,6 +472,16 @@ function salvarDadosLojaAutomatico() {
         contato: document.getElementById('contatoLoja').value.trim(),
         endereco: document.getElementById('endLoja').value.trim()
     }));
+}
+
+function carregarDadosLojaSalvos() {
+    const d = localStorage.getItem('dadosLojaMTZ');
+    if (d) {
+        const l = JSON.parse(d);
+        if (l.nome) document.getElementById('nomeLoja').value = l.nome;
+        if (l.contato) document.getElementById('contatoLoja').value = l.contato;
+        if (l.endereco) document.getElementById('endLoja').value = l.endereco;
+    }
 }
 
 document.addEventListener('input', (e) => {
@@ -533,35 +502,34 @@ function iniciarGoogle() {
     servicoDistancia = new google.maps.DistanceMatrixService();
     carregarDadosLojaSalvos();
     verificarNavegadorApp();
-    referenciaPedidos.on('value', (snap) => {
+    referenciaPedidos.on('value', snap => {
         todosPedidosCarregados = snap.val() || {};
         atualizarListaPedidos();
         atualizarResumoGestao();
     });
 }
 
-function calcularDistanciaGoogle(enderecoOrigem, enderecoDestino) {
+function calcularDistanciaGoogle(origem, destino) {
     return new Promise((sucesso, erro) => {
-        if (!googleCarregado || !servicoDistancia) return erro("Aguarde carregar o Google Maps...");
-        const origem = limparEndereco(enderecoOrigem) + ", Juiz de Fora - MG, Brasil";
-        const destino = limparEndereco(enderecoDestino) + ", Juiz de Fora - MG, Brasil";
+        if (!googleCarregado || !servicoDistancia) return erro("Aguarde o carregamento...");
+        const o = limparParaMapa(origem) + ", Juiz de Fora - MG, Brasil";
+        const d = limparParaMapa(destino) + ", Juiz de Fora - MG, Brasil";
         servicoDistancia.getDistanceMatrix({
-            origins: [origem], destinations: [destino],
-            travelMode: google.maps.TravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC
-        }, (resposta, status) => {
-            if (status === "OK" && resposta.rows[0].elements[0].status === "OK") {
-                sucesso(resposta.rows[0].elements[0].distance.value / 1000);
-            } else erro("❌ Endereço não encontrado! Verifique.");
+            origins: [o], destinations: [d],
+            travelMode: 'DRIVING', unitSystem: google.maps.UnitSystem.METRIC
+        }, (resp, status) => {
+            if (status === "OK" && resp.rows[0].elements[0].status === "OK") {
+                sucesso(resp.rows[0].elements[0].distance.value / 1000);
+            } else erro("❌ Endereço não encontrado! Confira o preenchimento.");
         });
     });
 }
 
-function mostrarAba(nomeAba) {
+function mostrarAba(nome) {
     document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
     event.target.classList.add('ativa');
     document.querySelectorAll('.conteudo-aba').forEach(d => d.classList.remove('visivel'));
-    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
+    document.getElementById('aba' + nome.charAt(0).toUpperCase() + nome.slice(1)).classList.add('visivel');
 }
 
 async function calcular() {
@@ -583,13 +551,10 @@ async function calcular() {
         );
         const kmArredondado = Math.ceil(kmReal);
         const valorBase = buscarValorPorKm(kmArredondado);
-        
         const retornoSim = document.querySelector('input[name="retorno"]:checked').value === 'sim';
         const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
-        
         const gorjetaSim = document.querySelector('input[name="gorjeta"]:checked').value === 'sim';
         const valorGorjeta = gorjetaSim ? parseFloat(document.getElementById('valorGorjeta').value) || 0 : 0;
-        
         const valorFinal = valorBase + valorRetorno + valorGorjeta;
 
         dadosPedidoAtual = {
@@ -628,15 +593,10 @@ async function calcular() {
 }
 
 function gerarPedido() {
-    if (!dadosPedidoAtual) {
-        alert("⚠️ Calcule o valor primeiro!");
-        return;
-    }
+    if (!dadosPedidoAtual) { alert("⚠️ Calcule o valor primeiro!"); return; }
     textoPedidoGerado = montarPedidoCompleto(dadosPedidoAtual);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
-    
     referenciaPedidos.push(dadosPedidoAtual);
-    
     setTimeout(abrirWhatsAppDireto, 400);
 }
 
@@ -660,9 +620,9 @@ function refazerPedido() {
 }
 
 function verificarLoginPainel() {
-    const usu = document.getElementById('usuarioPainel').value.trim();
-    const sen = document.getElementById('senhaPainel').value.trim();
-    if (usu === USUARIO_ADMIN && sen === SENHA_ADMIN) {
+    const u = document.getElementById('usuarioPainel').value.trim();
+    const s = document.getElementById('senhaPainel').value.trim();
+    if (u === USUARIO_ADMIN && s === SENHA_ADMIN) {
         document.getElementById('loginPainel').classList.add('escondido');
         document.getElementById('conteudoPainel').classList.remove('escondido');
     } else {
@@ -680,7 +640,7 @@ function sairPainel() {
 
 function filtrarPedidos(status) {
     filtroAtivo = status;
-    document.querySelectorAll('.linha-botoes button').forEach(b => b.classList.remove('filtro-ativo'));
+    document.querySelectorAll('#abaPainel .linha-botoes button').forEach(b => b.classList.remove('filtro-ativo'));
     event.target.classList.add('filtro-ativo');
     atualizarListaPedidos();
 }
@@ -688,15 +648,14 @@ function filtrarPedidos(status) {
 function atualizarListaPedidos() {
     const lista = document.getElementById('listaHistorico');
     lista.innerHTML = '';
-    
     let temPedido = false;
+
     for (const id in todosPedidosCarregados) {
         const p = todosPedidosCarregados[id];
         if (!p) continue;
 
         const statusAtual = (p.status || 'Pendente').toLowerCase().trim();
-        const mostrar = filtroAtivo === 'todos' || statusAtual === filtroAtivo;
-        if (!mostrar) continue;
+        if (filtroAtivo !== 'todos' && statusAtual !== filtroAtivo) continue;
 
         temPedido = true;
         const classeStatus = statusAtual === 'concluido' ? 'status-concluido' :
@@ -711,19 +670,59 @@ function atualizarListaPedidos() {
             💰 R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
             <span class="${classeStatus}"> — ${textoStatus}</span>
             <div class="botoes-pedido">
-                ${statusAtual === 'pendente' ? `
-                    <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'concluido')">✅ Concluir</button>
-                    <button class="btn-excluir" onclick="marcarStatus('${id}', 'cancelado')">❌ Cancelar</button>
-                ` : ''}
-                <button class="btn-excluir" onclick="excluirPedido('${id}')">🗑️ Excluir</button>
+                ✅ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'concluido')">Concluído</button>
+                ❌ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'cancelado')">Cancelado</button>
+                ⏳ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'pendente')">Pendente</button>
+                🗑️ <button class="btn-excluir" onclick="excluirPedido('${id}')">Excluir</button>
             </div>
-            <details style="margin-top:8px;">
-                <summary style="color:var(--dourado); cursor:pointer;">Ver detalhes</summary>
+            <details style="margin-top:12px;">
+                <summary style="color:var(--dourado); cursor:pointer; font-weight:700;">📋 Ver pedido completo</summary>
                 <div class="detalhes-pedido">
-                    Origem: ${p.endLoja || '-'}
-                    Destino: ${p.endDest || '-'}
-                    Distância: ${(p.kmReal || 0).toFixed(1)} km
-                    Valor: R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
+═══════════════════════════════════════
+📦 PEDIDO COMPLETO — MTZ EXPRESS
+📅 Data: ${p.data} ${p.hora}
+📱 Origem: ${p.origem || 'Não informada'}
+═══════════════════════════════════════
+
+📍 ORIGEM
+▫️ Nome: ${p.nomeLoja || 'Não informado'}
+▫️ Contato: ${p.contatoLoja || 'Não informado'}
+▫️ Endereço: ${p.endLoja || 'Não informado'}
+🔗 Mapa: ${p.endLoja ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.endLoja + ', Juiz de Fora - MG') : '-'}
+
+───────────────────────────────────────
+
+📍 DESTINO
+▫️ Nome: ${p.nomeDest || 'Não informado'}
+▫️ Contato: ${p.contatoDest || 'Não informado'}
+▫️ Endereço: ${p.endDest || 'Não informado'}
+🔗 Mapa: ${p.endDest ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.endDest + ', Juiz de Fora - MG') : '-'}
+
+───────────────────────────────────────
+
+📝 OBSERVAÇÃO
+▫️ ${p.refDest || 'Nenhuma'}
+
+───────────────────────────────────────
+
+📏 PERCURSO
+▫️ Km real: ${(p.kmReal || 0).toFixed(1).replace('.', ',')} km
+▫️ Km arredondado: ${p.kmArredondado || '--'} km
+▫️ Retorno: ${p.retorno === 'sim' ? '✅ Sim' : '❌ Não'}
+
+───────────────────────────────────────
+
+💰 VALORES
+▫️ Valor base: R$ ${(p.valorBase || 0).toFixed(2).replace('.', ',')}
+▫️ Retorno: R$ ${(p.valorRetorno || 0).toFixed(2).replace('.', ',')}
+▫️ Gorjeta: R$ ${(p.valorGorjeta || 0).toFixed(2).replace('.', ',')}
+▫️ TOTAL FINAL: R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
+
+───────────────────────────────────────
+
+💳 Quem paga: ${p.quemPaga === 'lojista' ? '🏪 Origem' : '👤 Destino'}
+💬 Status: ${textoStatus}
+═══════════════════════════════════════
                 </div>
             </details>
         `;
@@ -737,7 +736,7 @@ function atualizarListaPedidos() {
 
 function marcarStatus(id, novoStatus) {
     referenciaPedidos.child(id).update({ status: novoStatus })
-        .then(() => alert(`✅ Pedido ${novoStatus === 'concluido' ? 'concluído' : 'cancelado'}!`))
+        .then(() => alert(`✅ Status alterado com sucesso!`))
         .catch(e => alert('❌ Erro: ' + e.message));
 }
 
