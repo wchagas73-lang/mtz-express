@@ -58,7 +58,7 @@
         .btn-principal {background: linear-gradient(90deg, var(--primaria), var(--primaria-escura)); color: white;}
         .btn-secundario {background: linear-gradient(90deg, var(--dourado), var(--dourado-escuro)); color: #1A1A1A; font-weight: 800;}
         .btn-perigo {background: linear-gradient(90deg, #ef4444, #dc2626); color: white;}
-        .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; flex: 1; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;}
+        .btn-excluir {background: linear-gradient(90deg, #b91c1c, #991b1b); color: white; padding: 8px 12px; font-size: 13px; flex: 1; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
         .btn-alterar-status {background: linear-gradient(90deg, #3B82F6, #2563EB); color: white; padding: 8px 12px; font-size: 13px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
         .btn-copiar {background: linear-gradient(90deg, #8B5CF6, #7C3AED); color: white; padding: 12px 16px; font-size: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%;}
         .btn-whatsapp {background: linear-gradient(90deg, #25D366, #128C7E); color: white; padding: 14px 16px; font-size: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%;}
@@ -71,7 +71,6 @@
         .resumo-completo {background: rgba(59,130,246,0.08); border: 2px solid var(--azul); border-radius: 16px; padding: 18px; margin: 12px 0; font-size: 14px; line-height: 1.8; white-space: pre-wrap;}
         .mensagem-parceria {background: rgba(255,215,0,0.12); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0; text-align: center; font-weight: 700; font-size: 17px; color: #FFF8C1;}
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
-        .qrcode-pix {margin: 15px auto; padding: 10px; background: white; border-radius: 12px; display: inline-block;}
         .titulo-bloco {display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         .titulo-bloco h4 {color: var(--azul); font-size: 18px;}
         .aviso-auto {font-size:13px; color:var(--primaria); margin-top:-5px; margin-bottom:8px;}
@@ -248,16 +247,11 @@
 
                     <div class="pagamento">
                         <h3 style="color:var(--dourado); margin-bottom:10px;">💸 FORMAS DE PAGAMENTO</h3>
-                        <p><strong>✅ Pix rápido e seguro — VALOR JÁ PREENCHIDO!</strong></p>
+                        <p><strong>✅ Pix rápido e seguro!</strong></p>
                         <p>🔑 Chave Pix: <strong>(32) 9 9995-3215</strong></p>
                         <p>👤 Recebedor: Wellington Chagas Aleixo</p>
                         <p>🏦 Banco: Nu Pagamentos S.A.</p>
-                        <p>🔗 Link com valor exato: <a id="linkPixValor" href="#" target="_blank" style="color:var(--dourado);">Clique aqui para pagar</a></p>
-                        
-                        <div class="qrcode-pix">
-                            <canvas id="qrcodePix"></canvas>
-                        </div>
-                        <p style="font-size:14px; color:#B2DFDB;">📷 Escaneie ou clique — valor já vem pronto!</p>
+                        <p>💬 Envie o comprovante pelo WhatsApp!</p>
                     </div>
                 </div>
             </div>
@@ -356,7 +350,6 @@ const referenciaPedidos = banco.ref('pedidos');
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
-const LINK_PIX_BASE = "https://nubank.com.br/cobrar/4vx6y/6a63d778-31e1-4816-a82c-238531536283?valor=";
 
 let googleCarregado = false;
 let servicoDistancia = null;
@@ -626,12 +619,6 @@ async function calcular() {
         document.getElementById('valGorjetaRes').textContent = `R$ ${valorGorjeta.toFixed(2).replace('.', ',')}`;
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
         document.getElementById('resumoPedido').classList.remove('escondido');
-        document.getElementById('linkPixValor').href = LINK_PIX_BASE + valorFinal.toFixed(2).replace('.', '');
-
-        new QRCode(document.getElementById('qrcodePix'), {
-            text: LINK_PIX_BASE + valorFinal.toFixed(2).replace('.', ''),
-            width: 180, height: 180
-        });
 
     } catch (erro) {
         alert(erro);
