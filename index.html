@@ -16,6 +16,7 @@
             --perigo: #dc3545; --fundo-escuro: #0F2B33; --fundo-card: #173842;
             --texto: #E0F8F0; --borda: rgba(0,200,150,0.25);
             --azul: #3B82F6; --cinza: #9CA3AF;
+            --vermelho-natal: #dc2626;
         }
         body {background: linear-gradient(135deg, var(--fundo-escuro), #1A3F4A); min-height: 100vh; padding: 15px; color: var(--texto);}
         .container {max-width: 780px; margin: 0 auto;}
@@ -48,6 +49,59 @@
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
         .opcao-radio.selecionado {border-color: var(--dourado); background: rgba(255,215,0,0.1);}
         .opcao-radio input {width: auto; transform: scale(1.3);}
+
+        /* 🎄 CAIXINHA DE NATAL */
+        .caixinha-natal {
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(220,38,38,0.08));
+            border: 2px solid var(--dourado);
+            border-radius: 18px;
+            padding: 22px;
+            margin: 25px 0;
+        }
+        .caixinha-natal p.titulo-caixinha {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .caixinha-natal strong.titulo-natal {
+            font-size: 18px;
+            color: var(--dourado);
+        }
+        .caixinha-natal .frase-natal {
+            font-size: 15px;
+            color: #FFF8C1;
+            text-align: center;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+        .caixinha-natal input#valorCaixinha {
+            margin-top: 16px;
+            display: none;
+            max-width: 260px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid var(--dourado);
+            background: rgba(15,43,51,0.6);
+            color: white;
+            font-size: 16px;
+        }
+        .caixinha-natal p#avisoEscolhaNatal {
+            text-align: center;
+            color: #FCA5A5;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+        .caixinha-natal label.opcao-radio.selecionado-sim {
+            border-color: var(--primaria);
+            background: rgba(34, 197, 94, 0.15);
+        }
+        .caixinha-natal label.opcao-radio.selecionado-nao {
+            border-color: var(--perigo);
+            background: rgba(239, 68, 68, 0.15);
+        }
 
         .carregando {color: var(--dourado); font-weight: 600; animation: piscar 1s infinite;}
         @keyframes piscar {50% {opacity: 0.5;}}
@@ -171,26 +225,36 @@
                 <div class="caixa-retorno">
                     <p><strong>✅ Retorno para a Origem?</strong></p>
                     <div class="opcoes-linha">
-                        <label class="opcao-radio selecionado">
+                        <label class="opcao-radio selecionado" id="retornoNao">
                             <input type="radio" name="retorno" value="nao" checked onclick="calcular()"> Não
                         </label>
-                        <label class="opcao-radio">
+                        <label class="opcao-radio" id="retornoSim">
                             <input type="radio" name="retorno" value="sim" onclick="calcular()"> Sim
                         </label>
                     </div>
                 </div>
 
-                <div class="caixa-gorjeta">
-                    <p><strong>💸 Gorjeta para o Motoboy?</strong></p>
-                    <div class="opcoes-linha">
-                        <label class="opcao-radio selecionado">
-                            <input type="radio" name="gorjeta" value="nao" checked onclick="document.getElementById('valorGorjeta').style.display='none'; calcular()"> Não
+                <!-- 🎄 CAIXINHA DE NATAL -->
+                <div class="caixinha-natal" id="caixinhaNatalBloco">
+                    <p class="titulo-caixinha">
+                        <span style="font-size: 22px;">🎄🎁</span>
+                        <strong class="titulo-natal">CAIXINHA DE NATAL DA NOSSA EQUIPE</strong>
+                    </p>
+                    <p class="frase-natal">
+                        💛 Uma ajudinha pra alegrar nosso final de ano! Valor livre — contribua com quanto quiser, sem obrigação 😊
+                    </p>
+                    <div class="opcoes-linha" style="justify-content: center; gap: 16px; flex-wrap: wrap;">
+                        <label class="opcao-radio" id="labelNaoNatal">
+                            <input type="radio" name="caixinhaNatal" value="nao" onclick="escolherCaixinha('nao'); calcular()">
+                            ❌ Não, obrigado
                         </label>
-                        <label class="opcao-radio">
-                            <input type="radio" name="gorjeta" value="sim" onclick="document.getElementById('valorGorjeta').style.display='block'; calcular()"> Sim
+                        <label class="opcao-radio" id="labelSimNatal">
+                            <input type="radio" name="caixinhaNatal" value="sim" onclick="escolherCaixinha('sim'); calcular()">
+                            ✅ Sim, quero contribuir!
                         </label>
                     </div>
-                    <input type="number" id="valorGorjeta" min="0" step="0.01" placeholder="R$ 0,00" style="margin-top:10px; display:none" oninput="calcular()">
+                    <input type="number" id="valorCaixinha" min="0" step="0.01" placeholder="💵 Digite o valor aqui — R$ 0,00">
+                    <p id="avisoEscolhaNatal">⚠️ Por favor, escolha uma opção acima para continuar</p>
                 </div>
 
                 <div class="caixa-pagamento" style="margin-top:20px;">
@@ -224,7 +288,7 @@
                     </div>
                     
                     <p id="linhaRetorno" class="escondido">✅ Retorno (50% do valor base): <span id="valRetorno">--</span></p>
-                    <p id="linhaGorjeta" class="escondido">💸 Gorjeta: <span id="valGorjetaRes">--</span></p>
+                    <p id="linhaCaixinha" class="escondido">🎁 Caixinha de Natal: <span id="valCaixinhaRes">--</span></p>
                     
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
@@ -358,6 +422,39 @@ let textoPedidoGerado = "";
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
 
+// ===== 🎄 FUNÇÃO DA CAIXINHA DE NATAL =====
+function escolherCaixinha(opcao) {
+    const valorInput = document.getElementById('valorCaixinha');
+    const labelSim = document.getElementById('labelSimNatal');
+    const labelNao = document.getElementById('labelNaoNatal');
+    const aviso = document.getElementById('avisoEscolhaNatal');
+    
+    aviso.style.display = 'none';
+    
+    if (opcao === 'sim') {
+        valorInput.style.display = 'block';
+        valorInput.focus();
+        labelSim.classList.add('selecionado-sim');
+        labelNao.classList.remove('selecionado-nao');
+    } else {
+        valorInput.style.display = 'none';
+        valorInput.value = '';
+        labelNao.classList.add('selecionado-nao');
+        labelSim.classList.remove('selecionado-sim');
+    }
+}
+
+// ===== ✅ VALIDAÇÃO DA CAIXINHA =====
+function validarCaixinha() {
+    const escolha = document.querySelector('input[name="caixinhaNatal"]:checked');
+    if (!escolha) {
+        document.getElementById('avisoEscolhaNatal').style.display = 'block';
+        document.getElementById('caixinhaNatalBloco').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    return true;
+}
+
 function detectarOrigem() {
     const ua = navigator.userAgent;
     if (/iPhone|iPad|iPod/.test(ua)) return 'iPhone';
@@ -386,7 +483,9 @@ function montarPedidoCompleto(pedido) {
     const kmArred = pedido.kmArredondado || '--';
     const valorBase = pedido.valorBase ? pedido.valorBase.toFixed(2).replace('.', ',') : '--';
     const valorRetorno = pedido.valorRetorno ? pedido.valorRetorno.toFixed(2).replace('.', ',') : '0,00';
-    const valorGorjeta = pedido.valorGorjeta ? pedido.valorGorjeta.toFixed(2).replace('.', ',') : '0,00';
+    const caixinhaTexto = pedido.caixinhaNatal === 'sim' 
+        ? `🎁 Caixinha de Natal: R$ ${(pedido.valorCaixinha || 0).toFixed(2).replace('.', ',')}` 
+        : '🎁 Caixinha de Natal: ❌ Não';
     const valorFinal = pedido.valorFinal ? pedido.valorFinal.toFixed(2).replace('.', ',') : '--';
     const dataHora = pedido.data && pedido.hora ? `${pedido.data} ${pedido.hora}` : '--';
 
@@ -427,7 +526,7 @@ function montarPedidoCompleto(pedido) {
 💰 VALORES
 ▫️ Entrega: R$ ${valorBase}
 ▫️ Retorno: R$ ${valorRetorno}
-▫️ Gorjeta: R$ ${valorGorjeta}
+▫️ ${caixinhaTexto}
 ▫️ TOTAL FINAL: R$ ${valorFinal}
 
 ───────────────────────────────────────
@@ -488,7 +587,7 @@ document.addEventListener('input', (e) => {
     if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
 });
 
-// ✅ TABELA DE PREÇOS — 2km = R$12,00 | +R$3,00/km acima de 10km
+// ✅ TABELA DE PREÇOS
 function buscarValorPorKm(kmArredondado) {
     const valoresFixos = {
         1: 10, 2: 12, 3: 13, 4: 14, 5: 15,
@@ -541,6 +640,9 @@ async function calcular() {
         }
     }
 
+    // ✅ Validação da Caixinha de Natal
+    if (!validarCaixinha()) return;
+
     document.getElementById('areaCalculando').classList.remove('escondido');
     document.getElementById('resumoPedido').classList.add('escondido');
 
@@ -553,9 +655,13 @@ async function calcular() {
         const valorBase = buscarValorPorKm(kmArredondado);
         const retornoSim = document.querySelector('input[name="retorno"]:checked').value === 'sim';
         const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
-        const gorjetaSim = document.querySelector('input[name="gorjeta"]:checked').value === 'sim';
-        const valorGorjeta = gorjetaSim ? parseFloat(document.getElementById('valorGorjeta').value) || 0 : 0;
-        const valorFinal = valorBase + valorRetorno + valorGorjeta;
+        
+        // 🎄 Cálculo da Caixinha de Natal
+        const escolhaCaixinha = document.querySelector('input[name="caixinhaNatal"]:checked');
+        const caixinhaSim = escolhaCaixinha.value === 'sim';
+        const valorCaixinha = caixinhaSim ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
+        
+        const valorFinal = valorBase + valorRetorno + valorCaixinha;
 
         dadosPedidoAtual = {
             nomeLoja: document.getElementById('nomeLoja').value.trim(),
@@ -565,9 +671,11 @@ async function calcular() {
             contatoDest: document.getElementById('contatoDest').value.trim(),
             endDest: document.getElementById('endDest').value.trim(),
             refDest: document.getElementById('refDest').value.trim(),
-            kmReal, kmArredondado, valorBase, valorRetorno, valorGorjeta, valorFinal,
+            kmReal, kmArredondado, valorBase, valorRetorno,
+            caixinhaNatal: escolhaCaixinha.value,
+            valorCaixinha,
+            valorFinal,
             retorno: retornoSim ? 'sim' : 'nao',
-            gorjeta: gorjetaSim ? 'sim' : 'nao',
             quemPaga: document.querySelector('input[name="quemPaga"]:checked').value,
             origem: detectarOrigem(),
             data: new Date().toLocaleDateString('pt-BR'),
@@ -578,10 +686,17 @@ async function calcular() {
         document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
         document.getElementById('kmTotalArred').textContent = kmArredondado;
         document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
-        document.getElementById('linhaRetorno').classList.toggle('escondido', !retornoSim);
+        
+        const linhaRetorno = document.getElementById('linhaRetorno');
+        linhaRetorno.classList.toggle('escondido', !retornoSim);
         document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
-        document.getElementById('linhaGorjeta').classList.toggle('escondido', !gorjetaSim);
-        document.getElementById('valGorjetaRes').textContent = `R$ ${valorGorjeta.toFixed(2).replace('.', ',')}`;
+        
+        const linhaCaixinha = document.getElementById('linhaCaixinha');
+        linhaCaixinha.classList.toggle('escondido', !caixinhaSim);
+        if (caixinhaSim) {
+            document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
+        }
+        
         document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
         document.getElementById('resumoPedido').classList.remove('escondido');
 
@@ -608,15 +723,26 @@ function refazerPedido() {
     document.getElementById('contatoDest').value = '';
     document.getElementById('endDest').value = '';
     document.getElementById('refDest').value = '';
+    
     document.querySelector('input[name="retorno"][value="nao"]').checked = true;
-    document.querySelector('input[name="gorjeta"][value="nao"]').checked = true;
-    document.getElementById('valorGorjeta').value = '';
-    document.getElementById('valorGorjeta').style.display = 'none';
+    
+    document.querySelectorAll('input[name="caixinhaNatal"]').forEach(el => el.checked = false);
+    document.getElementById('valorCaixinha').style.display = 'none';
+    document.getElementById('valorCaixinha').value = '';
+    document.getElementById('avisoEscolhaNatal').style.display = 'block';
+    document.getElementById('labelSimNatal').classList.remove('selecionado-sim');
+    document.getElementById('labelNaoNatal').classList.remove('selecionado-nao');
+    
     document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
+    
     document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('linhaRetorno').classList.add('escondido');
+    document.getElementById('linhaCaixinha').classList.add('escondido');
+    
     dadosPedidoAtual = null;
     textoPedidoGerado = '';
     localStorage.removeItem('dadosLojaMTZ');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function verificarLoginPainel() {
@@ -678,51 +804,7 @@ function atualizarListaPedidos() {
             <details style="margin-top:12px;">
                 <summary style="color:var(--dourado); cursor:pointer; font-weight:700;">📋 Ver pedido completo</summary>
                 <div class="detalhes-pedido">
-═══════════════════════════════════════
-📦 PEDIDO COMPLETO — MTZ EXPRESS
-📅 Data: ${p.data} ${p.hora}
-📱 Origem: ${p.origem || 'Não informada'}
-═══════════════════════════════════════
-
-📍 ORIGEM
-▫️ Nome: ${p.nomeLoja || 'Não informado'}
-▫️ Contato: ${p.contatoLoja || 'Não informado'}
-▫️ Endereço: ${p.endLoja || 'Não informado'}
-🔗 Mapa: ${p.endLoja ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.endLoja + ', Juiz de Fora - MG') : '-'}
-
-───────────────────────────────────────
-
-📍 DESTINO
-▫️ Nome: ${p.nomeDest || 'Não informado'}
-▫️ Contato: ${p.contatoDest || 'Não informado'}
-▫️ Endereço: ${p.endDest || 'Não informado'}
-🔗 Mapa: ${p.endDest ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.endDest + ', Juiz de Fora - MG') : '-'}
-
-───────────────────────────────────────
-
-📝 OBSERVAÇÃO
-▫️ ${p.refDest || 'Nenhuma'}
-
-───────────────────────────────────────
-
-📏 PERCURSO
-▫️ Km real: ${(p.kmReal || 0).toFixed(1).replace('.', ',')} km
-▫️ Km arredondado: ${p.kmArredondado || '--'} km
-▫️ Retorno: ${p.retorno === 'sim' ? '✅ Sim' : '❌ Não'}
-
-───────────────────────────────────────
-
-💰 VALORES
-▫️ Valor base: R$ ${(p.valorBase || 0).toFixed(2).replace('.', ',')}
-▫️ Retorno: R$ ${(p.valorRetorno || 0).toFixed(2).replace('.', ',')}
-▫️ Gorjeta: R$ ${(p.valorGorjeta || 0).toFixed(2).replace('.', ',')}
-▫️ TOTAL FINAL: R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
-
-───────────────────────────────────────
-
-💳 Quem paga: ${p.quemPaga === 'lojista' ? '🏪 Origem' : '👤 Destino'}
-💬 Status: ${textoStatus}
-═══════════════════════════════════════
+${montarPedidoCompleto(p)}
                 </div>
             </details>
         `;
@@ -819,6 +901,4 @@ function aplicarFiltroPeriodo() {
     document.getElementById('mediaPeriodo').textContent = qtd > 0 ? `R$ ${(total/qtd).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
     document.getElementById('resultadoPeriodo').classList.remove('escondido');
 }
-</script>
-</body>
-</html>
+    </script>
