@@ -48,6 +48,8 @@
         .opcoes-linha {display: flex; gap: 15px; align-items: center; margin: 10px 0; flex-wrap: wrap;}
         .opcao-radio {display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 14px; border: 2px solid transparent; border-radius: 14px; transition: all 0.2s;}
         .opcao-radio.selecionado {border-color: var(--dourado); background: rgba(255,215,0,0.1);}
+        .opcao-radio.selecionado-sim {border-color: var(--primaria); background: rgba(34, 197, 94, 0.15);}
+        .opcao-radio.selecionado-nao {border-color: var(--perigo); background: rgba(239, 68, 68, 0.15);}
         .opcao-radio input {width: auto; transform: scale(1.3);}
 
         /* 🎄 CAIXINHA DE NATAL */
@@ -57,6 +59,17 @@
             border-radius: 18px;
             padding: 22px;
             margin: 25px 0;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        .caixinha-natal.erro-preenchimento {
+            border-color: var(--perigo);
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.35);
+            animation: piscar-erro 1s ease-in-out 2;
+        }
+        @keyframes piscar-erro {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
         }
         .caixinha-natal p.titulo-caixinha {
             text-align: center;
@@ -90,17 +103,12 @@
         .caixinha-natal p#avisoEscolhaNatal {
             text-align: center;
             color: #FCA5A5;
-            font-size: 13px;
+            font-size: 14px;
             margin-top: 12px;
             font-weight: 600;
         }
-        .caixinha-natal label.opcao-radio.selecionado-sim {
-            border-color: var(--primaria);
-            background: rgba(34, 197, 94, 0.15);
-        }
-        .caixinha-natal label.opcao-radio.selecionado-nao {
-            border-color: var(--perigo);
-            background: rgba(239, 68, 68, 0.15);
+        .caixinha-natal p#avisoEscolhaNatal.visivel {
+            display: block;
         }
 
         .carregando {color: var(--dourado); font-weight: 600; animation: piscar 1s infinite;}
@@ -146,6 +154,7 @@
         .status-cancelado {color: #ef4444; font-weight: bold;}
         .filtro-ativo {background: var(--primaria); color: white;}
         .bloco-periodo {background: rgba(255,215,0,0.08); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 25px 0;}
+        .bloco-caixinha {background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(220,38,38,0.05)); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0;}
         .botoes-pedido {display: flex; gap: 4px; margin-top: 12px; flex-wrap: wrap;}
         .detalhes-pedido {margin-top:10px; padding:15px; background:rgba(0,0,0,0.25); border-radius:12px; font-size:13px; line-height:1.8; white-space:pre-wrap; border:1px solid var(--dourado);}
         .sucesso-copia {color: var(--primaria); font-weight: 700; margin-top: 8px;}
@@ -234,7 +243,7 @@
                     </div>
                 </div>
 
-                <!-- 🎄 CAIXINHA DE NATAL -->
+                <!-- 🎄 CAIXINHA DE NATAL COM VALIDAÇÃO -->
                 <div class="caixinha-natal" id="caixinhaNatalBloco">
                     <p class="titulo-caixinha">
                         <span style="font-size: 22px;">🎄🎁</span>
@@ -245,16 +254,16 @@
                     </p>
                     <div class="opcoes-linha" style="justify-content: center; gap: 16px; flex-wrap: wrap;">
                         <label class="opcao-radio" id="labelNaoNatal">
-                            <input type="radio" name="caixinhaNatal" value="nao" onclick="escolherCaixinha('nao'); calcular()">
+                            <input type="radio" name="caixinhaNatal" value="nao" onclick="escolherCaixinha('nao');">
                             ❌ Não, obrigado
                         </label>
                         <label class="opcao-radio" id="labelSimNatal">
-                            <input type="radio" name="caixinhaNatal" value="sim" onclick="escolherCaixinha('sim'); calcular()">
+                            <input type="radio" name="caixinhaNatal" value="sim" onclick="escolherCaixinha('sim');">
                             ✅ Sim, quero contribuir!
                         </label>
                     </div>
                     <input type="number" id="valorCaixinha" min="0" step="0.01" placeholder="💵 Digite o valor aqui — R$ 0,00">
-                    <p id="avisoEscolhaNatal">⚠️ Por favor, escolha uma opção acima para continuar</p>
+                    <p id="avisoEscolhaNatal">⚠️ Por favor, escolha se deseja contribuir com a Caixinha de Natal — Sim ou Não</p>
                 </div>
 
                 <div class="caixa-pagamento" style="margin-top:20px;">
@@ -352,8 +361,30 @@
                         </div>
                     </div>
 
+                    <!-- 🎄 CAIXINHA DE NATAL — FILTRO POR PERÍODO EDITÁVEL -->
+                    <div class="bloco-caixinha">
+                        <h3 style="color:var(--dourado); margin-bottom:15px;">🎄 CAIXINHA DE NATAL — Por Período</h3>
+                        <div class="linha-dupla">
+                            <div>
+                                <label>📅 Data Inicial</label>
+                                <input type="date" id="dataInicialCaixa">
+                            </div>
+                            <div>
+                                <label>📅 Data Final</label>
+                                <input type="date" id="dataFinalCaixa">
+                            </div>
+                        </div>
+                        <button class="btn btn-secundario" style="width:100%; margin-top:15px;" onclick="calcularCaixinhaPorPeriodo()">🔍 CALCULAR</button>
+                        
+                        <div id="resultadoCaixinha" class="escondido" style="margin-top:20px; padding:15px; background:rgba(255,215,0,0.1); border-radius:12px;">
+                            <h4 style="color:var(--dourado); margin-bottom:10px;">📊 RESULTADO DO PERÍODO</h4>
+                            <p>📦 Quantidade de caixinhas: <strong id="qtdCaixinha">0</strong></p>
+                            <p>💰 Valor Total Recebido: <strong id="totalCaixinha">R$ 0,00</strong></p>
+                        </div>
+                    </div>
+
                     <div class="bloco-periodo">
-                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 FILTRAR POR PERÍODO</h3>
+                        <h3 style="color:var(--dourado); margin-bottom:15px;">📅 FILTRAR POR PERÍODO — Geral</h3>
                         <div class="linha-dupla">
                             <div>
                                 <label>Data Inicial</label>
@@ -368,7 +399,7 @@
                         
                         <div id="resultadoPeriodo" class="escondido" style="margin-top:20px; padding:15px; background:rgba(0,200,150,0.1); border-radius:12px;">
                             <h4 style="color:var(--dourado); margin-bottom:10px;">📊 RESULTADO</h4>
-                            <p>📦 Total: <strong id="qtdPeriodo">0</strong></p>
+                            <p>📦 Total de entregas: <strong id="qtdPeriodo">0</strong></p>
                             <p>💰 Faturamento: <strong id="fatPeriodo">R$ 0,00</strong></p>
                             <p>📊 Média: <strong id="mediaPeriodo">R$ 0,00</strong></p>
                         </div>
@@ -428,8 +459,11 @@ function escolherCaixinha(opcao) {
     const labelSim = document.getElementById('labelSimNatal');
     const labelNao = document.getElementById('labelNaoNatal');
     const aviso = document.getElementById('avisoEscolhaNatal');
+    const bloco = document.getElementById('caixinhaNatalBloco');
     
+    // Remove destaque de erro quando o usuário escolher uma opção
     aviso.style.display = 'none';
+    bloco.classList.remove('erro-preenchimento');
     
     if (opcao === 'sim') {
         valorInput.style.display = 'block';
@@ -444,14 +478,22 @@ function escolherCaixinha(opcao) {
     }
 }
 
-// ===== ✅ VALIDAÇÃO DA CAIXINHA =====
+// ===== ✅ VALIDAÇÃO OBRIGATÓRIA DA CAIXINHA =====
 function validarCaixinha() {
     const escolha = document.querySelector('input[name="caixinhaNatal"]:checked');
+    const aviso = document.getElementById('avisoEscolhaNatal');
+    const bloco = document.getElementById('caixinhaNatalBloco');
+    
     if (!escolha) {
-        document.getElementById('avisoEscolhaNatal').style.display = 'block';
-        document.getElementById('caixinhaNatalBloco').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        aviso.style.display = 'block';
+        bloco.classList.add('erro-preenchimento');
+        bloco.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert("⚠️ Atenção! Falta preencher:\n\n🎄 Caixinha de Natal\n\nPor favor, escolha se deseja contribuir — Sim ✨ ou Não, obrigado!");
         return false;
     }
+    
+    aviso.style.display = 'none';
+    bloco.classList.remove('erro-preenchimento');
     return true;
 }
 
@@ -590,129 +632,148 @@ document.addEventListener('input', (e) => {
 // ✅ TABELA DE PREÇOS
 function buscarValorPorKm(kmArredondado) {
     const valoresFixos = {
-        1: 10, 2: 12, 3: 13, 4: 14, 5: 15,
-        6: 16, 7: 22, 8: 24, 9: 25, 10: 30
+        1: 10, 2: 12, 3: 13, 4: 14, 5: 15, 6: 20, 7: 22, 8: 26, 9: 28, 10: 30
     };
-    return kmArredondado <= 10 ? valoresFixos[kmArredondado] : 30 + ((kmArredondado - 10) * 3);
+    return valoresFixos[kmArredondado] || (10 + (kmArredondado - 1) * 3);
 }
 
 function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
-    carregarDadosLojaSalvos();
-    verificarNavegadorApp();
-    referenciaPedidos.on('value', snap => {
-        todosPedidosCarregados = snap.val() || {};
-        atualizarListaPedidos();
-        atualizarResumoGestao();
-    });
+    calcular();
 }
 
-function calcularDistanciaGoogle(origem, destino) {
-    return new Promise((sucesso, erro) => {
-        if (!googleCarregado || !servicoDistancia) return erro("Aguarde o carregamento...");
-        const o = limparParaMapa(origem) + ", Juiz de Fora - MG, Brasil";
-        const d = limparParaMapa(destino) + ", Juiz de Fora - MG, Brasil";
-        servicoDistancia.getDistanceMatrix({
-            origins: [o], destinations: [d],
-            travelMode: 'DRIVING', unitSystem: google.maps.UnitSystem.METRIC
-        }, (resp, status) => {
-            if (status === "OK" && resp.rows[0].elements[0].status === "OK") {
-                sucesso(resp.rows[0].elements[0].distance.value / 1000);
-            } else erro("❌ Endereço não encontrado! Confira o preenchimento.");
-        });
-    });
-}
-
-function mostrarAba(nome) {
+function mostrarAba(nomeAba) {
     document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+    document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
     event.target.classList.add('ativa');
-    document.querySelectorAll('.conteudo-aba').forEach(d => d.classList.remove('visivel'));
-    document.getElementById('aba' + nome.charAt(0).toUpperCase() + nome.slice(1)).classList.add('visivel');
+    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
+    
+    if (nomeAba === 'painel' && localStorage.getItem('painelLogado') === 'sim') {
+        mostrarConteudoPainel();
+    }
 }
 
 async function calcular() {
-    const campos = ['nomeLoja','endLoja','nomeDest','endDest'];
-    for (const id of campos) {
-        if (!document.getElementById(id).value.trim()) {
-            alert("⚠️ Preencha todos os campos obrigatórios!");
-            return;
-        }
-    }
-
-    // ✅ Validação da Caixinha de Natal
-    if (!validarCaixinha()) return;
-
+    if (!verificarNavegadorApp()) return;
+    if (!googleCarregado) return;
+    
+    const endLoja = document.getElementById('endLoja').value.trim();
+    const endDest = document.getElementById('endDest').value.trim();
+    
+    if (!endLoja || !endDest) return;
+    
     document.getElementById('areaCalculando').classList.remove('escondido');
     document.getElementById('resumoPedido').classList.add('escondido');
-
+    
+    const origemCompleta = `${limparParaMapa(endLoja)}, Juiz de Fora - MG, Brasil`;
+    const destinoCompleto = `${limparParaMapa(endDest)}, Juiz de Fora - MG, Brasil`;
+    
     try {
-        const kmReal = await calcularDistanciaGoogle(
-            document.getElementById('endLoja').value,
-            document.getElementById('endDest').value
-        );
-        const kmArredondado = Math.ceil(kmReal);
-        const valorBase = buscarValorPorKm(kmArredondado);
-        const retornoSim = document.querySelector('input[name="retorno"]:checked').value === 'sim';
-        const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
+        const resposta = await servicoDistancia.getDistanceMatrix({
+            origins: [origemCompleta],
+            destinations: [destinoCompleto],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+            avoidHighways: false
+        });
         
-        // 🎄 Cálculo da Caixinha de Natal
-        const escolhaCaixinha = document.querySelector('input[name="caixinhaNatal"]:checked');
-        const caixinhaSim = escolhaCaixinha.value === 'sim';
-        const valorCaixinha = caixinhaSim ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
-        
-        const valorFinal = valorBase + valorRetorno + valorCaixinha;
-
-        dadosPedidoAtual = {
-            nomeLoja: document.getElementById('nomeLoja').value.trim(),
-            contatoLoja: document.getElementById('contatoLoja').value.trim(),
-            endLoja: document.getElementById('endLoja').value.trim(),
-            nomeDest: document.getElementById('nomeDest').value.trim(),
-            contatoDest: document.getElementById('contatoDest').value.trim(),
-            endDest: document.getElementById('endDest').value.trim(),
-            refDest: document.getElementById('refDest').value.trim(),
-            kmReal, kmArredondado, valorBase, valorRetorno,
-            caixinhaNatal: escolhaCaixinha.value,
-            valorCaixinha,
-            valorFinal,
-            retorno: retornoSim ? 'sim' : 'nao',
-            quemPaga: document.querySelector('input[name="quemPaga"]:checked').value,
-            origem: detectarOrigem(),
-            data: new Date().toLocaleDateString('pt-BR'),
-            hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
-            status: 'Pendente'
-        };
-
-        document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
-        document.getElementById('kmTotalArred').textContent = kmArredondado;
-        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
-        
-        const linhaRetorno = document.getElementById('linhaRetorno');
-        linhaRetorno.classList.toggle('escondido', !retornoSim);
-        document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
-        
-        const linhaCaixinha = document.getElementById('linhaCaixinha');
-        linhaCaixinha.classList.toggle('escondido', !caixinhaSim);
-        if (caixinhaSim) {
-            document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
+        if (resposta.rows[0].elements[0].status === 'OK') {
+            const kmReal = resposta.rows[0].elements[0].distance.value / 1000;
+            const kmArredondado = Math.ceil(kmReal);
+            const valorBase = buscarValorPorKm(kmArredondado);
+            
+            const retornoSim = document.querySelector('input[name="retorno"][value="sim"]').checked;
+            const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
+            
+            document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
+            document.getElementById('kmTotalArred').textContent = kmArredondado;
+            document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+            
+            if (retornoSim) {
+                document.getElementById('linhaRetorno').classList.remove('escondido');
+                document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
+            } else {
+                document.getElementById('linhaRetorno').classList.add('escondido');
+            }
+            
+            dadosPedidoAtual = { kmReal, kmArredondado, valorBase, valorRetorno };
+        } else {
+            alert("⚠️ Não foi possível calcular a distância. Verifique os endereços.");
         }
-        
-        document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-        document.getElementById('resumoPedido').classList.remove('escondido');
-
     } catch (erro) {
-        alert(erro);
-    } finally {
-        document.getElementById('areaCalculando').classList.add('escondido');
+        console.error(erro);
+        alert("❌ Erro ao calcular distância. Tente novamente.");
     }
+    
+    document.getElementById('areaCalculando').classList.add('escondido');
 }
 
 function gerarPedido() {
-    if (!dadosPedidoAtual) { alert("⚠️ Calcule o valor primeiro!"); return; }
-    textoPedidoGerado = montarPedidoCompleto(dadosPedidoAtual);
+    if (!validarCaixinha()) return;
+    
+    const nomeLoja = document.getElementById('nomeLoja').value.trim();
+    const endLoja = document.getElementById('endLoja').value.trim();
+    const nomeDest = document.getElementById('nomeDest').value.trim();
+    const endDest = document.getElementById('endDest').value.trim();
+    
+    if (!nomeLoja || !endLoja || !nomeDest || !endDest) {
+        alert("⚠️ Preencha todos os campos obrigatórios!");
+        return;
+    }
+    
+    if (!dadosPedidoAtual) {
+        alert("⚠️ Clique primeiro em 'CALCULAR VALOR TOTAL'!");
+        return;
+    }
+    
+    const retorno = document.querySelector('input[name="retorno"]:checked').value;
+    const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
+    const caixinhaNatal = document.querySelector('input[name="caixinhaNatal"]:checked')?.value || 'nao';
+    const valorCaixinha = caixinhaNatal === 'sim' ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
+    const refDest = document.getElementById('refDest').value.trim();
+    const contatoLoja = document.getElementById('contatoLoja').value.trim();
+    const contatoDest = document.getElementById('contatoDest').value.trim();
+    
+    const valorTotalComRetorno = dadosPedidoAtual.valorBase + dadosPedidoAtual.valorRetorno;
+    const valorFinal = valorTotalComRetorno + valorCaixinha;
+    
+    const agora = new Date();
+    const data = `${agora.getDate().toString().padStart(2,'0')}/${(agora.getMonth()+1).toString().padStart(2,'0')}/${agora.getFullYear()}`;
+    const hora = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}`;
+    const idPedido = `${agora.getFullYear()}${(agora.getMonth()+1)}${agora.getDate()}-${agora.getHours()}${agora.getMinutes()}${agora.getSeconds()}`;
+    
+    const pedido = {
+        id: idPedido,
+        nomeLoja, endLoja, contatoLoja,
+        nomeDest, endDest, contatoDest, refDest,
+        retorno, quemPaga, caixinhaNatal, valorCaixinha,
+        kmReal: dadosPedidoAtual.kmReal,
+        kmArredondado: dadosPedidoAtual.kmArredondado,
+        valorBase: dadosPedidoAtual.valorBase,
+        valorRetorno: dadosPedidoAtual.valorRetorno,
+        valorFinal, data, hora,
+        status: 'pendente',
+        origem: detectarOrigem()
+    };
+    
+    textoPedidoGerado = montarPedidoCompleto(pedido);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
-    referenciaPedidos.push(dadosPedidoAtual);
-    setTimeout(abrirWhatsAppDireto, 400);
+    
+    if (caixinhaNatal === 'sim') {
+        document.getElementById('linhaCaixinha').classList.remove('escondido');
+        document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
+    } else {
+        document.getElementById('linhaCaixinha').classList.add('escondido');
+    }
+    document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+    
+    document.getElementById('resumoPedido').classList.remove('escondido');
+    document.getElementById('resumoPedido').scrollIntoView({ behavior: 'smooth' });
+    
+    referenciaPedidos.child(idPedido).set(pedido)
+        .then(() => console.log('✅ Pedido salvo:', idPedido))
+        .catch(e => console.error('❌ Erro ao salvar:', e));
 }
 
 function refazerPedido() {
@@ -723,146 +784,119 @@ function refazerPedido() {
     document.getElementById('contatoDest').value = '';
     document.getElementById('endDest').value = '';
     document.getElementById('refDest').value = '';
-    
-    document.querySelector('input[name="retorno"][value="nao"]').checked = true;
-    
-    document.querySelectorAll('input[name="caixinhaNatal"]').forEach(el => el.checked = false);
-    document.getElementById('valorCaixinha').style.display = 'none';
     document.getElementById('valorCaixinha').value = '';
-    document.getElementById('avisoEscolhaNatal').style.display = 'block';
+    
+    document.querySelectorAll('input[name="retorno"]')[1].checked = false;
+    document.querySelectorAll('input[name="retorno"]')[0].checked = true;
+    document.querySelectorAll('input[name="quemPaga"]')[0].checked = true;
+    document.querySelectorAll('input[name="caixinhaNatal"]').forEach(r => r.checked = false);
+    
+    document.getElementById('valorCaixinha').style.display = 'none';
     document.getElementById('labelSimNatal').classList.remove('selecionado-sim');
     document.getElementById('labelNaoNatal').classList.remove('selecionado-nao');
-    
-    document.querySelector('input[name="quemPaga"][value="lojista"]').checked = true;
+    document.getElementById('avisoEscolhaNatal').style.display = 'none';
+    document.getElementById('caixinhaNatalBloco').classList.remove('erro-preenchimento');
     
     document.getElementById('resumoPedido').classList.add('escondido');
-    document.getElementById('linhaRetorno').classList.add('escondido');
-    document.getElementById('linhaCaixinha').classList.add('escondido');
-    
     dadosPedidoAtual = null;
     textoPedidoGerado = '';
-    localStorage.removeItem('dadosLojaMTZ');
+    
+    document.querySelector('.aba.ativa').click();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function verificarLoginPainel() {
-    const u = document.getElementById('usuarioPainel').value.trim();
-    const s = document.getElementById('senhaPainel').value.trim();
-    if (u === USUARIO_ADMIN && s === SENHA_ADMIN) {
-        document.getElementById('loginPainel').classList.add('escondido');
-        document.getElementById('conteudoPainel').classList.remove('escondido');
+    const usuario = document.getElementById('usuarioPainel').value.trim();
+    const senha = document.getElementById('senhaPainel').value.trim();
+    
+    if (usuario === USUARIO_ADMIN && senha === SENHA_ADMIN) {
+        localStorage.setItem('painelLogado', 'sim');
+        mostrarConteudoPainel();
     } else {
         document.getElementById('erroLoginPainel').classList.remove('escondido');
     }
 }
 
+function mostrarConteudoPainel() {
+    document.getElementById('loginPainel').classList.add('escondido');
+    document.getElementById('conteudoPainel').classList.remove('escondido');
+    carregarPedidos();
+}
+
 function sairPainel() {
-    document.getElementById('conteudoPainel').classList.add('escondido');
+    localStorage.removeItem('painelLogado');
     document.getElementById('loginPainel').classList.remove('escondido');
+    document.getElementById('conteudoPainel').classList.add('escondido');
     document.getElementById('usuarioPainel').value = '';
     document.getElementById('senhaPainel').value = '';
     document.getElementById('erroLoginPainel').classList.add('escondido');
 }
 
-function filtrarPedidos(status) {
-    filtroAtivo = status;
-    document.querySelectorAll('#abaPainel .linha-botoes button').forEach(b => b.classList.remove('filtro-ativo'));
-    event.target.classList.add('filtro-ativo');
-    atualizarListaPedidos();
+function carregarPedidos() {
+    referenciaPedidos.on('value', (snapshot) => {
+        todosPedidosCarregados = snapshot.val() || {};
+        atualizarResumoPainel();
+        aplicarFiltroPeriodo();
+        filtrarPedidos(filtroAtivo);
+    });
 }
 
-function atualizarListaPedidos() {
-    const lista = document.getElementById('listaHistorico');
-    lista.innerHTML = '';
-    let temPedido = false;
-
-    for (const id in todosPedidosCarregados) {
-        const p = todosPedidosCarregados[id];
-        if (!p) continue;
-
-        const statusAtual = (p.status || 'Pendente').toLowerCase().trim();
-        if (filtroAtivo !== 'todos' && statusAtual !== filtroAtivo) continue;
-
-        temPedido = true;
-        const classeStatus = statusAtual === 'concluido' ? 'status-concluido' :
-                             statusAtual === 'cancelado' ? 'status-cancelado' : 'status-pendente';
-        const textoStatus = statusAtual === 'concluido' ? '✅ Concluído' :
-                            statusAtual === 'cancelado' ? '❌ Cancelado' : '⏳ Pendente';
-
-        const item = document.createElement('div');
-        item.className = 'item-pedido';
-        item.innerHTML = `
-            <strong>${p.data} ${p.hora}</strong> — ${p.nomeLoja || 'Sem nome'} → ${p.nomeDest || 'Sem destino'}<br>
-            💰 R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
-            <span class="${classeStatus}"> — ${textoStatus}</span>
-            <div class="botoes-pedido">
-                ✅ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'concluido')">Concluído</button>
-                ❌ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'cancelado')">Cancelado</button>
-                ⏳ <button class="btn-alterar-status" onclick="marcarStatus('${id}', 'pendente')">Pendente</button>
-                🗑️ <button class="btn-excluir" onclick="excluirPedido('${id}')">Excluir</button>
-            </div>
-            <details style="margin-top:12px;">
-                <summary style="color:var(--dourado); cursor:pointer; font-weight:700;">📋 Ver pedido completo</summary>
-                <div class="detalhes-pedido">
-${montarPedidoCompleto(p)}
-                </div>
-            </details>
-        `;
-        lista.appendChild(item);
-    }
-
-    if (!temPedido) {
-        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
-    }
-}
-
-function marcarStatus(id, novoStatus) {
-    referenciaPedidos.child(id).update({ status: novoStatus })
-        .then(() => alert(`✅ Status alterado com sucesso!`))
-        .catch(e => alert('❌ Erro: ' + e.message));
-}
-
-function excluirPedido(id) {
-    if (confirm('Tem certeza que deseja excluir este pedido?')) {
-        referenciaPedidos.child(id).remove()
-            .then(() => alert('✅ Pedido excluído!'))
-            .catch(e => alert('❌ Erro: ' + e.message));
-    }
-}
-
-function atualizarResumoGestao() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const mesAtual = new Date().getMonth();
-    const anoAtual = new Date().getFullYear();
+function atualizarResumoPainel() {
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth() + 1;
+    const anoAtual = hoje.getFullYear();
+    const diaHoje = hoje.getDate();
     
-    let totalDia = 0, qtdDia = 0;
-    let totalMes = 0, qtdMes = 0;
-
-    for (const id in todosPedidosCarregados) {
-        const p = todosPedidosCarregados[id];
-        if (!p || !p.valorFinal) continue;
-        
-        if (p.data === hoje) {
-            totalDia += p.valorFinal;
-            qtdDia++;
-        }
-        
+    let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
+    
+    Object.values(todosPedidosCarregados).forEach(p => {
+        if (p.status === 'cancelado') return;
         const partesData = p.data.split('/');
-        if (partesData.length === 3) {
-            const dt = new Date(`${partesData[2]}-${partesData[1]}-${partesData[0]}`);
-            if (dt.getMonth() === mesAtual && dt.getFullYear() === anoAtual) {
-                totalMes += p.valorFinal;
-                qtdMes++;
+        const dia = parseInt(partesData[0]), mes = parseInt(partesData[1]), ano = parseInt(partesData[2]);
+        
+        if (mes === mesAtual && ano === anoAtual) {
+            fatMes += p.valorFinal || 0;
+            qtdMes++;
+            if (dia === diaHoje) {
+                fatDia += p.valorFinal || 0;
+                qtdDia++;
             }
         }
-    }
-
-    const media = qtdDia > 0 ? totalDia / qtdDia : 0;
+    });
     
-    document.getElementById('fatDia').textContent = `R$ ${totalDia.toFixed(2).replace('.', ',')}`;
+    document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdDia').textContent = qtdDia;
-    document.getElementById('fatMes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaEntrega').textContent = `R$ ${media.toFixed(2).replace('.', ',')}`;
+    document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaEntrega').textContent = qtdMes > 0 ? `R$ ${(fatMes/qtdMes).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+}
+
+function calcularCaixinhaPorPeriodo() {
+    const dataInicial = document.getElementById('dataInicialCaixa').value;
+    const dataFinal = document.getElementById('dataFinalCaixa').value;
+    
+    if (!dataInicial || !dataFinal) {
+        alert("⚠️ Preencha as duas datas!");
+        return;
+    }
+    
+    const inicio = new Date(dataInicial + 'T00:00:00');
+    const fim = new Date(dataFinal + 'T23:59:59');
+    
+    let qtdCaixinha = 0, totalCaixinha = 0;
+    
+    Object.values(todosPedidosCarregados).forEach(p => {
+        if (!p.data) return;
+        const partes = p.data.split('/');
+        const dataPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
+        if (dataPedido >= inicio && dataPedido <= fim && p.caixinhaNatal === 'sim') {
+            qtdCaixinha++;
+            totalCaixinha += p.valorCaixinha || 0;
+        }
+    });
+    
+    document.getElementById('qtdCaixinha').textContent = qtdCaixinha;
+    document.getElementById('totalCaixinha').textContent = `R$ ${totalCaixinha.toFixed(2).replace('.', ',')}`;
+    document.getElementById('resultadoCaixinha').classList.remove('escondido');
 }
 
 function aplicarFiltroPeriodo() {
@@ -870,35 +904,110 @@ function aplicarFiltroPeriodo() {
     const dataFinal = document.getElementById('dataFinal').value;
     
     if (!dataInicial || !dataFinal) {
-        alert('⚠️ Selecione as duas datas!');
+        document.getElementById('resultadoPeriodo').classList.add('escondido');
         return;
     }
-
-    const ini = new Date(dataInicial);
-    const fim = new Date(dataFinal);
-    if (ini > fim) {
-        alert('⚠️ Data inicial não pode ser depois da final!');
-        return;
-    }
-
-    let total = 0, qtd = 0;
-    for (const id in todosPedidosCarregados) {
-        const p = todosPedidosCarregados[id];
-        if (!p || !p.valorFinal || !p.data) continue;
-        
+    
+    const inicio = new Date(dataInicial + 'T00:00:00');
+    const fim = new Date(dataFinal + 'T23:59:59');
+    
+    let totalValor = 0, totalQtd = 0;
+    
+    Object.values(todosPedidosCarregados).forEach(p => {
+        if (!p.data || p.status === 'cancelado') return;
         const partes = p.data.split('/');
-        if (partes.length !== 3) continue;
-        const dtPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
-        
-        if (dtPedido >= ini && dtPedido <= fim) {
-            total += p.valorFinal;
-            qtd++;
+        const dataPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
+        if (dataPedido >= inicio && dataPedido <= fim) {
+            totalQtd++;
+            totalValor += p.valorFinal || 0;
         }
-    }
-
-    document.getElementById('qtdPeriodo').textContent = qtd;
-    document.getElementById('fatPeriodo').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaPeriodo').textContent = qtd > 0 ? `R$ ${(total/qtd).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+    });
+    
+    document.getElementById('qtdPeriodo').textContent = totalQtd;
+    document.getElementById('fatPeriodo').textContent = `R$ ${totalValor.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaPeriodo').textContent = totalQtd > 0 ? `R$ ${(totalValor/totalQtd).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
     document.getElementById('resultadoPeriodo').classList.remove('escondido');
 }
-    </script>
+
+function filtrarPedidos(status) {
+    filtroAtivo = status;
+    document.querySelectorAll('#btnFiltroTodos, #btnFiltroPendente, #btnFiltroConcluido, #btnFiltroCancelado').forEach(b => b.classList.remove('filtro-ativo'));
+    event.target.classList.add('filtro-ativo');
+    
+    const lista = document.getElementById('listaHistorico');
+    lista.innerHTML = '';
+    
+    let pedidosFiltrados = Object.values(todosPedidosCarregados);
+    if (status !== 'todos') {
+        pedidosFiltrados = pedidosFiltrados.filter(p => p.status === status);
+    }
+    
+    pedidosFiltrados.sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+    
+    if (pedidosFiltrados.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
+        return;
+    }
+    
+    pedidosFiltrados.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'item-pedido';
+        const classeStatus = p.status === 'pendente' ? 'status-pendente' : 
+                            p.status === 'concluido' ? 'status-concluido' : 'status-cancelado';
+        const textoStatus = p.status === 'pendente' ? '⏳ PENDENTE' : 
+                           p.status === 'concluido' ? '✅ CONCLUÍDO' : '❌ CANCELADO';
+        
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                <div>
+                    <strong>${p.data} ${p.hora}</strong><br>
+                    📍 ${p.nomeDest || 'Sem nome'} — ${p.kmArredondado || '--'} km
+                </div>
+                <div>
+                    <strong style="color:var(--dourado); font-size:18px;">R$ ${(p.valorFinal||0).toFixed(2).replace('.', ',')}</strong><br>
+                    <span class="${classeStatus}">${textoStatus}</span>
+                </div>
+            </div>
+            <div class="botoes-pedido">
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'pendente')">⏳ Pendente</button>
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'concluido')">✅ Concluído</button>
+                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'cancelado')">❌ Cancelado</button>
+                <button class="btn-excluir" onclick="excluirPedido('${p.id}')">🗑️ Excluir</button>
+            </div>
+            <details style="margin-top:8px;">
+                <summary style="color:var(--dourado); cursor:pointer;">📝 Ver detalhes</summary>
+                <div class="detalhes-pedido">${montarPedidoCompleto(p)}</div>
+                <button class="btn-copiar" style="padding:8px 12px; font-size:14px; margin-top:8px;" onclick="copiarDetalhe(\`${montarPedidoCompleto(p).replace(/`/g, '\\`')}\`)">📋 Copiar</button>
+            </details>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+function copiarDetalhe(texto) {
+    navigator.clipboard.writeText(texto).then(() => alert('✅ Copiado!')).catch(() => {});
+}
+
+function alterarStatusPedido(id, novoStatus) {
+    referenciaPedidos.child(id).update({ status: novoStatus })
+        .then(() => console.log('✅ Status atualizado'))
+        .catch(e => console.error('❌ Erro:', e));
+}
+
+function excluirPedido(id) {
+    if (confirm("⚠️ Tem certeza que deseja excluir este pedido? Essa ação não pode ser desfeita!")) {
+        referenciaPedidos.child(id).remove()
+            .then(() => console.log('✅ Excluído'))
+            .catch(e => console.error('❌ Erro:', e));
+    }
+}
+
+window.onload = function() {
+    carregarDadosLojaSalvos();
+    if (localStorage.getItem('painelLogado') === 'sim') {
+        mostrarConteudoPainel();
+    }
+};
+</script>
+</body>
+    </html>
