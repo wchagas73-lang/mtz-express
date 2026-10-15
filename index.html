@@ -502,6 +502,7 @@ function escolherCaixinha(opcao) {
     const bloco = document.getElementById('caixinhaNatalBloco');
     
     aviso.style.display = 'none';
+    aviso.classList.remove('visivel');
     bloco.classList.remove('erro-preenchimento');
     
     if (opcao === 'sim') {
@@ -536,20 +537,24 @@ function atualizarValorComCaixinha() {
     document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
 
-function validarCaixinha() {
+function validarCaixinha(mensagemAlerta = true) {
     const escolha = document.querySelector('input[name="caixinhaNatal"]:checked');
     const aviso = document.getElementById('avisoEscolhaNatal');
     const bloco = document.getElementById('caixinhaNatalBloco');
     
     if (!escolha) {
         aviso.style.display = 'block';
+        aviso.classList.add('visivel');
         bloco.classList.add('erro-preenchimento');
         bloco.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        alert("⚠️ Atenção! Falta preencher:\n\n🎄 Caixinha de Natal\n\nPor favor, escolha se deseja contribuir — Sim ✨ ou Não, obrigado!");
+        if (mensagemAlerta) {
+            alert("⚠️ Atenção! Falta escolher a Caixinha de Natal:\n\n🎄 Escolha ✅ Sim ou ❌ Não, obrigado!\n\nÉ só clicar em uma das opções abaixo 👇");
+        }
         return false;
     }
     
     aviso.style.display = 'none';
+    aviso.classList.remove('visivel');
     bloco.classList.remove('erro-preenchimento');
     return true;
 }
@@ -645,198 +650,156 @@ async function copiarTextoPedido() {
     } catch {
         const ta = document.getElementById('textoPedidoCompleto');
         ta.select(); 
-        ta.setSelectionRange(0, 99999);
+                ta.setSelectionRange(0, 99999);
         ok = document.execCommand('copy');
     }
     if (ok) {
-                document.getElementById('msgCopiaSucesso').classList.remove('escondido');
+        document.getElementById('msgCopiaSucesso').classList.remove('escondido');
         setTimeout(()=>document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
     }
 }
 
 function verificarNavegadorApp() {
     const ua = navigator.userAgent;
-    const dentroApp = /Instagram|FB_IAB|FBAV|MicroMessenger|Line|Snapchat|TikTok/i.test(ua);
-    const aviso = document.getElementById('avisoNavegadorApp');
+    const dentroApp = /Instagram|FB_IAB|FBAV|MicroMessenger|Line|Snapchat|TikTok|Facebook|Messenger/i.test(ua);
     if (dentroApp) {
-        aviso.classList.remove('escondido');
-        alert("⚠️ Por favor, abra no navegador! Toque nos 3 pontinhos → 'Abrir no navegador'");
-        return false;
-    } else {
-        aviso.classList.add('escondido');
-        return true;
+        document.getElementById('avisoNavegadorApp').classList.remove('escondido');
     }
 }
 
-async function calcular() {
-    if (!verificarNavegadorApp()) return;
-    if (!googleCarregado) return;
+function calcular() {
+    if (!validarCaixinha(true)) return;
     
     const endLoja = document.getElementById('endLoja').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
     
     if (!endLoja || !endDest) {
-        alert("⚠️ Preencha os endereços de Origem e Destino primeiro!");
+        alert("⚠️ Preencha os endereços de Origem e Destino!");
+        return;
+    }
+    
+    if (!googleCarregado || !servicoDistancia) {
+        alert("⏳ Aguarde o Google Maps carregar e tente novamente.");
         return;
     }
     
     document.getElementById('areaCalculando').classList.remove('escondido');
-    document.getElementById('resumoPedido').classList.add('escondido');
     
-    const origemCompleta = `${limparParaMapa(endLoja)}, Juiz de Fora - MG, Brasil`;
-    const destinoCompleto = `${limparParaMapa(endDest)}, Juiz de Fora - MG, Brasil`;
+    const origem = `${endLoja}, Juiz de Fora - MG, Brasil`;
+    const destino = `${endDest}, Juiz de Fora - MG, Brasil`;
+    const retorno = document.querySelector('input[name="retorno"]:checked').value;
     
-    try {
-        const resposta = await servicoDistancia.getDistanceMatrix({
-            origins: [origemCompleta],
-            destinations: [destinoCompleto],
-            travelMode: google.maps.TravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC,
-            avoidHighways: false
-        });
+    servicoDistancia.getDistanceMatrix({
+        origins: [origem],
+        destinations: [destino],
+        travelMode: 'DRIVING',
+        unitSystem: google.maps.UnitSystem.METERS,
+        language: 'pt-BR'
+    }, function(resposta, status) {
+        document.getElementById('areaCalculando').classList.add('escondido');
         
-        if (resposta.rows[0].elements[0].status === 'OK') {
-            const kmReal = resposta.rows[0].elements[0].distance.value / 1000;
-            const kmArredondado = Math.ceil(kmReal);
-            const valorBase = buscarValorPorKm(kmArredondado);
-            
-            const retornoSim = document.querySelector('input[name="retorno"][value="sim"]').checked;
-            const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
-            const valorParcial = valorBase + valorRetorno;
-            
-            document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
-            document.getElementById('kmTotalArred').textContent = kmArredondado;
-            document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
-            
-            if (retornoSim) {
-                document.getElementById('linhaRetorno').classList.remove('escondido');
-                document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
-            } else {
-                document.getElementById('linhaRetorno').classList.add('escondido');
-            }
-            
-            document.getElementById('linhaCaixinha').classList.add('escondido');
-            document.getElementById('valTotal').textContent = `R$ ${valorParcial.toFixed(2).replace('.', ',')}`;
-            document.getElementById('resumoPedido').classList.remove('escondido');
-            
-            dadosPedidoAtual = { kmReal, kmArredondado, valorBase, valorRetorno };
-            
-        } else {
-            alert("⚠️ Não foi possível calcular a distância. Verifique os endereços.");
+        if (status !== 'OK' || !resposta.rows[0].elements[0] || resposta.rows[0].elements[0].status !== 'OK') {
+            alert("❌ Não consegui calcular a distância. Verifique os endereços.");
+            return;
         }
-    } catch (erro) {
-        console.error(erro);
-        alert("❌ Erro ao calcular distância. Tente novamente.");
-    }
-    
-    document.getElementById('areaCalculando').classList.add('escondido');
+        
+        const kmReal = resposta.rows[0].elements[0].distance.value / 1000;
+        const kmArredondado = Math.ceil(kmReal);
+        const valorBase = buscarValorPorKm(kmArredondado);
+        const valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
+        
+        dadosPedidoAtual = { kmReal, kmArredondado, valorBase, valorRetorno, retorno };
+        
+        document.getElementById('kmTotal').textContent = kmReal.toFixed(1);
+        document.getElementById('kmTotalArred').textContent = kmArredondado;
+        document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+        
+        if (retorno === 'sim') {
+            document.getElementById('linhaRetorno').classList.remove('escondido');
+            document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
+        } else {
+            document.getElementById('linhaRetorno').classList.add('escondido');
+        }
+        
+        atualizarValorComCaixinha();
+        document.getElementById('resumoPedido').classList.remove('escondido');
+    });
 }
 
 function gerarPedido() {
-    if (!validarCaixinha()) return;
+    if (!validarCaixinha(true)) return;
+    if (!dadosPedidoAtual) { alert("⚠️ Calcule o valor primeiro!"); return; }
     
     const nomeLoja = document.getElementById('nomeLoja').value.trim();
+    const contatoLoja = document.getElementById('contatoLoja').value.trim();
     const endLoja = document.getElementById('endLoja').value.trim();
     const nomeDest = document.getElementById('nomeDest').value.trim();
+    const contatoDest = document.getElementById('contatoDest').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
+    const refDest = document.getElementById('refDest').value.trim();
+    const retorno = document.querySelector('input[name="retorno"]:checked').value;
+    const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
+    const caixinhaNatal = document.querySelector('input[name="caixinhaNatal"]:checked').value;
+    const valorCaixinha = caixinhaNatal === 'sim' ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
     
     if (!nomeLoja || !endLoja || !nomeDest || !endDest) {
         alert("⚠️ Preencha todos os campos obrigatórios!");
         return;
     }
     
-    if (!dadosPedidoAtual) {
-        alert("⚠️ Clique primeiro em 'CALCULAR VALOR'!");
-        return;
-    }
-    
-    const retorno = document.querySelector('input[name="retorno"]:checked').value;
-    const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
-    const caixinhaNatal = document.querySelector('input[name="caixinhaNatal"]:checked')?.value || 'nao';
-    const valorCaixinha = caixinhaNatal === 'sim' ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
-    const refDest = document.getElementById('refDest').value.trim();
-    const contatoLoja = document.getElementById('contatoLoja').value.trim();
-    const contatoDest = document.getElementById('contatoDest').value.trim();
-    
-    const valorTotalComRetorno = dadosPedidoAtual.valorBase + dadosPedidoAtual.valorRetorno;
-    const valorFinal = valorTotalComRetorno + valorCaixinha;
-    
+    const valorFinal = dadosPedidoAtual.valorBase + dadosPedidoAtual.valorRetorno + valorCaixinha;
     const agora = new Date();
     const data = `${agora.getDate().toString().padStart(2,'0')}/${(agora.getMonth()+1).toString().padStart(2,'0')}/${agora.getFullYear()}`;
     const hora = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}`;
-    const idPedido = `${agora.getFullYear()}${(agora.getMonth()+1)}${agora.getDate()}-${agora.getHours()}${agora.getMinutes()}${agora.getSeconds()}`;
     
     const pedido = {
-        id: idPedido,
-        nomeLoja, endLoja, contatoLoja,
-        nomeDest, endDest, contatoDest, refDest,
+        nomeLoja, contatoLoja, endLoja, nomeDest, contatoDest, endDest, refDest,
         retorno, quemPaga, caixinhaNatal, valorCaixinha,
         kmReal: dadosPedidoAtual.kmReal,
         kmArredondado: dadosPedidoAtual.kmArredondado,
         valorBase: dadosPedidoAtual.valorBase,
         valorRetorno: dadosPedidoAtual.valorRetorno,
         valorFinal, data, hora,
-        status: 'pendente',
-        origem: detectarOrigem()
+        origem: detectarOrigem(), status: 'pendente'
     };
     
     textoPedidoGerado = montarPedidoCompleto(pedido);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
     document.getElementById('caixaCopia').classList.remove('escondido');
     
-    if (caixinhaNatal === 'sim') {
-        document.getElementById('linhaCaixinha').classList.remove('escondido');
-        document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
-    } else {
-        document.getElementById('linhaCaixinha').classList.add('escondido');
-    }
-    document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-    
-    document.getElementById('avisoIphone').classList.remove('escondido');
-    
-    referenciaPedidos.child(idPedido).set(pedido)
-        .then(() => console.log('✅ Pedido salvo:', idPedido))
-        .catch(e => console.error('❌ Erro ao salvar:', e));
-    
-    setTimeout(() => {
-        abrirWhatsAppDireto();
-    }, 500);
+    referenciaPedidos.push(pedido);
+    carregarPedidosPainel();
+    window.scrollTo({ top: document.getElementById('resumoPedido').offsetTop - 20, behavior: 'smooth' });
+}
+
+function abrirWhatsAppDireto() {
+    if (!textoPedidoGerado) return;
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank');
 }
 
 function refazerPedido() {
-    document.getElementById('nomeLoja').value = '';
-    document.getElementById('contatoLoja').value = '';
-    document.getElementById('endLoja').value = '';
-    document.getElementById('nomeDest').value = '';
-    document.getElementById('contatoDest').value = '';
-    document.getElementById('endDest').value = '';
-    document.getElementById('refDest').value = '';
-    document.getElementById('valorCaixinha').value = '';
-    
-    document.querySelectorAll('input[name="retorno"]')[1].checked = false;
-    document.querySelectorAll('input[name="retorno"]')[0].checked = true;
-    document.querySelectorAll('input[name="quemPaga"]')[0].checked = true;
-    document.querySelectorAll('input[name="caixinhaNatal"]').forEach(r => r.checked = false);
-    
-    document.getElementById('valorCaixinha').style.display = 'none';
-    document.getElementById('labelSimNatal').classList.remove('selecionado-sim');
-    document.getElementById('labelNaoNatal').classList.remove('selecionado-nao');
-    document.getElementById('avisoEscolhaNatal').style.display = 'none';
-    document.getElementById('caixinhaNatalBloco').classList.remove('erro-preenchimento');
-    
-    document.getElementById('resumoPedido').classList.add('escondido');
-    document.getElementById('caixaCopia').classList.add('escondido');
-    document.getElementById('avisoIphone').classList.add('escondido');
-    dadosPedidoAtual = null;
-    textoPedidoGerado = '';
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (confirm("🔄 Limpar tudo e começar um novo pedido?")) {
+        document.getElementById('nomeDest').value = '';
+        document.getElementById('contatoDest').value = '';
+        document.getElementById('endDest').value = '';
+        document.getElementById('refDest').value = '';
+        document.querySelector(`input[name="retorno"][value="nao"]`).checked = true;
+        document.getElementById('retornoNao').classList.add('selecionado');
+        document.getElementById('retornoSim').classList.remove('selecionado');
+        document.querySelectorAll('input[name="caixinhaNatal"]').forEach(r => r.checked = false);
+        escolherCaixinha('nao');
+        document.getElementById('valorCaixinha').value = '';
+        document.getElementById('resumoPedido').classList.add('escondido');
+        document.getElementById('caixaCopia').classList.add('escondido');
+        dadosPedidoAtual = null;
+        textoPedidoGerado = "";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 function verificarLoginPainel() {
     const usuario = document.getElementById('usuarioPainel').value.trim();
-    const senha = document.getElementById('senhaPainel').value.trim();
-    
+    const senha = document.getElementById('senhaPainel').value;
     if (usuario === USUARIO_ADMIN && senha === SENHA_ADMIN) {
         localStorage.setItem('painelLogado', 'sim');
         mostrarConteudoPainel();
@@ -848,7 +811,7 @@ function verificarLoginPainel() {
 function mostrarConteudoPainel() {
     document.getElementById('loginPainel').classList.add('escondido');
     document.getElementById('conteudoPainel').classList.remove('escondido');
-    carregarPedidos();
+    carregarPedidosPainel();
 }
 
 function sairPainel() {
@@ -860,183 +823,139 @@ function sairPainel() {
     document.getElementById('erroLoginPainel').classList.add('escondido');
 }
 
-function carregarPedidos() {
-    referenciaPedidos.on('value', (snapshot) => {
+function carregarPedidosPainel() {
+    referenciaPedidos.once('value').then(snapshot => {
         todosPedidosCarregados = snapshot.val() || {};
+        atualizarListaPedidos();
         atualizarResumoPainel();
-        aplicarFiltroPeriodo();
-        filtrarPedidos(filtroAtivo);
     });
+}
+
+function atualizarListaPedidos() {
+    const lista = document.getElementById('listaHistorico');
+    const itens = Object.entries(todosPedidosCarregados).reverse();
+    if (itens.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
+        return;
+    }
+    lista.innerHTML = itens.filter(([_, p]) => filtroAtivo === 'todos' || p.status === filtroAtivo).map(([id, p]) => {
+        const statusClasse = p.status === 'concluido' ? 'status-concluido' : p.status === 'cancelado' ? 'status-cancelado' : 'status-pendente';
+        const statusTexto = p.status === 'concluido' ? '✅ Concluído' : p.status === 'cancelado' ? '❌ Cancelado' : '⏳ Pendente';
+        return `<div class="item-pedido">
+            <strong>${p.data} ${p.hora}</strong> — ${p.nomeLoja || 'Sem nome'} → ${p.nomeDest || 'Sem destino'}
+            <br>💰 R$ ${(p.valorFinal || 0).toFixed(2).replace('.', ',')}
+            <span class="${statusClasse}"> — ${statusTexto}</span>
+            <div class="botoes-pedido">
+                <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'pendente')">⏳ Pendente</button>
+                <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'concluido')">✅ Concluído</button>
+                <button class="btn-alterar-status" onclick="alterarStatus('${id}', 'cancelado')">❌ Cancelado</button>
+                <button class="btn-excluir" onclick="excluirPedido('${id}')">🗑️ Excluir</button>
+            </div>
+            <details>
+                <summary style="color:#93C5FD; font-size:13px; cursor:pointer;">Ver detalhes</summary>
+                <div class="detalhes-pedido">${montarPedidoCompleto(p)}</div>
+            </details>
+        </div>`;
+    }).join('');
 }
 
 function atualizarResumoPainel() {
     const hoje = new Date();
-    const mesAtual = hoje.getMonth() + 1;
-    const anoAtual = hoje.getFullYear();
-    const diaHoje = hoje.getDate();
-    
+    const dataHoje = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
+    const mesAtual = hoje.getMonth(), anoAtual = hoje.getFullYear();
     let fatDia = 0, qtdDia = 0, fatMes = 0, qtdMes = 0;
-    
     Object.values(todosPedidosCarregados).forEach(p => {
-        if (p.status === 'cancelado') return;
-        const partesData = p.data.split('/');
-        const dia = parseInt(partesData[0]), mes = parseInt(partesData[1]), ano = parseInt(partesData[2]);
-        
-        if (mes === mesAtual && ano === anoAtual) {
-            fatMes += p.valorFinal || 0;
-            qtdMes++;
-            if (dia === diaHoje) {
-                fatDia += p.valorFinal || 0;
-                qtdDia++;
-            }
-        }
+        if (p.status !== 'concluido') return;
+        if (p.data === dataHoje) { fatDia += p.valorFinal || 0; qtdDia++; }
+        const [d, m, a] = p.data.split('/').map(Number);
+        if (m - 1 === mesAtual && a === anoAtual) { fatMes += p.valorFinal || 0; qtdMes++; }
     });
-    
     document.getElementById('fatDia').textContent = `R$ ${fatDia.toFixed(2).replace('.', ',')}`;
     document.getElementById('qtdDia').textContent = qtdDia;
     document.getElementById('fatMes').textContent = `R$ ${fatMes.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaEntrega').textContent = qtdMes > 0 ? `R$ ${(fatMes/qtdMes).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+    document.getElementById('mediaEntrega').textContent = qtdMes ? `R$ ${(fatMes/qtdMes).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
 }
 
-function calcularCaixinhaPorPeriodo() {
-    const dataInicial = document.getElementById('dataInicialCaixa').value;
-    const dataFinal = document.getElementById('dataFinalCaixa').value;
-    
-    if (!dataInicial || !dataFinal) {
-        alert("⚠️ Preencha as duas datas!");
-        return;
-    }
-    
-    const inicio = new Date(dataInicial + 'T00:00:00');
-    const fim = new Date(dataFinal + 'T23:59:59');
-    
-    let qtdCaixinha = 0, totalCaixinha = 0;
-    
-    Object.values(todosPedidosCarregados).forEach(p => {
-        if (!p.data) return;
-        const partes = p.data.split('/');
-        const dataPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
-        if (dataPedido >= inicio && dataPedido <= fim && p.caixinhaNatal === 'sim') {
-            qtdCaixinha++;
-            totalCaixinha += p.valorCaixinha || 0;
-        }
+function filtrarPedidos(filtro) {
+    filtroAtivo = filtro;
+    document.querySelectorAll('#btnFiltroTodos, #btnFiltroPendente, #btnFiltroConcluido, #btnFiltroCancelado').forEach(b => b.classList.remove('filtro-ativo'));
+    event.target.classList.add('filtro-ativo');
+    atualizarListaPedidos();
+}
+
+function alterarStatus(id, status) {
+    referenciaPedidos.child(id).update({ status }).then(() => {
+        todosPedidosCarregados[id].status = status;
+        atualizarListaPedidos();
+        atualizarResumoPainel();
     });
-    
-    document.getElementById('qtdCaixinha').textContent = qtdCaixinha;
-    document.getElementById('totalCaixinha').textContent = `R$ ${totalCaixinha.toFixed(2).replace('.', ',')}`;
-    document.getElementById('resultadoCaixinha').classList.remove('escondido');
+}
+
+function excluirPedido(id) {
+    if (confirm("🗑️ Tem certeza que deseja excluir este pedido?")) {
+        referenciaPedidos.child(id).remove().then(() => {
+            delete todosPedidosCarregados[id];
+            atualizarListaPedidos();
+            atualizarResumoPainel();
+        });
+    }
 }
 
 function aplicarFiltroPeriodo() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
-    
-    if (!dataInicial || !dataFinal) {
-        document.getElementById('resultadoPeriodo').classList.add('escondido');
-        return;
-    }
-    
-    const inicio = new Date(dataInicial + 'T00:00:00');
-    const fim = new Date(dataFinal + 'T23:59:59');
-    
-    let totalValor = 0, totalQtd = 0;
-    
+    if (!dataInicial || !dataFinal) { alert("Preencha as duas datas!"); return; }
+    const [anoI, mesI, diaI] = dataInicial.split('-').map(Number);
+    const [anoF, mesF, diaF] = dataFinal.split('-').map(Number);
+    const inicio = new Date(anoI, mesI - 1, diaI);
+    const fim = new Date(anoF, mesF - 1, diaF);
+    let total = 0, qtd = 0;
     Object.values(todosPedidosCarregados).forEach(p => {
-        if (!p.data || p.status === 'cancelado') return;
-        const partes = p.data.split('/');
-        const dataPedido = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
-        if (dataPedido >= inicio && dataPedido <= fim) {
-            totalQtd++;
-            totalValor += p.valorFinal || 0;
-        }
+        if (p.status !== 'concluido') return;
+        const [dia, mes, ano] = p.data.split('/').map(Number);
+        const dt = new Date(ano, mes - 1, dia);
+        if (dt >= inicio && dt <= fim) { total += p.valorFinal || 0; qtd++; }
     });
-    
-    document.getElementById('qtdPeriodo').textContent = totalQtd;
-    document.getElementById('fatPeriodo').textContent = `R$ ${totalValor.toFixed(2).replace('.', ',')}`;
-    document.getElementById('mediaPeriodo').textContent = totalQtd > 0 ? `R$ ${(totalValor/totalQtd).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+    document.getElementById('qtdPeriodo').textContent = qtd;
+    document.getElementById('fatPeriodo').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mediaPeriodo').textContent = qtd ? `R$ ${(total/qtd).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
     document.getElementById('resultadoPeriodo').classList.remove('escondido');
 }
 
-function filtrarPedidos(status) {
-    filtroAtivo = status;
-    document.querySelectorAll('#btnFiltroTodos, #btnFiltroPendente, #btnFiltroConcluido, #btnFiltroCancelado').forEach(b => b.classList.remove('filtro-ativo'));
-    event.target.classList.add('filtro-ativo');
-    
-    const lista = document.getElementById('listaHistorico');
-    lista.innerHTML = '';
-    
-    let pedidosFiltrados = Object.values(todosPedidosCarregados);
-    if (status !== 'todos') {
-        pedidosFiltrados = pedidosFiltrados.filter(p => p.status === status);
-    }
-    
-    pedidosFiltrados.sort((a, b) => (b.id || '').localeCompare(a.id || ''));
-    
-    if (pedidosFiltrados.length === 0) {
-        lista.innerHTML = '<p style="text-align:center; color:#9CA3AF; padding:20px;">Nenhum pedido encontrado.</p>';
-        return;
-    }
-    
-    pedidosFiltrados.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'item-pedido';
-        const classeStatus = p.status === 'pendente' ? 'status-pendente' : 
-                            p.status === 'concluido' ? 'status-concluido' : 'status-cancelado';
-        const textoStatus = p.status === 'pendente' ? '⏳ PENDENTE' : 
-                           p.status === 'concluido' ? '✅ CONCLUÍDO' : '❌ CANCELADO';
-        
-        div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
-                <div>
-                    <strong>${p.data} ${p.hora}</strong><br>
-                    📍 ${p.nomeDest || 'Sem nome'} — ${p.kmArredondado || '--'} km
-                </div>
-                <div>
-                    <strong style="color:var(--dourado); font-size:18px;">R$ ${(p.valorFinal||0).toFixed(2).replace('.', ',')}</strong><br>
-                    <span class="${classeStatus}">${textoStatus}</span>
-                </div>
-            </div>
-            <div class="botoes-pedido">
-                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'pendente')">⏳ Pendente</button>
-                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'concluido')">✅ Concluído</button>
-                <button class="btn-alterar-status" onclick="alterarStatusPedido('${p.id}', 'cancelado')">❌ Cancelado</button>
-                <button class="btn-excluir" onclick="excluirPedido('${p.id}')">🗑️ Excluir</button>
-            </div>
-            <details style="margin-top:8px;">
-                <summary style="color:var(--dourado); cursor:pointer;">📝 Ver detalhes</summary>
-                <div class="detalhes-pedido">${montarPedidoCompleto(p)}</div>
-                <button class="btn-copiar" style="padding:8px 12px; font-size:14px; margin-top:8px;" onclick="navigator.clipboard.writeText(\`${montarPedidoCompleto(p).replace(/`/g, '\\`')}\`).then(()=>alert('✅ Copiado!'))">📋 Copiar</button>
-            </details>
-        `;
-        lista.appendChild(div);
+function calcularCaixinhaPorPeriodo() {
+    const dataInicial = document.getElementById('dataInicialCaixa').value;
+    const dataFinal = document.getElementById('dataFinalCaixa').value;
+    if (!dataInicial || !dataFinal) { alert("Preencha as duas datas!"); return; }
+    const [anoI, mesI, diaI] = dataInicial.split('-').map(Number);
+    const [anoF, mesF, diaF] = dataFinal.split('-').map(Number);
+    const inicio = new Date(anoI, mesI - 1, diaI);
+    const fim = new Date(anoF, mesF - 1, diaF);
+    let total = 0, qtd = 0;
+    Object.values(todosPedidosCarregados).forEach(p => {
+        if (p.caixinhaNatal === 'sim') {
+            const [dia, mes, ano] = p.data.split('/').map(Number);
+            const dt = new Date(ano, mes - 1, dia);
+            if (dt >= inicio && dt <= fim) { total += p.valorCaixinha || 0; qtd++; }
+        }
     });
-}
-
-function alterarStatusPedido(id, novoStatus) {
-    referenciaPedidos.child(id).update({ status: novoStatus })
-        .then(() => console.log('✅ Status atualizado'))
-        .catch(e => console.error('❌ Erro:', e));
-}
-
-function excluirPedido(id) {
-    if (confirm("⚠️ Tem certeza que deseja excluir este pedido? Essa ação não pode ser desfeita!")) {
-        referenciaPedidos.child(id).remove()
-            .then(() => console.log('✅ Excluído'))
-            .catch(e => console.error('❌ Erro:', e));
-    }
-}
-
-function abrirWhatsAppDireto() {
-    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
-    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank', 'noopener,noreferrer');
+    document.getElementById('qtdCaixinha').textContent = qtd;
+    document.getElementById('totalCaixinha').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    document.getElementById('resultadoCaixinha').classList.remove('escondido');
 }
 
 window.onload = function() {
     carregarDadosLojaSalvos();
-    if (localStorage.getItem('painelLogado') === 'sim') {
-        mostrarConteudoPainel();
-    }
+    verificarNavegadorApp();
+    
+    document.getElementById('retornoNao').addEventListener('click', function() {
+        this.classList.add('selecionado');
+        document.getElementById('retornoSim').classList.remove('selecionado');
+    });
+    document.getElementById('retornoSim').addEventListener('click', function() {
+        this.classList.add('selecionado');
+        document.getElementById('retornoNao').classList.remove('selecionado');
+    });
 };
 </script>
 </body>
-</html>
+    </html>
