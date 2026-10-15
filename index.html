@@ -52,7 +52,6 @@
         .opcao-radio.selecionado-nao {border-color: var(--perigo); background: rgba(239, 68, 68, 0.15);}
         .opcao-radio input {width: auto; transform: scale(1.3);}
 
-        /* 🎄 CAIXINHA DE NATAL */
         .caixinha-natal {
             background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(220,38,38,0.08));
             border: 2px solid var(--dourado);
@@ -106,6 +105,7 @@
             font-size: 14px;
             margin-top: 12px;
             font-weight: 600;
+            display: none;
         }
         .caixinha-natal p#avisoEscolhaNatal.visivel {
             display: block;
@@ -176,10 +176,10 @@
 
             <div class="aviso-navegador-app escondido" id="avisoNavegadorApp">
                 ⚠️ <strong>AVISO IMPORTANTE:</strong> Não funciona dentro de redes sociais!<br>
-                Toque nos 3 pontinhos → "Abrir no navegador" ou "Abrir no Safari/Chrome" e refaça o pedido.
+                Toque nos 3 pontinhos → "Abrir no navegador" e refaça o pedido.
             </div>
 
-            <div class="aviso-iphone" id="avisoIphone">
+            <div class="aviso-iphone escondido" id="avisoIphone">
                 ✅ <strong>Pedido gerado!</strong> O WhatsApp vai abrir direto com o texto já pronto.<br>
                 💡 Se não abrir, use o botão abaixo — é só enviar!
             </div>
@@ -189,7 +189,6 @@
                 <button class="aba" onclick="mostrarAba('painel')">📊 Painel Gestão</button>
             </div>
 
-            <!-- ==================== ABA PEDIDO ==================== -->
             <div class="conteudo-aba visivel" id="abaLoja">
                 <div class="destaque-percurso">
                     📍 VALOR CALCULADO POR PERCURSO TOTAL<br>
@@ -235,15 +234,14 @@
                     <p><strong>✅ Retorno para a Origem?</strong></p>
                     <div class="opcoes-linha">
                         <label class="opcao-radio selecionado" id="retornoNao">
-                            <input type="radio" name="retorno" value="nao" checked onclick="calcular()"> Não
+                            <input type="radio" name="retorno" value="nao" checked onchange="calcular()"> Não
                         </label>
                         <label class="opcao-radio" id="retornoSim">
-                            <input type="radio" name="retorno" value="sim" onclick="calcular()"> Sim
+                            <input type="radio" name="retorno" value="sim" onchange="calcular()"> Sim
                         </label>
                     </div>
                 </div>
 
-                <!-- 🎄 CAIXINHA DE NATAL COM VALIDAÇÃO -->
                 <div class="caixinha-natal" id="caixinhaNatalBloco">
                     <p class="titulo-caixinha">
                         <span style="font-size: 22px;">🎄🎁</span>
@@ -254,16 +252,16 @@
                     </p>
                     <div class="opcoes-linha" style="justify-content: center; gap: 16px; flex-wrap: wrap;">
                         <label class="opcao-radio" id="labelNaoNatal">
-                            <input type="radio" name="caixinhaNatal" value="nao" onclick="escolherCaixinha('nao');">
+                            <input type="radio" name="caixinhaNatal" value="nao" onchange="escolherCaixinha('nao'); atualizarValorComCaixinha();">
                             ❌ Não, obrigado
                         </label>
                         <label class="opcao-radio" id="labelSimNatal">
-                            <input type="radio" name="caixinhaNatal" value="sim" onclick="escolherCaixinha('sim');">
+                            <input type="radio" name="caixinhaNatal" value="sim" onchange="escolherCaixinha('sim'); atualizarValorComCaixinha();">
                             ✅ Sim, quero contribuir!
                         </label>
                     </div>
-                    <input type="number" id="valorCaixinha" min="0" step="0.01" placeholder="💵 Digite o valor aqui — R$ 0,00">
-                    <p id="avisoEscolhaNatal">⚠️ Por favor, escolha se deseja contribuir com a Caixinha de Natal — Sim ou Não</p>
+                    <input type="number" id="valorCaixinha" min="0" step="0.01" placeholder="💵 Digite o valor aqui — R$ 0,00" oninput="atualizarValorComCaixinha();">
+                    <p id="avisoEscolhaNatal">⚠️ Por favor, escolha se deseja contribuir com a Caixinha de Natal — Sim ✨ ou Não, obrigado!</p>
                 </div>
 
                 <div class="caixa-pagamento" style="margin-top:20px;">
@@ -281,7 +279,7 @@
                 <div id="areaCalculando" class="carregando escondido">🔄 Calculando distância total com Google Maps...</div>
 
                 <div class="linha-botoes">
-                    <button class="btn btn-principal" onclick="calcular()">🧮 CALCULAR VALOR TOTAL</button>
+                    <button class="btn btn-principal" onclick="calcular()">🧮 CALCULAR VALOR</button>
                     <button class="btn btn-secundario" id="btnGerarPedido" onclick="gerarPedido()">✅ GERAR PEDIDO</button>
                 </div>
 
@@ -302,7 +300,7 @@
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
 
-                    <div class="caixa-texto-copia" id="caixaCopia">
+                    <div class="caixa-texto-copia escondido" id="caixaCopia">
                         <strong>📋 PEDIDO PRONTO:</strong>
                         <textarea id="textoPedidoCompleto" class="texto-copia" readonly></textarea>
                         
@@ -329,7 +327,6 @@
                 </div>
             </div>
 
-            <!-- ==================== ABA PAINEL DE GESTÃO ==================== -->
             <div class="conteudo-aba" id="abaPainel">
                 <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO</h2>
                 <div class="caixa-login" id="loginPainel">
@@ -361,7 +358,6 @@
                         </div>
                     </div>
 
-                    <!-- 🎄 CAIXINHA DE NATAL — FILTRO POR PERÍODO EDITÁVEL -->
                     <div class="bloco-caixinha">
                         <h3 style="color:var(--dourado); margin-bottom:15px;">🎄 CAIXINHA DE NATAL — Por Período</h3>
                         <div class="linha-dupla">
@@ -453,7 +449,51 @@ let textoPedidoGerado = "";
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
 
-// ===== 🎄 FUNÇÃO DA CAIXINHA DE NATAL =====
+function salvarDadosLojaAutomatico() {
+    localStorage.setItem('dadosLojaMTZ', JSON.stringify({
+        nome: document.getElementById('nomeLoja').value.trim(),
+        contato: document.getElementById('contatoLoja').value.trim(),
+        endereco: document.getElementById('endLoja').value.trim()
+    }));
+}
+
+function carregarDadosLojaSalvos() {
+    const d = localStorage.getItem('dadosLojaMTZ');
+    if (d) {
+        const l = JSON.parse(d);
+        if (l.nome) document.getElementById('nomeLoja').value = l.nome;
+        if (l.contato) document.getElementById('contatoLoja').value = l.contato;
+        if (l.endereco) document.getElementById('endLoja').value = l.endereco;
+    }
+}
+
+document.addEventListener('input', (e) => {
+    if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
+});
+
+function buscarValorPorKm(kmArredondado) {
+    const valoresFixos = {
+        1: 10, 2: 12, 3: 14, 4: 16, 5: 18, 6: 20, 7: 22, 8: 24, 9: 26, 10: 28
+    };
+    return valoresFixos[kmArredondado] || (10 + (kmArredondado - 1) * 2);
+}
+
+function iniciarGoogle() {
+    googleCarregado = true;
+    servicoDistancia = new google.maps.DistanceMatrixService();
+}
+
+function mostrarAba(nomeAba) {
+    document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+    document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
+    event.target.classList.add('ativa');
+    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
+    
+    if (nomeAba === 'painel' && localStorage.getItem('painelLogado') === 'sim') {
+        mostrarConteudoPainel();
+    }
+}
+
 function escolherCaixinha(opcao) {
     const valorInput = document.getElementById('valorCaixinha');
     const labelSim = document.getElementById('labelSimNatal');
@@ -461,13 +501,11 @@ function escolherCaixinha(opcao) {
     const aviso = document.getElementById('avisoEscolhaNatal');
     const bloco = document.getElementById('caixinhaNatalBloco');
     
-    // Remove destaque de erro quando o usuário escolher uma opção
     aviso.style.display = 'none';
     bloco.classList.remove('erro-preenchimento');
     
     if (opcao === 'sim') {
         valorInput.style.display = 'block';
-        valorInput.focus();
         labelSim.classList.add('selecionado-sim');
         labelNao.classList.remove('selecionado-nao');
     } else {
@@ -476,9 +514,28 @@ function escolherCaixinha(opcao) {
         labelNao.classList.add('selecionado-nao');
         labelSim.classList.remove('selecionado-sim');
     }
+    atualizarValorComCaixinha();
 }
 
-// ===== ✅ VALIDAÇÃO OBRIGATÓRIA DA CAIXINHA =====
+function atualizarValorComCaixinha() {
+    if (!dadosPedidoAtual) return;
+    
+    const escolha = document.querySelector('input[name="caixinhaNatal"]:checked');
+    let valorCaixinha = 0;
+    
+    if (escolha && escolha.value === 'sim') {
+        valorCaixinha = parseFloat(document.getElementById('valorCaixinha').value) || 0;
+        document.getElementById('linhaCaixinha').classList.remove('escondido');
+        document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
+    } else {
+        document.getElementById('linhaCaixinha').classList.add('escondido');
+        valorCaixinha = 0;
+    }
+    
+    const total = dadosPedidoAtual.valorBase + dadosPedidoAtual.valorRetorno + valorCaixinha;
+    document.getElementById('valTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
 function validarCaixinha() {
     const escolha = document.querySelector('input[name="caixinhaNatal"]:checked');
     const aviso = document.getElementById('avisoEscolhaNatal');
@@ -582,75 +639,32 @@ function montarPedidoCompleto(pedido) {
 async function copiarTextoPedido() {
     if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
     let ok = false;
-    try { await navigator.clipboard.writeText(textoPedidoGerado); ok = true; }
-    catch {
+    try { 
+        await navigator.clipboard.writeText(textoPedidoGerado); 
+        ok = true; 
+    } catch {
         const ta = document.getElementById('textoPedidoCompleto');
-        ta.select(); ta.setSelectionRange(0, 99999);
+        ta.select(); 
+        ta.setSelectionRange(0, 99999);
         ok = document.execCommand('copy');
     }
     if (ok) {
-        document.getElementById('msgCopiaSucesso').classList.remove('escondido');
+                document.getElementById('msgCopiaSucesso').classList.remove('escondido');
         setTimeout(()=>document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
-    } else alert("⚠️ Copie manualmente o texto.");
-}
-
-function abrirWhatsAppDireto() {
-    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
-    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank', 'noopener,noreferrer');
+    }
 }
 
 function verificarNavegadorApp() {
-    if (/instagram|fbav|facebook|tiktok|messenger|line|snapchat/i.test(navigator.userAgent.toLowerCase())) {
-        document.getElementById('avisoNavegadorApp').classList.remove('escondido');
+    const ua = navigator.userAgent;
+    const dentroApp = /Instagram|FB_IAB|FBAV|MicroMessenger|Line|Snapchat|TikTok/i.test(ua);
+    const aviso = document.getElementById('avisoNavegadorApp');
+    if (dentroApp) {
+        aviso.classList.remove('escondido');
+        alert("⚠️ Por favor, abra no navegador! Toque nos 3 pontinhos → 'Abrir no navegador'");
         return false;
-    }
-    return true;
-}
-
-function salvarDadosLojaAutomatico() {
-    localStorage.setItem('dadosLojaMTZ', JSON.stringify({
-        nome: document.getElementById('nomeLoja').value.trim(),
-        contato: document.getElementById('contatoLoja').value.trim(),
-        endereco: document.getElementById('endLoja').value.trim()
-    }));
-}
-
-function carregarDadosLojaSalvos() {
-    const d = localStorage.getItem('dadosLojaMTZ');
-    if (d) {
-        const l = JSON.parse(d);
-        if (l.nome) document.getElementById('nomeLoja').value = l.nome;
-        if (l.contato) document.getElementById('contatoLoja').value = l.contato;
-        if (l.endereco) document.getElementById('endLoja').value = l.endereco;
-    }
-}
-
-document.addEventListener('input', (e) => {
-    if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
-});
-
-// ✅ TABELA DE PREÇOS
-function buscarValorPorKm(kmArredondado) {
-    const valoresFixos = {
-        1: 10, 2: 12, 3: 13, 4: 14, 5: 15, 6: 20, 7: 22, 8: 26, 9: 28, 10: 30
-    };
-    return valoresFixos[kmArredondado] || (10 + (kmArredondado - 1) * 3);
-}
-
-function iniciarGoogle() {
-    googleCarregado = true;
-    servicoDistancia = new google.maps.DistanceMatrixService();
-    calcular();
-}
-
-function mostrarAba(nomeAba) {
-    document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
-    document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
-    event.target.classList.add('ativa');
-    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
-    
-    if (nomeAba === 'painel' && localStorage.getItem('painelLogado') === 'sim') {
-        mostrarConteudoPainel();
+    } else {
+        aviso.classList.add('escondido');
+        return true;
     }
 }
 
@@ -661,7 +675,10 @@ async function calcular() {
     const endLoja = document.getElementById('endLoja').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
     
-    if (!endLoja || !endDest) return;
+    if (!endLoja || !endDest) {
+        alert("⚠️ Preencha os endereços de Origem e Destino primeiro!");
+        return;
+    }
     
     document.getElementById('areaCalculando').classList.remove('escondido');
     document.getElementById('resumoPedido').classList.add('escondido');
@@ -685,6 +702,7 @@ async function calcular() {
             
             const retornoSim = document.querySelector('input[name="retorno"][value="sim"]').checked;
             const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
+            const valorParcial = valorBase + valorRetorno;
             
             document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
             document.getElementById('kmTotalArred').textContent = kmArredondado;
@@ -697,7 +715,12 @@ async function calcular() {
                 document.getElementById('linhaRetorno').classList.add('escondido');
             }
             
+            document.getElementById('linhaCaixinha').classList.add('escondido');
+            document.getElementById('valTotal').textContent = `R$ ${valorParcial.toFixed(2).replace('.', ',')}`;
+            document.getElementById('resumoPedido').classList.remove('escondido');
+            
             dadosPedidoAtual = { kmReal, kmArredondado, valorBase, valorRetorno };
+            
         } else {
             alert("⚠️ Não foi possível calcular a distância. Verifique os endereços.");
         }
@@ -723,7 +746,7 @@ function gerarPedido() {
     }
     
     if (!dadosPedidoAtual) {
-        alert("⚠️ Clique primeiro em 'CALCULAR VALOR TOTAL'!");
+        alert("⚠️ Clique primeiro em 'CALCULAR VALOR'!");
         return;
     }
     
@@ -759,6 +782,7 @@ function gerarPedido() {
     
     textoPedidoGerado = montarPedidoCompleto(pedido);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
+    document.getElementById('caixaCopia').classList.remove('escondido');
     
     if (caixinhaNatal === 'sim') {
         document.getElementById('linhaCaixinha').classList.remove('escondido');
@@ -768,12 +792,15 @@ function gerarPedido() {
     }
     document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
     
-    document.getElementById('resumoPedido').classList.remove('escondido');
-    document.getElementById('resumoPedido').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('avisoIphone').classList.remove('escondido');
     
     referenciaPedidos.child(idPedido).set(pedido)
         .then(() => console.log('✅ Pedido salvo:', idPedido))
         .catch(e => console.error('❌ Erro ao salvar:', e));
+    
+    setTimeout(() => {
+        abrirWhatsAppDireto();
+    }, 500);
 }
 
 function refazerPedido() {
@@ -798,10 +825,11 @@ function refazerPedido() {
     document.getElementById('caixinhaNatalBloco').classList.remove('erro-preenchimento');
     
     document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('caixaCopia').classList.add('escondido');
+    document.getElementById('avisoIphone').classList.add('escondido');
     dadosPedidoAtual = null;
     textoPedidoGerado = '';
     
-    document.querySelector('.aba.ativa').click();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -977,15 +1005,11 @@ function filtrarPedidos(status) {
             <details style="margin-top:8px;">
                 <summary style="color:var(--dourado); cursor:pointer;">📝 Ver detalhes</summary>
                 <div class="detalhes-pedido">${montarPedidoCompleto(p)}</div>
-                <button class="btn-copiar" style="padding:8px 12px; font-size:14px; margin-top:8px;" onclick="copiarDetalhe(\`${montarPedidoCompleto(p).replace(/`/g, '\\`')}\`)">📋 Copiar</button>
+                <button class="btn-copiar" style="padding:8px 12px; font-size:14px; margin-top:8px;" onclick="navigator.clipboard.writeText(\`${montarPedidoCompleto(p).replace(/`/g, '\\`')}\`).then(()=>alert('✅ Copiado!'))">📋 Copiar</button>
             </details>
         `;
         lista.appendChild(div);
     });
-}
-
-function copiarDetalhe(texto) {
-    navigator.clipboard.writeText(texto).then(() => alert('✅ Copiado!')).catch(() => {});
 }
 
 function alterarStatusPedido(id, novoStatus) {
@@ -1002,6 +1026,11 @@ function excluirPedido(id) {
     }
 }
 
+function abrirWhatsAppDireto() {
+    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank', 'noopener,noreferrer');
+}
+
 window.onload = function() {
     carregarDadosLojaSalvos();
     if (localStorage.getItem('painelLogado') === 'sim') {
@@ -1010,4 +1039,4 @@ window.onload = function() {
 };
 </script>
 </body>
-    </html>
+</html>
