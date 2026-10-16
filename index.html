@@ -428,7 +428,7 @@
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwPteUqAxzWCVDlNl8nJKv4L4F3h5iEeI&libraries=places&callback=iniciarGoogle"></script>
 
 <script>
-    const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCmo13EeupO_WIU6yqXH2E9pQ6TzrQ0wV4",
   authDomain: "mtz-express-fcd0b.firebaseapp.com",
   databaseURL: "https://mtz-express-fcd0b-default-rtdb.firebaseio.com",
@@ -442,7 +442,6 @@ firebase.initializeApp(firebaseConfig);
 const banco = firebase.database();
 const referenciaPedidos = banco.ref('pedidos');
 
-// ✅ LOGIN E SENHA CORRIGIDOS
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
@@ -641,14 +640,24 @@ function iniciarGoogle() {
     servicoDistancia = new google.maps.DistanceMatrixService();
 }
 
+// ✅ SEMPRE MOSTRA TELA DE LOGIN AO CLICAR NO PAINEL
 function mostrarAba(nomeAba) {
     document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
     document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
     event.target.classList.add('ativa');
-    document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
     
-    if (nomeAba === 'painel' && localStorage.getItem('painelLogado') === 'sim') {
-        mostrarConteudoPainel();
+    if (nomeAba === 'painel') {
+        // ✅ NUNCA ENTRA AUTOMATICAMENTE — SEMPRE PEDE LOGIN
+        document.getElementById('abaPainel').classList.add('visivel');
+        document.getElementById('loginPainel').style.display = 'block';
+        document.getElementById('conteudoPainel').classList.add('escondido');
+        document.getElementById('erroLoginPainel').classList.add('escondido');
+        document.getElementById('usuarioPainel').value = '';
+        document.getElementById('senhaPainel').value = '';
+        // ✅ LIMPA QUALQUER ACESSO SALVO ANTERIORMENTE
+        localStorage.removeItem('painelLogado');
+    } else {
+        document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('visivel');
     }
 }
 
@@ -729,7 +738,6 @@ async function calcular() {
                 origem: detectarOrigem()
             };
             
-            // ✅ PREENCHE TUDO NO RESUMO
             document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
             document.getElementById('kmTotalArred').textContent = kmArredondado + ' km';
             document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
@@ -749,13 +757,6 @@ async function calcular() {
             }
             
             document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-            
-            // ✅ MOSTRA QUEM PAGA
-            const textoQuemPaga = quemPaga.value === 'lojista' 
-                ? '🏪 Quem envia (Origem)' 
-                : '👤 Quem recebe (Destino)';
-            
-            // ✅ MOSTRA O RESUMO COMPLETO
             document.getElementById('resumoPedido').classList.remove('escondido');
             document.getElementById('resumoPedido').scrollIntoView({ behavior: 'smooth' });
             
@@ -770,7 +771,6 @@ async function calcular() {
     document.getElementById('areaCalculando').classList.add('escondido');
 }
 
-// ✅ GERAR PEDIDO — ABRE WHATSAPP AUTOMÁTICO
 function gerarPedido() {
     if (!validarCaixinha()) return;
     
@@ -821,15 +821,12 @@ function gerarPedido() {
     textoPedidoGerado = montarPedidoCompleto(pedido);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
     
-    // ✅ MOSTRA A CAIXA DE COPIAR/WHATSAPP
     document.getElementById('caixaCopia').classList.remove('escondido');
     
-    // ✅ SALVA NO FIREBASE
     referenciaPedidos.child(idPedido).set(pedido)
         .then(() => console.log('✅ Pedido salvo:', idPedido))
         .catch(e => console.error('❌ Erro ao salvar:', e));
     
-    // ✅ ABRE WHATSAPP AUTOMATICAMENTE
     setTimeout(() => {
         abrirWhatsAppDireto();
     }, 300);
@@ -865,28 +862,19 @@ function refazerPedido() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ✅ LOGIN CORRIGIDO — usuario: mtz2026  senha: 1120
+// ✅ LOGIN — SEMPRE PEDE USUÁRIO E SENHA
 function verificarLoginPainel() {
     const usuario = document.getElementById('usuarioPainel').value.trim();
     const senha = document.getElementById('senhaPainel').value.trim();
     
-    console.log("🔑 Tentando login — Usuário:", usuario, "Senha:", senha);
-    
     if (usuario === USUARIO_ADMIN && senha === SENHA_ADMIN) {
-        console.log("✅ Login bem-sucedido!");
-        localStorage.setItem('painelLogado', 'sim');
         document.getElementById('erroLoginPainel').classList.add('escondido');
-        mostrarConteudoPainel();
+        document.getElementById('loginPainel').style.display = 'none';
+        document.getElementById('conteudoPainel').classList.remove('escondido');
+        carregarPedidos();
     } else {
-        console.log("❌ Login falhou!");
         document.getElementById('erroLoginPainel').classList.remove('escondido');
     }
-}
-
-function mostrarConteudoPainel() {
-    document.getElementById('loginPainel').style.display = 'none';
-    document.getElementById('conteudoPainel').classList.remove('escondido');
-    carregarPedidos();
 }
 
 function sairPainel() {
@@ -896,6 +884,11 @@ function sairPainel() {
     document.getElementById('usuarioPainel').value = '';
     document.getElementById('senhaPainel').value = '';
     document.getElementById('erroLoginPainel').classList.add('escondido');
+    // ✅ Volta para a aba principal ao sair
+    document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+    document.querySelector('.aba').classList.add('ativa');
+    document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
+    document.getElementById('abaPrincipal').classList.add('visivel');
 }
 
 function carregarPedidos() {
@@ -995,33 +988,17 @@ function aplicarFiltroPeriodo() {
     document.getElementById('resultadoPeriodo').classList.remove('escondido');
 }
 
-// ✅ FUNÇÃO CORRIGIDA — ALTERAR STATUS DO PEDIDO
 function alterarStatusPedido(id, novoStatus) {
-    console.log("🔄 Alterando pedido:", id, "para:", novoStatus);
     referenciaPedidos.child(id).update({ status: novoStatus })
-        .then(() => {
-            console.log('✅ Status atualizado para:', novoStatus);
-            alert(`✅ Pedido marcado como: ${novoStatus.toUpperCase()}`);
-        })
-        .catch(e => {
-            console.error('❌ Erro:', e);
-            alert("❌ Erro ao atualizar: " + e.message);
-        });
+        .then(() => alert(`✅ Pedido marcado como: ${novoStatus.toUpperCase()}`))
+        .catch(e => alert("❌ Erro: " + e.message));
 }
 
-// ✅ FUNÇÃO CORRIGIDA — EXCLUIR PEDIDO
 function excluirPedido(id) {
     if (confirm("⚠️ Tem certeza que deseja EXCLUIR este pedido? Essa ação NÃO pode ser desfeita!")) {
-        console.log("🗑️ Excluindo pedido:", id);
         referenciaPedidos.child(id).remove()
-            .then(() => {
-                console.log('✅ Pedido excluído com sucesso!');
-                alert("✅ Excluído com sucesso!");
-            })
-            .catch(e => {
-                console.error('❌ Erro:', e);
-                alert("❌ Erro ao excluir: " + e.message);
-            });
+            .then(() => alert("✅ Excluído com sucesso!"))
+            .catch(e => alert("❌ Erro: " + e.message));
     }
 }
 
@@ -1088,8 +1065,8 @@ function filtrarPedidos(status) {
 
 window.onload = function() {
     carregarDadosLojaSalvos();
-    if (localStorage.getItem('painelLogado') === 'sim') {
-        mostrarConteudoPainel();
-    }
+    // ✅ NÃO entra automaticamente no painel — SEMPRE pede login
+    localStorage.removeItem('painelLogado');
 };
 </script>
+    
