@@ -509,11 +509,16 @@ function escolherCaixinha(opcao) {
         valorInput.style.display = 'block';
         labelSim.classList.add('selecionado-sim');
         labelNao.classList.remove('selecionado-nao');
-    } else {
+    } else if (opcao === 'nao') {
         valorInput.style.display = 'none';
         valorInput.value = '';
         labelNao.classList.add('selecionado-nao');
         labelSim.classList.remove('selecionado-sim');
+    } else if (opcao === 'reset') {
+        valorInput.style.display = 'none';
+        valorInput.value = '';
+        labelSim.classList.remove('selecionado-sim');
+        labelNao.classList.remove('selecionado-nao');
     }
     atualizarValorComCaixinha();
 }
@@ -644,18 +649,18 @@ function montarPedidoCompleto(pedido) {
 async function copiarTextoPedido() {
     if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
     let ok = false;
-    try { 
-        await navigator.clipboard.writeText(textoPedidoGerado); 
-        ok = true; 
+    try {
+        await navigator.clipboard.writeText(textoPedidoGerado);
+        ok = true;
     } catch {
         const ta = document.getElementById('textoPedidoCompleto');
-        ta.select(); 
-                ta.setSelectionRange(0, 99999);
+        ta.select();
+        ta.setSelectionRange(0, 99999);
         ok = document.execCommand('copy');
     }
     if (ok) {
         document.getElementById('msgCopiaSucesso').classList.remove('escondido');
-        setTimeout(()=>document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
+        setTimeout(() => document.getElementById('msgCopiaSucesso').classList.add('escondido'), 3000);
     }
 }
 
@@ -664,6 +669,9 @@ function verificarNavegadorApp() {
     const dentroApp = /Instagram|FB_IAB|FBAV|MicroMessenger|Line|Snapchat|TikTok|Facebook|Messenger/i.test(ua);
     if (dentroApp) {
         document.getElementById('avisoNavegadorApp').classList.remove('escondido');
+    }
+    if (/iPhone|iPad|iPod/.test(ua)) {
+        document.getElementById('avisoIphone').classList.remove('escondido');
     }
 }
 
@@ -769,6 +777,9 @@ function gerarPedido() {
     
     referenciaPedidos.push(pedido);
     carregarPedidosPainel();
+    
+    abrirWhatsAppDireto();
+    
     window.scrollTo({ top: document.getElementById('resumoPedido').offsetTop - 20, behavior: 'smooth' });
 }
 
@@ -787,7 +798,7 @@ function refazerPedido() {
         document.getElementById('retornoNao').classList.add('selecionado');
         document.getElementById('retornoSim').classList.remove('selecionado');
         document.querySelectorAll('input[name="caixinhaNatal"]').forEach(r => r.checked = false);
-        escolherCaixinha('nao');
+        escolherCaixinha('reset');
         document.getElementById('valorCaixinha').value = '';
         document.getElementById('resumoPedido').classList.add('escondido');
         document.getElementById('caixaCopia').classList.add('escondido');
@@ -955,7 +966,11 @@ window.onload = function() {
         this.classList.add('selecionado');
         document.getElementById('retornoNao').classList.remove('selecionado');
     });
+    
+    if (localStorage.getItem('painelLogado') === 'sim') {
+        mostrarConteudoPainel();
+    }
 };
 </script>
 </body>
-    </html>
+</html>
