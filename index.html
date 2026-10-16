@@ -461,7 +461,6 @@ function escolherCaixinha(opcao) {
     const aviso = document.getElementById('avisoEscolhaNatal');
     const bloco = document.getElementById('caixinhaNatalBloco');
     
-    // Remove destaque de erro quando o usuário escolher uma opção
     aviso.style.display = 'none';
     bloco.classList.remove('erro-preenchimento');
     
@@ -488,7 +487,7 @@ function validarCaixinha() {
         aviso.style.display = 'block';
         bloco.classList.add('erro-preenchimento');
         bloco.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        alert("⚠️ Atenção! Falta preencher:\n\n🎄 Caixinha de Natal\n\nPor favor, escolha se deseja contribuir — Sim ✨ ou Não, obrigado!");
+        alert("⚠️ Atenção! Por favor, escolha se deseja contribuir com a Caixinha de Natal — Sim ou Não!");
         return false;
     }
     
@@ -595,7 +594,7 @@ async function copiarTextoPedido() {
 }
 
 function abrirWhatsAppDireto() {
-    if (!textoPedidoGerado) { alert("⚠️ Gere o pedido primeiro!"); return; }
+    if (!textoPedidoGerado) { alert("⚠️ Calcule e gere o pedido primeiro!"); return; }
     window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`, '_blank', 'noopener,noreferrer');
 }
 
@@ -629,7 +628,6 @@ document.addEventListener('input', (e) => {
     if (['nomeLoja','contatoLoja','endLoja'].includes(e.target.id)) salvarDadosLojaAutomatico();
 });
 
-// ✅ TABELA DE PREÇOS
 function buscarValorPorKm(kmArredondado) {
     const valoresFixos = {
         1: 10, 2: 12, 3: 13, 4: 14, 5: 15, 6: 20, 7: 22, 8: 26, 9: 28, 10: 30
@@ -640,7 +638,6 @@ function buscarValorPorKm(kmArredondado) {
 function iniciarGoogle() {
     googleCarregado = true;
     servicoDistancia = new google.maps.DistanceMatrixService();
-    calcular();
 }
 
 function mostrarAba(nomeAba) {
@@ -654,17 +651,36 @@ function mostrarAba(nomeAba) {
     }
 }
 
+// ✅ CALCULAR — MOSTRA RESUMO COMPLETO
 async function calcular() {
     if (!verificarNavegadorApp()) return;
-    if (!googleCarregado) return;
+    if (!googleCarregado) {
+        alert("⏳ Aguarde um instante e clique novamente!");
+        return;
+    }
     
     const endLoja = document.getElementById('endLoja').value.trim();
     const endDest = document.getElementById('endDest').value.trim();
     
-    if (!endLoja || !endDest) return;
+    if (!endLoja || !endDest) {
+        alert("⚠️ Preencha os endereços de Origem e Destino!");
+        return;
+    }
+    
+    if (!validarCaixinha()) return;
+    
+    const quemPaga = document.querySelector('input[name="quemPaga"]:checked');
+    if (!quemPaga) {
+        alert("⚠️ Selecione quem vai pagar a entrega!");
+        return;
+    }
+    
+    const retornoEl = document.querySelector('input[name="retorno"]:checked');
+    const retorno = retornoEl ? retornoEl.value : 'nao';
     
     document.getElementById('areaCalculando').classList.remove('escondido');
     document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('caixaCopia').classList.add('escondido');
     
     const origemCompleta = `${limparParaMapa(endLoja)}, Juiz de Fora - MG, Brasil`;
     const destinoCompleto = `${limparParaMapa(endDest)}, Juiz de Fora - MG, Brasil`;
@@ -682,22 +698,70 @@ async function calcular() {
             const kmReal = resposta.rows[0].elements[0].distance.value / 1000;
             const kmArredondado = Math.ceil(kmReal);
             const valorBase = buscarValorPorKm(kmArredondado);
+            const valorRetorno = retorno === 'sim' ? valorBase * 0.5 : 0;
             
-            const retornoSim = document.querySelector('input[name="retorno"][value="sim"]').checked;
-            const valorRetorno = retornoSim ? valorBase * 0.5 : 0;
+            const caixinhaEscolha = document.querySelector('input[name="caixinhaNatal"]:checked').value;
+            const valorCaixinha = caixinhaEscolha === 'sim' ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
             
+            const valorFinal = valorBase + valorRetorno + valorCaixinha;
+            
+            dadosPedidoAtual = {
+                nomeLoja: document.getElementById('nomeLoja').value.trim(),
+                contatoLoja: document.getElementById('contatoLoja').value.trim(),
+                endLoja,
+                nomeDest: document.getElementById('nomeDest').value.trim(),
+                contatoDest: document.getElementById('contatoDest').value.trim(),
+                endDest,
+                refDest: document.getElementById('refDest').value.trim(),
+                retorno,
+                caixinhaNatal: caixinhaEscolha,
+                valorCaixinha,
+                quemPaga: quemPaga.value,
+                kmReal,
+                kmArredondado,
+                valorBase,
+                valorRetorno,
+                valorFinal,
+                status: 'pendente',
+                data: new Date().toLocaleDateString('pt-BR'),
+                hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+                origem: detectarOrigem()
+            };
+            
+            // ✅ PREENCHE TUDO NO RESUMO
             document.getElementById('kmTotal').textContent = kmReal.toFixed(1).replace('.', ',');
-            document.getElementById('kmTotalArred').textContent = kmArredondado;
+            document.getElementById('kmTotalArred').textContent = kmArredondado + ' km';
             document.getElementById('valorTotalEntregas').textContent = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
             
-            if (retornoSim) {
+            if (retorno === 'sim') {
                 document.getElementById('linhaRetorno').classList.remove('escondido');
                 document.getElementById('valRetorno').textContent = `R$ ${valorRetorno.toFixed(2).replace('.', ',')}`;
             } else {
                 document.getElementById('linhaRetorno').classList.add('escondido');
             }
             
-            dadosPedidoAtual = { kmReal, kmArredondado, valorBase, valorRetorno };
+            if (caixinhaEscolha === 'sim' && valorCaixinha > 0) {
+                document.getElementById('linhaCaixinha').classList.remove('escondido');
+                document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
+            } else {
+                document.getElementById('linhaCaixinha').classList.add('escondido');
+            }
+            
+            document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+            
+            // ✅ MOSTRA QUEM PAGA
+            const textoQuemPaga = quemPaga.value === 'lojista' 
+                ? '🏪 Quem envia (Origem)' 
+                : '👤 Quem recebe (Destino)';
+            
+            // ✅ ATUALIZA O RESUMO COMPLETO
+            const resumoDiv = document.getElementById('resumoPedido');
+            resumoDiv.querySelector('.pagamento').style.display = 'block';
+            
+            // ✅ MOSTRA O RESUMO COMPLETO
+            document.getElementById('resumoPedido').classList.remove('escondido');
+            document.getElementById('resumoPedido').scrollIntoView({ behavior: 'smooth' });
+            
         } else {
             alert("⚠️ Não foi possível calcular a distância. Verifique os endereços.");
         }
@@ -709,6 +773,7 @@ async function calcular() {
     document.getElementById('areaCalculando').classList.add('escondido');
 }
 
+// ✅ GERAR PEDIDO — ABRE WHATSAPP AUTOMÁTICO
 function gerarPedido() {
     if (!validarCaixinha()) return;
     
@@ -729,14 +794,13 @@ function gerarPedido() {
     
     const retorno = document.querySelector('input[name="retorno"]:checked').value;
     const quemPaga = document.querySelector('input[name="quemPaga"]:checked').value;
-    const caixinhaNatal = document.querySelector('input[name="caixinhaNatal"]:checked')?.value || 'nao';
+    const caixinhaNatal = document.querySelector('input[name="caixinhaNatal"]:checked').value;
     const valorCaixinha = caixinhaNatal === 'sim' ? parseFloat(document.getElementById('valorCaixinha').value) || 0 : 0;
     const refDest = document.getElementById('refDest').value.trim();
     const contatoLoja = document.getElementById('contatoLoja').value.trim();
     const contatoDest = document.getElementById('contatoDest').value.trim();
     
-    const valorTotalComRetorno = dadosPedidoAtual.valorBase + dadosPedidoAtual.valorRetorno;
-    const valorFinal = valorTotalComRetorno + valorCaixinha;
+    const valorFinal = dadosPedidoAtual.valorFinal;
     
     const agora = new Date();
     const data = `${agora.getDate().toString().padStart(2,'0')}/${(agora.getMonth()+1).toString().padStart(2,'0')}/${agora.getFullYear()}`;
@@ -760,20 +824,18 @@ function gerarPedido() {
     textoPedidoGerado = montarPedidoCompleto(pedido);
     document.getElementById('textoPedidoCompleto').value = textoPedidoGerado;
     
-    if (caixinhaNatal === 'sim') {
-        document.getElementById('linhaCaixinha').classList.remove('escondido');
-        document.getElementById('valCaixinhaRes').textContent = `R$ ${valorCaixinha.toFixed(2).replace('.', ',')}`;
-    } else {
-        document.getElementById('linhaCaixinha').classList.add('escondido');
-    }
-    document.getElementById('valTotal').textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+    // ✅ MOSTRA A CAIXA DE COPIAR/WHATSAPP
+    document.getElementById('caixaCopia').classList.remove('escondido');
     
-    document.getElementById('resumoPedido').classList.remove('escondido');
-    document.getElementById('resumoPedido').scrollIntoView({ behavior: 'smooth' });
-    
+    // ✅ SALVA NO FIREBASE
     referenciaPedidos.child(idPedido).set(pedido)
         .then(() => console.log('✅ Pedido salvo:', idPedido))
         .catch(e => console.error('❌ Erro ao salvar:', e));
+    
+    // ✅ ABRE WHATSAPP AUTOMATICAMENTE
+    setTimeout(() => {
+        abrirWhatsAppDireto();
+    }, 300);
 }
 
 function refazerPedido() {
@@ -798,10 +860,11 @@ function refazerPedido() {
     document.getElementById('caixinhaNatalBloco').classList.remove('erro-preenchimento');
     
     document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('caixaCopia').classList.add('escondido');
+    document.getElementById('avisoIphone').style.display = 'none';
     dadosPedidoAtual = null;
     textoPedidoGerado = '';
     
-    document.querySelector('.aba.ativa').click();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1010,4 +1073,4 @@ window.onload = function() {
 };
 </script>
 </body>
-    </html>
+</html>
