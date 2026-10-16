@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTZ EXPRESS | Entregas — Juiz de Fora-MG</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -436,6 +439,7 @@ let dadosPedidoAtual = null;
 let textoPedidoGerado = "";
 let filtroAtivo = 'todos';
 let todosPedidosCarregados = {};
+let estaLogadoPainel = false;
 
 // ===== 🎁 CAIXINHA DE NATAL =====
 function mostrarValorNatal() {
@@ -648,10 +652,9 @@ function calcularDistanciaGoogle(origem, destino) {
     });
 }
 
-// ✅ FUNÇÃO CORRIGIDA
 function mostrarAba(nome) {
     document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
-        event.target.classList.add('ativa');
+    event.target.classList.add('ativa');
     document.querySelectorAll('.conteudo-aba').forEach(d => d.classList.remove('visivel'));
     document.getElementById('aba' + nome.charAt(0).toUpperCase() + nome.slice(1)).classList.add('visivel');
     
@@ -660,8 +663,6 @@ function mostrarAba(nome) {
         document.getElementById('conteudoPainel').classList.add('escondido');
     }
 }
-
-let estaLogadoPainel = false;
 
 function verificarLoginPainel() {
     const usuario = document.getElementById('usuarioPainel').value.trim().toLowerCase();
@@ -762,7 +763,6 @@ async function calcular() {
         }
         
         document.getElementById('valTotal').textContent = 'R$ ' + valorFinal.toFixed(2).replace('.', ',');
-        document.getElementById('resumoPedido').classList.remove('escondido');
         
     } catch (erro) {
         alert(erro);
@@ -788,6 +788,13 @@ function gerarPedido() {
     novaRef.set(dadosPedidoAtual).then(() => {
         console.log("✅ Pedido salvo!");
     }).catch(err => console.error("Erro:", err));
+    
+    document.getElementById('resumoPedido').classList.remove('escondido');
+    
+    setTimeout(() => {
+        const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }, 500);
     
     if (detectarOrigem() === 'iPhone') {
         document.getElementById('avisoIphone').style.display = 'block';
@@ -955,4 +962,4 @@ function calcularCaixinhaPorPeriodo() {
 }
 </script>
 </body>
-</html>
+    </html>
