@@ -32,8 +32,8 @@
         .dados-rapidos strong {color: var(--dourado);}
 
         .aviso-navegador-app {background: rgba(220,53,69,0.15); border: 2px solid var(--perigo); border-radius: 14px; padding: 12px; margin: 15px 0; font-size: 14px; color: #FCA5A5; font-weight: 600;}
-        .aviso-iphone {background: rgba(59,130,246,0.1); border: 2px solid var(--azul); border-radius: 14px; padding: 15px; margin: 15px 0; font-size: 15px; color: #93C5FD; font-weight: 600; line-height: 1.6;}
-        .caixa-texto-copia {background: rgba(0,200,150,0.08); border: 2px dashed var(--primaria); border-radius: 14px; padding: 15px; margin: 15px 0;}
+        .aviso-iphone {background: rgba(59,130,246,0.1); border: 2px solid var(--azul); border-radius: 14px; padding: 15px; margin: 15px 0; font-size: 15px; color: #93C5FD; font-weight: 600; line-height: 1.6; display: none;}
+        .caixa-texto-copia {background: rgba(0,200,150,0.08); border: 2px dashed var(--primaria); border-radius: 14px; padding: 15px; margin: 15px 0; display: none;}
         .texto-copia {width: 100%; min-height: 180px; background: rgba(0,0,0,0.3); border: 1px solid var(--borda); border-radius: 10px; padding: 12px; color: white; font-size: 13px; line-height: 1.6; white-space: pre-wrap; resize: vertical; margin: 10px 0;}
         .escondido {display: none !important;}
 
@@ -113,7 +113,7 @@
         @keyframes aparecer {from{opacity:0; transform: translateY(15px);} to{opacity:1; transform: translateY(0);}}
         
         .bloco-entrega {background: rgba(59,130,246,0.06); border: 2px solid var(--azul); border-radius: 20px; padding: 22px; margin: 25px 0; position: relative;}
-        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2;}
+        .resumo {background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(0,200,150,0.05)); border: 2px solid var(--dourado); border-radius: 22px; padding: 26px; margin: 25px 0; line-height: 2; display: none;}
         .resumo-completo {background: rgba(59,130,246,0.08); border: 2px solid var(--azul); border-radius: 16px; padding: 18px; margin: 12px 0; font-size: 14px; line-height: 1.8; white-space: pre-wrap;}
         .mensagem-parceria {background: rgba(255,215,0,0.12); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px; margin: 20px 0; text-align: center; font-weight: 700; font-size: 17px; color: #FFF8C1;}
         .pagamento {background: rgba(0,200,150,0.1); border: 2px solid var(--primaria); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: center;}
@@ -165,8 +165,7 @@
             </div>
 
             <div class="aviso-iphone" id="avisoIphone">
-                ✅ <strong>Pedido gerado!</strong> O WhatsApp vai abrir direto com o texto já pronto.<br>
-                💡 Se não abrir, use o botão abaixo — é só enviar!
+                ✅ <strong>Pedido gerado!</strong> Se o WhatsApp não abriu automaticamente, use os botões abaixo 👇
             </div>
 
             <div class="abas">
@@ -220,10 +219,10 @@
                     <p><strong>✅ Retorno para a Origem?</strong></p>
                     <div class="opcoes-linha">
                         <label class="opcao-radio" id="opNaoRetorno">
-                            <input type="radio" name="retorno" value="nao" onclick="calcular()"> Não
+                            <input type="radio" name="retorno" value="nao"> Não
                         </label>
                         <label class="opcao-radio" id="opSimRetorno">
-                            <input type="radio" name="retorno" value="sim" onclick="calcular()"> Sim
+                            <input type="radio" name="retorno" value="sim"> Sim
                         </label>
                     </div>
                 </div>
@@ -244,7 +243,7 @@
                             <input type="radio" name="caixinhaNatal" value="sim" onclick="mostrarValorNatal()"> ✅ Sim, com alegria!
                         </label>
                     </div>
-                    <input type="number" id="valorCaixinhaNatal" min="0" step="0.01" placeholder="💛 Digite o valor aqui..." oninput="calcular()">
+                    <input type="number" id="valorCaixinhaNatal" min="0" step="0.01" placeholder="💛 Digite o valor aqui...">
                     <p id="avisoEscolhaNatal">⚠️ Por favor, escolha uma opção acima</p>
                 </div>
 
@@ -269,8 +268,9 @@
 
                 <button class="btn btn-perigo" style="width:100%; margin-top:10px;" onclick="refazerPedido()">🔄 LIMPAR / NOVO PEDIDO</button>
 
-                <div class="resumo escondido" id="resumoPedido">
-                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO • CÁLCULO TOTAL</h3>
+                <!-- ✅ RESUMO APARECE AQUI APÓS CALCULAR -->
+                <div class="resumo" id="resumoPedido">
+                    <h3 style="color:var(--dourado); text-align:center; font-size:22px; margin-bottom:20px;">📑 RESUMO DO PEDIDO</h3>
                     
                     <div style="background:rgba(0,200,150,0.15); border:2px solid var(--primaria); border-radius:12px; padding:12px; margin:15px 0; font-weight:700;">
                         📏 KM TOTAL: <span id="kmTotal">--</span> km<br>
@@ -283,21 +283,9 @@
                     
                     <hr>
                     <p style="font-size:24px; font-weight:900; color:var(--dourado); text-align:center;">💰 VALOR FINAL: <span id="valTotal">--</span></p>
-
-                    <div class="caixa-texto-copia" id="caixaCopia">
-                        <strong>📋 PEDIDO PRONTO:</strong>
-                        <textarea id="textoPedidoCompleto" class="texto-copia" readonly></textarea>
-                        
-                        <button class="btn-whatsapp" id="btnAbrirWhatsApp" onclick="abrirWhatsAppDireto()">💬 ABRIR WHATSAPP ✅</button>
-                        <p style="font-size:13px; color:var(--primaria); margin:8px 0;">👉 O texto já aparece lá dentro! É só enviar!</p>
-                        
-                        <button class="btn-copiar" onclick="copiarTextoPedido()">📋 COPIAR (se preferir)</button>
-                        <p id="msgCopiaSucesso" class="sucesso-copia escondido">✅ COPIADO COM SUCESSO!</p>
-                    </div>
-
-                    <div class="mensagem-parceria">
-                        💪🏿 Agradecemos pela confiança! 📸<br>
-                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels! 🤳🏿
+                    
+                    <div style="background:rgba(59,130,246,0.08); border:2px solid var(--azul); border-radius:12px; padding:15px; margin:15px 0;">
+                        <p><strong>💳 Quem paga:</strong> <span id="textoQuemPaga">Selecione acima</span></p>
                     </div>
 
                     <div class="pagamento">
@@ -306,7 +294,23 @@
                         <p>🔑 Chave Pix: <strong>(32) 9 9995-3215</strong></p>
                         <p>👤 Recebedor: Wellington Chagas Aleixo</p>
                         <p>🏦 Banco: Nu Pagamentos S.A.</p>
-                        <p>💬 Envie o comprovante pelo WhatsApp!</p>
+                    </div>
+
+                    <!-- ✅ CAIXA DE COPIAR/WHATSAPP MANUAL — SÓ APARECE APÓS GERAR PEDIDO -->
+                    <div class="caixa-texto-copia" id="caixaCopia">
+                        <strong>📋 PEDIDO PRONTO:</strong>
+                        <textarea id="textoPedidoCompleto" class="texto-copia" readonly></textarea>
+                        
+                        <button class="btn-whatsapp" id="btnAbrirWhatsApp" onclick="abrirWhatsAppDireto()">💬 ABRIR WHATSAPP</button>
+                        <p style="font-size:13px; color:var(--primaria); margin:8px 0;">👉 Se não abriu automaticamente, é só clicar aqui!</p>
+                        
+                        <button class="btn-copiar" onclick="copiarTextoPedido()">📋 COPIAR TEXTO</button>
+                        <p id="msgCopiaSucesso" class="sucesso-copia escondido">✅ COPIADO COM SUCESSO!</p>
+                    </div>
+
+                    <div class="mensagem-parceria">
+                        💪🏿 Agradecemos pela confiança! 📸<br>
+                        Siga nosso Instagram @mtzexpresss — sua loja vai aparecer em breve nos nossos Stories e Reels! 🤳🏿
                     </div>
                 </div>
             </div>
@@ -315,7 +319,6 @@
             <div class="conteudo-aba" id="abaPainel">
                 <h2 style="text-align:center; color:var(--dourado); margin-bottom:20px;">🔐 PAINEL DE GESTÃO</h2>
                 
-                <!-- TELA DE LOGIN -- SEMPRE VISÍVEL INICIALMENTE -->
                 <div class="caixa-login" id="loginPainel" style="display:block;">
                     <label>Usuário</label>
                     <input type="text" id="usuarioPainel" placeholder="Digite seu usuário">
@@ -325,7 +328,6 @@
                     <button class="btn btn-principal" style="width:100%; margin-top:20px;" onclick="verificarLoginPainel()">ENTRAR</button>
                 </div>
 
-                <!-- CONTEÚDO PROTEGIDO -- ESCONDIDO INICIALMENTE -->
                 <div class="escondido" id="conteudoPainel">
                     <div class="sair-btn">
                         <button class="btn-sair" onclick="sairPainel()">🚪 Sair</button>
@@ -428,7 +430,6 @@ firebase.initializeApp(firebaseConfig);
 const banco = firebase.database();
 const referenciaPedidos = banco.ref('pedidos');
 
-// 🔐 DADOS DE ACESSO
 const USUARIO_ADMIN = "mtz2026";
 const SENHA_ADMIN = "1120";
 const NUMERO_WHATSAPP = "5532999953215";
@@ -578,7 +579,7 @@ async function copiarTextoPedido() {
 
 function abrirWhatsAppDireto() {
     if (!textoPedidoGerado) { 
-        alert("⚠️ Gere o pedido primeiro!"); 
+        alert("⚠️ Calcule e gere o pedido primeiro!"); 
         return; 
     }
     const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`;
@@ -646,8 +647,8 @@ function calcularDistanciaGoogle(origem, destino) {
             travelMode: 'DRIVING', unitSystem: google.maps.UnitSystem.METRIC
         }, (resp, status) => {
             if (status === "OK" && resp.rows[0].elements[0].status === "OK") {
-                sucesso(resp.rows[0].elements[0].distance.value / 1000);
-            } else erro("❌ Endereço não encontrado! Confira o preenchimento.");
+                            sucesso(resp.rows[0].elements[0].distance.value / 1000);
+        } else erro("❌ Endereço não encontrado! Confira o preenchimento.");
         });
     });
 }
@@ -706,7 +707,8 @@ async function calcular() {
     const retorno = retornoEl ? retornoEl.value : 'nao';
     
     document.getElementById('areaCalculando').classList.remove('escondido');
-    document.getElementById('resumoPedido').classList.add('escondido');
+    document.getElementById('resumoPedido').classList.remove('escondido');
+    document.getElementById('caixaCopia').classList.add('escondido');
     
     try {
         const kmReal = await calcularDistanciaGoogle(endLoja, endDest);
@@ -763,6 +765,7 @@ async function calcular() {
         }
         
         document.getElementById('valTotal').textContent = 'R$ ' + valorFinal.toFixed(2).replace('.', ',');
+        document.getElementById('textoQuemPaga').textContent = quemPaga.value === 'lojista' ? '🏪 Quem envia (Origem)' : '👤 Quem recebe (Destino)';
         
     } catch (erro) {
         alert(erro);
@@ -789,7 +792,7 @@ function gerarPedido() {
         console.log("✅ Pedido salvo!");
     }).catch(err => console.error("Erro:", err));
     
-    document.getElementById('resumoPedido').classList.remove('escondido');
+    document.getElementById('caixaCopia').classList.remove('escondido');
     
     setTimeout(() => {
         const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(textoPedidoGerado)}`;
@@ -962,4 +965,4 @@ function calcularCaixinhaPorPeriodo() {
 }
 </script>
 </body>
-    </html>
+</html>
